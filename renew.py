@@ -2,6 +2,7 @@
 
   python renew.py whop-check                 # is the Whop login still valid? opens an issue if not
   python renew.py whop-save FILE             # store the refreshed Whop session (rotated cookies)
+  python renew.py save SECRET FILE           # store any refreshed credential file (e.g. YT_COOKIES)
   python renew.py instagram [--min-age 7]    # refresh the 60-day Instagram tokens, store the new ones
 
 Storing needs the SECRETS_PAT secret (fine-grained token: this repo, "Secrets: read and write").
@@ -24,8 +25,12 @@ def set_secret(name: str, value: str) -> bool:
     if not pat:
         print(f"::warning::SECRETS_PAT not set - can't store the renewed {name}")
         return False
-    subprocess.run(["gh", "secret", "set", name, "--repo", REPO], input=value.encode(), check=True,
-                   env={**os.environ, "GH_TOKEN": pat}, capture_output=True)
+    r = subprocess.run(["gh", "secret", "set", name, "--repo", REPO], input=value.encode(),
+                       env={**os.environ, "GH_TOKEN": pat}, capture_output=True)
+    if r.returncode:  # gh's error text never contains the secret value
+        print(f"::warning::could not store {name}: {r.stderr.decode(errors='replace').strip()[:300]} "
+              "(SECRETS_PAT needs access to this repo with 'Secrets: Read and write')")
+        return False
     print(f"stored renewed {name}")
     return True
 
@@ -69,9 +74,9 @@ def whop_check() -> int:
     return 0
 
 
-def whop_save(file: str) -> int:
+def save(name: str, file: str) -> int:
     if os.path.exists(file) and os.path.getsize(file) > 100:
-        set_secret("WHOP_SESSION", open(file, encoding="utf-8").read())
+        set_secret(name, open(file, encoding="utf-8").read())
     return 0
 
 
@@ -108,7 +113,9 @@ if __name__ == "__main__":
     if cmd == "whop-check":
         sys.exit(whop_check())
     if cmd == "whop-save":
-        sys.exit(whop_save(rest[0]))
+        sys.exit(save("WHOP_SESSION", rest[0]))
+    if cmd == "save":
+        sys.exit(save(rest[0], rest[1]))
     if cmd == "instagram":
         sys.exit(instagram(int(rest[1]) if rest[:1] == ["--min-age"] else 7))
     sys.exit(f"unknown: {cmd}")

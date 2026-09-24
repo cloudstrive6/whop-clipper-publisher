@@ -85,6 +85,7 @@ jobs:
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           PUBLISHER_DIR: ${{ github.workspace }}
           QUEUE_RELEASE: queue
+          YT_COOKIES: ${{ secrets.YT_COOKIES }}   # optional: a throwaway Google account's youtube.com cookies
         run: |
           if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
             echo "::error::CLAUDE_CODE_OAUTH_TOKEN secret missing (run 'claude setup-token' on the PC)"; exit 1
@@ -93,6 +94,10 @@ jobs:
             gh release create queue --title "clip queue" --notes "Videos waiting to be posted. Managed by the workflows."
           printf '%s' "$WHOP_SESSION" > "$RUNNER_TEMP/whop_session.json"
           export WHOP_SESSION_FILE="$RUNNER_TEMP/whop_session.json"
+          if [ -n "$YT_COOKIES" ]; then
+            printf '%s' "$YT_COOKIES" > "$RUNNER_TEMP/yt_cookies.txt"
+            export YT_COOKIES_FILE="$RUNNER_TEMP/yt_cookies.txt"
+          fi
           cd producer
           python -u -m clipper produce
 
@@ -100,7 +105,9 @@ jobs:
         if: always()
         env:
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
-        run: python renew.py whop-save "$RUNNER_TEMP/whop_session.json"
+        run: |
+          python renew.py whop-save "$RUNNER_TEMP/whop_session.json"
+          python renew.py save YT_COOKIES "$RUNNER_TEMP/yt_cookies.txt"   # yt-dlp refreshes them as it goes
 
       - name: Save held clips for review
         if: always()
