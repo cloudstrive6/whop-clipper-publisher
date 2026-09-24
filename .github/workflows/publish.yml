@@ -1,0 +1,83 @@
+name: publish
+
+# Fired by cron-job.org (repository_dispatch) at each time slot, because GitHub's own cron drops runs.
+# The schedule below is a safety net that runs slightly later and skips anything already posted.
+on:
+  repository_dispatch:
+    types: [publish-youtube, publish-instagram, publish-tiktok, publish-all]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: youtube | instagram | tiktok | all
+        default: all
+      dry_run:
+        description: "true to simulate"
+        default: "false"
+  schedule:
+    # backup slots, 30 min after the primary cron-job.org calls (UTC)
+    - cron: "30 1,7,13,19 * * *"
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Work out which platform this run handles
+        id: which
+        run: |
+          EVENT="${{ github.event.action }}"
+          case "$EVENT" in
+            publish-youtube)   P=youtube ;;
+            publish-instagram) P=instagram ;;
+            publish-tiktok)    P=tiktok ;;
+            publish-all)       P=all ;;
+            *)                 P="${{ github.event.inputs.platform || 'all' }}" ;;
+          esac
+          echo "platform=$P" >> "$GITHUB_OUTPUT"
+
+      - name: Publish and submit
+        env:
+          YOUTUBE_TOKEN_YT_POGINGPANDA: ${{ secrets.YOUTUBE_TOKEN_YT_POGINGPANDA }}
+          YOUTUBE_TOKEN_YT_ERICKNOX: ${{ secrets.YOUTUBE_TOKEN_YT_ERICKNOX }}
+          YOUTUBE_TOKEN_YT_MANIFESTATION: ${{ secrets.YOUTUBE_TOKEN_YT_MANIFESTATION }}
+          INSTAGRAM_TOKENS: ${{ secrets.INSTAGRAM_TOKENS }}
+          POSTFORME_API_KEY: ${{ secrets.POSTFORME_API_KEY }}
+          WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
+        run: |
+          python publish.py --platform "${{ steps.which.outputs.platform }}" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Save proof screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission-proof-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Record what was posted
+        if: always()
+        run: |
+          git config user.name "whop-clipper"
+          git config user.email "bot@users.noreply.github.com"
+          git add state/posts.json
+          git diff --staged --quiet || git commit -m "posted: $(date -u +%FT%TZ)"
+          git pull --rebase --autostash || true
+          git push || true

@@ -1,0 +1,116 @@
+targets:
+- id: yt_pogingpanda
+  label: YouTube Shorts (@PogingPanda)
+  platform: youtube
+  handle: '@PogingPanda'
+  niches:
+  - gaming
+  - esports
+  - movies_tv
+  - entertainment
+  auto_post: true
+  token_env: YOUTUBE_TOKEN_YT_POGINGPANDA
+- id: yt_ericknox
+  label: YouTube Shorts (@ericknox2802)
+  platform: youtube
+  handle: '@ericknox2802'
+  niches:
+  - crypto
+  - finance
+  auto_post: true
+  token_env: YOUTUBE_TOKEN_YT_ERICKNOX
+- id: yt_manifestation
+  label: YouTube Shorts (@modernmanifestationsecrets)
+  platform: youtube
+  handle: '@modernmanifestationsecrets'
+  niches:
+  - manifestation
+  - selfimprovement
+  - lifestyle
+  auto_post: true
+  token_env: YOUTUBE_TOKEN_YT_MANIFESTATION
+- id: ig_kiwinoygamer
+  label: Instagram Reels (@kiwinoygamer)
+  platform: instagram
+  handle: kiwinoygamer
+  ig_user_id: ''
+  niches:
+  - gaming
+  - esports
+  - movies_tv
+  - entertainment
+  auto_post: true
+- id: ig_cryptohustler
+  label: Instagram Reels (@iamcryptohustler)
+  platform: instagram
+  handle: iamcryptohustler
+  ig_user_id: ''
+  niches:
+  - crypto
+  - finance
+  auto_post: true
+- id: ig_manifestation
+  label: Instagram Reels (@modernmanifestationsecrets)
+  platform: instagram
+  handle: modernmanifestationsecrets
+  niches:
+  - manifestation
+  - selfimprovement
+  - lifestyle
+  auto_post: true
+- id: tt_cryptohustler
+  label: TikTok draft (@iamcryptohustler)
+  platform: tiktok
+  handle: iamcryptohustler
+  postforme_external_id: whop-crypto
+  niches:
+  - crypto
+  - finance
+  auto_post: true
+- id: tt_mnfsttnsecrets
+  label: TikTok draft (@mnfsttnsecrets)
+  platform: tiktok
+  handle: mnfsttnsecrets
+  postforme_external_id: whop-manifestation
+  niches:
+  - manifestation
+  - selfimprovement
+  - lifestyle
+  auto_post: true
+- id: x_mostviewedclips
+  label: X (@MostViewedClips)
+  platform: x
+  handle: MostViewedClips
+  niches:
+  - gaming
+  - esports
+  - entertainment
+  - movies_tv
+  auto_post: false
+- id: x_cryptoericknox
+  label: X (@cryptoericknox)
+  platform: x
+  handle: cryptoericknox
+  niches:
+  - crypto
+  - finance
+  auto_post: false
+cadence:
+  youtube:
+    per_day: 4
+    spacing_hours: 6
+  instagram:
+    per_day: 3
+    spacing_hours: 8
+  tiktok:
+    per_day: 4
+    spacing_hours: 6
+youtube:
+  privacy_on_upload: public
+  post_window_et:
+  - 12
+  - 22
+  geo_location: New York, NY
+  category_id: '24'
+whop:
+  submit_deadline_minutes: 60

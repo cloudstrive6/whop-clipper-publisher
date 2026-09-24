@@ -1,0 +1,5 @@
+google-api-python-client==2.200.0
+google-auth-oauthlib==1.2.3
+post-for-me
+playwright==1.63.0
+PyYAML
