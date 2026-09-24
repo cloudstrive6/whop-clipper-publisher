@@ -1,7 +1,7 @@
 """Cloud publisher: post one queued clip per account, then submit it on Whop.
 
-Runs on GitHub Actions, fired by cron-job.org (one call per time slot). No GPU, no AI, no rendering:
-everything creative was decided locally and approved before the clip entered the queue.
+Runs on GitHub Actions, fired by cron-job.org (one call per time slot). No AI, no rendering: every clip
+was made and compliance-audited by the producer (producer/, daily) before it entered the queue.
 
   python publish.py --platform youtube          # every account on that platform, one clip each
   python publish.py --platform tiktok --account tt_cryptohustler
@@ -10,6 +10,8 @@ everything creative was decided locally and approved before the clip entered the
 import argparse
 import json
 import os
+import shutil
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -17,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 QUEUE = ROOT / "queue"
 STATE = ROOT / "state" / "posts.json"
+RELEASE = "queue"  # cloud-made clips live as assets of this GitHub release, not in git
 
 
 def now() -> str:
@@ -69,11 +72,30 @@ def next_clip(state: dict, target: dict, clips: list[dict]) -> dict | None:
     return max(eligible, key=lambda c: c.get("score", 0), default=None)
 
 
+def ensure_video(clip: dict) -> None:
+    if clip["file"].exists() or not clip.get("video_asset"):
+        return
+    subprocess.run(["gh", "release", "download", RELEASE, "-p", clip["video_asset"], "-D", str(clip["dir"]),
+                    "--clobber"], cwd=ROOT, check=True)
+    (clip["dir"] / clip["video_asset"]).rename(clip["file"])
+
+
+def retire_finished(state: dict, clips: list[dict]) -> None:
+    """A clip posted to every one of its accounts leaves the queue (and its release asset is deleted)."""
+    for c in clips:
+        if all(already_posted(state, c["clip_id"], t) for t in c.get("targets", [])):
+            if c.get("video_asset"):
+                subprocess.run(["gh", "release", "delete-asset", RELEASE, c["video_asset"], "-y"], cwd=ROOT)
+            shutil.rmtree(c["dir"], ignore_errors=True)
+            print(f"retired {c['clip_id']} (posted everywhere)")
+
+
 def post_clip(clip: dict, target: dict, cfg: dict, dry: bool) -> tuple[str, str, str]:
     """Returns (status, url, note)."""
     caption = clip["caption"]
     if dry:
         return "dry_run", "", f"would post {clip['clip_id']} to {target['label']}"
+    ensure_video(clip)
     if target["platform"] == "youtube":
         import platforms.youtube as yt
 
@@ -154,6 +176,8 @@ def main() -> int:
                 print(f"  whop submission error: {err.__class__.__name__}: {err}")
                 exit_code = 1
             save_state(state)
+    if not args.dry_run:
+        retire_finished(state, clips)
     return exit_code
 
 

@@ -1,0 +1,127 @@
+name: produce
+
+# Daily, PC off: scout -> read briefs + reference docs -> join -> download footage -> clip
+# -> compliance audit -> auto-approve only clips cleared for unattended posting -> queue for publish.yml.
+on:
+  schedule:
+    - cron: "0 8 * * *"      # 08:00 UTC = 04:00 ET, so fresh clips are queued before the first posting slot
+  repository_dispatch:
+    types: [produce]         # cron-job.org can fire this too (GitHub's own cron sometimes skips runs)
+  workflow_dispatch:
+
+concurrency:
+  group: produce
+  cancel-in-progress: false
+
+permissions:
+  contents: write            # commits the producer database + queue metadata; uploads clips to the release
+  issues: write              # alerts (expired Whop login, token refresh failures) arrive as emailed issues
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            producer/requirements.txt
+            requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install ffmpeg, fonts, Claude Code, Python deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fontconfig > /dev/null
+          mkdir -p ~/.local/share/fonts
+          curl -fsSL -o ~/.local/share/fonts/ArchivoBlack-Regular.ttf \
+            https://github.com/google/fonts/raw/main/ofl/archivoblack/ArchivoBlack-Regular.ttf
+          fc-cache -f > /dev/null
+          npm install -g @anthropic-ai/claude-code > /dev/null
+          pip install -q -r requirements.txt -r producer/requirements.txt
+          python -m playwright install --with-deps chromium > /dev/null
+
+      - name: Restore footage and transcripts from earlier runs
+        uses: actions/cache@v4
+        with:
+          path: producer/data/campaigns/*/sources
+          key: sources-${{ github.run_id }}
+          restore-keys: sources-
+
+      - name: Restore whisper model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-small-base-v1
+
+      - name: Check the Whop login (alerts you by issue if it expired)
+        continue-on-error: true    # already-joined campaigns can still be clipped without it
+        env:
+          WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
+          SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python renew.py whop-check
+
+      - name: Renew Instagram tokens (each one weekly)
+        env:
+          INSTAGRAM_TOKENS: ${{ secrets.INSTAGRAM_TOKENS }}
+          SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python renew.py instagram
+
+      - name: Produce clips
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
+          PUBLISHER_DIR: ${{ github.workspace }}
+          QUEUE_RELEASE: queue
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN secret missing (run 'claude setup-token' on the PC)"; exit 1
+          fi
+          gh release view queue > /dev/null 2>&1 || \
+            gh release create queue --title "clip queue" --notes "Videos waiting to be posted. Managed by the workflows."
+          printf '%s' "$WHOP_SESSION" > "$RUNNER_TEMP/whop_session.json"
+          export WHOP_SESSION_FILE="$RUNNER_TEMP/whop_session.json"
+          cd producer
+          python -u -m clipper produce
+
+      - name: Keep Whop's refreshed login
+        if: always()
+        env:
+          SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
+        run: python renew.py whop-save "$RUNNER_TEMP/whop_session.json"
+
+      - name: Save held clips for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clips-${{ github.run_id }}
+          path: |
+            producer/data/campaigns/*/clips/*.mp4
+            producer/data/campaigns/*/clips/*_sheet.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Record results
+        if: always()
+        run: |
+          git config user.name "whop-clipper"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A queue producer/data   # footage/renders are gitignored
+          if git diff --staged --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "produced: $(date -u +%FT%TZ)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep 5
+          done
+          echo "::error::could not push producer state"; exit 1

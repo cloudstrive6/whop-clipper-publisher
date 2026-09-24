@@ -1,19 +1,19 @@
-# Whop clipper — cloud publisher
+# Whop clipper — cloud producer + publisher
 
-Posts already-approved clips to YouTube / Instagram / TikTok on a schedule, then submits each post
-on Whop inside the campaign's deadline. Runs on GitHub Actions, so it works while your PC is off.
+Everything runs on GitHub Actions, so it works while your PC is off.
 
-Clips are **produced locally** (GPU transcription, rendering, AI moment picking and the compliance
-audit all run on your machine and your Claude subscription). Only approved, audited clips reach the
-`queue/` folder here. This repo does no editing and no AI.
-
-## Daily loop
-
-| Where | What | Command |
+| Workflow | When | What |
 |---|---|---|
-| Your PC | make + audit clips, approve them | `python -m clipper clip …`, `review`, `approve` |
-| Your PC | push the batch to the cloud | `python -m clipper export-queue` then commit + push this repo |
-| Cloud | post + submit on schedule | fired by cron-job.org, nothing to do |
+| `produce.yml` | daily 08:00 UTC | scout Whop → read each brief + its reference docs/PDFs → join fitting campaigns → download footage → transcribe → AI picks moments → render → **compliance audit of every clip against every rule** → auto-approve only clips the audit clears for unattended posting → queue |
+| `publish.yml` | each posting slot (cron-job.org) | post one queued clip per account → submit it on Whop inside the deadline |
+
+Clips the audit doesn't clear are **held**, never posted. They're attached to the produce run
+(artifact `clips-<run>`) and listed in the run summary with the reason. Queued videos live as assets of
+the `queue` release, not in git; a clip posted to all its accounts is retired automatically.
+
+The producer code is a copy of the PC's `clipper/` package in `producer/`. After changing code or
+`config.yaml` on the PC, run `python -m clipper sync-producer`. The cloud owns the database
+(`producer/data/state.db`); `python -m clipper pull-state` brings it back to the PC.
 
 ## Schedule (cron-job.org)
 
@@ -59,6 +59,18 @@ The PAT needs only `Contents: read/write` and `Metadata: read` on this repo (fin
 | `INSTAGRAM_TOKENS` | `{"handle": {"token": "...", "user_id": "..."}}` |
 | `POSTFORME_API_KEY` | Post for Me project key (TikTok drafts, X) |
 | `WHOP_SESSION` | Playwright storage_state for whop.com, from `python -m clipper export-session` |
+| `CLAUDE_CODE_OAUTH_TOKEN` | from `claude setup-token` on the PC: the producer's AI runs on your Claude subscription |
+| `SECRETS_PAT` | fine-grained token, this repo only, **Secrets: read and write**: lets runs store renewed credentials |
+
+## Credentials renew themselves
+
+- **Whop login** — every run that uses Whop stores the refreshed cookies back into `WHOP_SESSION`, and the
+  daily run checks the login first. If Whop ever logs the automation out, you get a GitHub issue (emailed)
+  telling you to run `python -m clipper login` + `sync-secrets` on the PC. That is the only step that can
+  need you.
+- **Instagram** — the daily run refreshes each 60-day token once a week and stores the new one.
+- **YouTube** — refresh tokens don't expire while the Google app is published and the channel posts.
+- **Post for Me, Claude token** — don't expire (`claude setup-token` tokens last a year).
 
 ## Before an account can earn
 
@@ -68,14 +80,17 @@ and is **not** what the "Posted from one of your linked accounts" check uses.
 
 ## When something breaks
 
-- **Whop submission fails / "session is stale"** — run `python -m clipper export-session` locally and
-  update the `WHOP_SESSION` secret. An unsubmitted post earns nothing, so this is the alarm that matters.
+- **Whop submission fails / "session is stale"** — run `python -m clipper login` then
+  `python -m clipper sync-secrets` on the PC. An unsubmitted post earns nothing, so this is the alarm that matters.
 - **YouTube stops working after ~7 days** — the Google OAuth app fell back to "Testing" mode. Publish it
   to production in the Google Auth Platform console.
 - **TikTok posts appear as drafts** — Post for Me refused a direct post; open TikTok and publish the
   draft with the caption saved beside the clip.
 - **"rejected: Posted from one of your linked accounts"** — that account isn't connected inside the
   Content Rewards app (see above). The post can't be rescued once 30 minutes pass.
-- **"nothing queued"** — the local producer hasn't pushed new clips. Run a local batch.
+- **"nothing queued"** — the producer made nothing that passed the audit. Read the latest produce run's
+  summary: it lists held clips, campaigns that need a human, and download errors.
+- **Download errors on YouTube sources** — YouTube sometimes blocks GitHub's servers. Drive/Dropbox
+  footage is unaffected; for YouTube-only campaigns run `python -m clipper clip <campaign>` on the PC.
 
 Proof screenshots of each Whop submission are attached to every workflow run as artifacts.

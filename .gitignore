@@ -1,3 +1,8 @@
 artifacts/
 __pycache__/
 *.pyc
+producer/data/campaigns/*/sources/
+producer/data/campaigns/*/clips/
+producer/data/scout_raw/
+producer/data/review.html
+producer/.browser-profile/

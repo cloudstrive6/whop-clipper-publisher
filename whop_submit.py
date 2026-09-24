@@ -125,6 +125,8 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
             page.wait_for_timeout(3000)
             if "/login" in page.url:
                 raise RuntimeError("Whop session is stale - refresh WHOP_SESSION locally")
+            if os.environ.get("WHOP_SESSION_OUT"):  # keep Whop's rotated cookies; renew.py stores them
+                ctx.storage_state(path=os.environ["WHOP_SESSION_OUT"])
             _scroll(frame)
             if not _open_campaign(page, frame, clip["campaign_title"]):
                 page.screenshot(path=str(artifacts / f"{clip['clip_id']}-no-campaign.png"))

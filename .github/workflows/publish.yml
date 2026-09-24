@@ -29,6 +29,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}   # downloads queued videos from the 'queue' release
     steps:
       - uses: actions/checkout@v4
 
@@ -64,9 +66,16 @@ jobs:
           INSTAGRAM_TOKENS: ${{ secrets.INSTAGRAM_TOKENS }}
           POSTFORME_API_KEY: ${{ secrets.POSTFORME_API_KEY }}
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
+          WHOP_SESSION_OUT: ${{ runner.temp }}/whop_session.json
         run: |
           python publish.py --platform "${{ steps.which.outputs.platform }}" \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Keep Whop's refreshed login
+        if: always()
+        env:
+          SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
+        run: python renew.py whop-save "$RUNNER_TEMP/whop_session.json"
 
       - name: Save proof screenshots
         if: always()
@@ -82,7 +91,7 @@ jobs:
         run: |
           git config user.name "whop-clipper"
           git config user.email "bot@users.noreply.github.com"
-          git add state/posts.json
+          git add -A state queue   # queue: clips posted everywhere are retired
           if git diff --staged --quiet; then
             echo "no state change"
             exit 0
