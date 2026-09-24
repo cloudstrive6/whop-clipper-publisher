@@ -59,10 +59,13 @@ def _click_through(page, frame, matches) -> bool:
     return False
 
 
-def _open_campaign(page, frame, title: str) -> bool:
-    """Exact title on the marketplace first; otherwise search Whop for the title's stable prefix."""
+def _open_campaign(page, frame, title: str):
+    """Exact title on the marketplace first; otherwise search Whop for the title's stable prefix.
+
+    Returns the app frame showing the campaign (the search reloads the page, so the old frame is gone),
+    or None."""
     if _click_through(page, frame, frame.get_by_text(title, exact=True)):
-        return True
+        return frame
     prefix = _prefix(title)
     print(f"  campaign title changed? searching Whop for {prefix!r}")
     page.goto(MARKETPLACE, wait_until="domcontentloaded", timeout=90000)
@@ -73,7 +76,7 @@ def _open_campaign(page, frame, title: str) -> bool:
     box.fill(prefix)
     box.press("Enter")
     page.wait_for_timeout(9000)
-    return _click_through(page, frame, frame.get_by_text(prefix, exact=False))
+    return frame if _click_through(page, frame, frame.get_by_text(prefix, exact=False)) else None
 
 
 CHECKS = ("Posted from one of your linked accounts", "Not already submitted to this campaign",
@@ -106,6 +109,15 @@ def submit_with_retry(clip: dict, url: str, target: dict, window_minutes: int = 
         if _t.time() - start + w > window_minutes * 60:
             break
         if w:
+            if i == 1:  # the first attempt failed: tell you now, while there's time to do it by hand
+                try:
+                    from notify import alert
+
+                    alert(f"⏳ Whop auto-submit is struggling: {target['label']}",
+                          f"Campaign: {clip['campaign_title']}\nLink: {url}\n\nStill retrying for up to ~25 min. "
+                          "If you can, submit it by hand now (Whop → Content Rewards → campaign → Submit clip).")
+                except Exception:
+                    pass
             print(f"  retrying Whop submission in {w}s (attempt {i + 1})")
             _t.sleep(w)
         try:
@@ -161,7 +173,8 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
             if os.environ.get("WHOP_SESSION_OUT"):  # keep Whop's rotated cookies; renew.py stores them
                 ctx.storage_state(path=os.environ["WHOP_SESSION_OUT"])
             _scroll(frame)
-            if not _open_campaign(page, frame, clip["campaign_title"]):
+            frame = _open_campaign(page, frame, clip["campaign_title"])
+            if frame is None:
                 page.screenshot(path=str(artifacts / f"{clip['clip_id']}-no-campaign.png"))
                 raise RuntimeError(f"could not open campaign {clip['campaign_title']!r}")
 
