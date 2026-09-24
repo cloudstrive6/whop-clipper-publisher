@@ -139,7 +139,7 @@ def main() -> int:
             try:
                 import whop_submit
 
-                ok = whop_submit.submit(clip, url, t)
+                ok = whop_submit.submit_with_retry(clip, url, t)
                 state["posts"][-1]["submitted"] = ok
                 print(f"  whop submission: {'done' if ok else 'FAILED'}")
                 if not ok:

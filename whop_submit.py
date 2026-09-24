@@ -57,6 +57,40 @@ CHECKS = ("Posted from one of your linked accounts", "Not already submitted to t
           "Posted within the last 30 minutes")
 
 
+class SubmissionRejected(RuntimeError):
+    def __init__(self, failed: list[str]):
+        self.failed = failed
+        super().__init__(f"Whop rejected the link: {', '.join(failed)}")
+
+    @property
+    def retryable(self) -> bool:
+        # a fresh post often can't be fetched yet, so the ownership check fails at first
+        return all("linked accounts" in f for f in self.failed)
+
+
+def submit_with_retry(clip: dict, url: str, target: dict, window_minutes: int = 28) -> bool:
+    """Retries timing-type rejections until shortly before Whop's 30-minute window closes."""
+    import time as _t
+
+    waits = [0, 90, 180, 300, 420, 540]  # seconds between attempts, ~25 min in total
+    start = _t.time()
+    last: Exception | None = None
+    for i, w in enumerate(waits):
+        if _t.time() - start + w > window_minutes * 60:
+            break
+        if w:
+            print(f"  retrying Whop submission in {w}s (attempt {i + 1})")
+            _t.sleep(w)
+        try:
+            return submit(clip, url, target)
+        except SubmissionRejected as err:
+            last = err
+            print(f"  {err}")
+            if not err.retryable:
+                raise
+    raise last or RuntimeError("Whop submission did not succeed inside the window")
+
+
 def _failed_checks(dlg) -> list[str]:
     """Names of checks whose label Whop has turned red."""
     failed = []
@@ -113,13 +147,14 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
             submit_btn = dlg.locator("button:has-text('Submit clip')").last
             page.wait_for_timeout(1500)
             page.screenshot(path=str(artifacts / f"{clip['clip_id']}-before-submit.png"))
-            if not submit_btn.is_enabled():
-                # Whop's checks stay grey unless one FAILS; a failed check turns its label red.
-                failed = _failed_checks(dlg)
-                if any("already submitted" in f.lower() for f in failed):
-                    print("  whop says this link was already submitted - treating as done")
-                    return True
-                raise RuntimeError(f"Whop rejected the link: {', '.join(failed) or 'Submit stayed disabled'}")
+            # Whop's checks stay grey unless one FAILS (label turns red). The faded button is not
+            # really disabled in the DOM, so read the checks instead of trusting is_enabled().
+            failed = _failed_checks(dlg)
+            if any("already submitted" in f.lower() for f in failed):
+                print("  whop says this link was already submitted - treating as done")
+                return True
+            if failed:
+                raise SubmissionRejected(failed)
             submit_btn.click(timeout=20000)
             page.wait_for_timeout(8000)
             page.screenshot(path=str(artifacts / f"{clip['clip_id']}-after-submit.png"))
