@@ -128,6 +128,26 @@ def _search(page, query: str):
     return frame
 
 
+def _prefix(title: str) -> str:
+    return re.split(r"\s[–—|-]\s|\s\|", title, maxsplit=1)[0].strip().lower()
+
+
+def _known_id(title: str) -> str:
+    """Brands rename campaigns ("Clip Ali Choucair – Real Estate Content" -> "... – 21 y/o, 51 Rentals").
+    A new title whose stable prefix matches a campaign we already joined is that campaign, not a new one
+    (a second copy would re-clip the same footage)."""
+    cid = slug(title)
+    if db.get("campaigns", cid):
+        return cid
+    p = _prefix(title)
+    if len(p) >= 8:
+        for c in db.rows("campaigns", "status IN ('joined','ended')"):
+            if _prefix(c.get("title") or "") == p:
+                print(f"[scout] {title!r} is the renamed {c['title']!r}")
+                return c["id"]
+    return cid
+
+
 def scout(max_details: int = 12, query: str | None = None) -> list[dict]:
     """Featured marketplace by default; with `query`, the marketplace search results instead."""
     s = cfg()["scout"]
@@ -152,7 +172,7 @@ def scout(max_details: int = 12, query: str | None = None) -> list[dict]:
 
         ranked = []
         for L in listings:
-            cid = slug(L.title)
+            cid = _known_id(L.title)
             prev = db.get("campaigns", cid)
             if prev and prev["status"] in ("waitlisted", "applied"):
                 continue
