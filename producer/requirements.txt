@@ -1,0 +1,10 @@
+# cloud producer (GitHub Actions, CPU only)
+faster-whisper==1.2.1
+yt-dlp==2026.8.19
+gdown==6.4.0
+playwright==1.63.0
+pydantic==2.13.5
+pypdf==6.19.0
+PyYAML==6.0.3
+requests==2.34.2
+beautifulsoup4==4.15.0

@@ -1,0 +1,189 @@
+# Whop clipping pipeline configuration
+
+# Where clips get posted. A campaign goes to every target whose niches match it.
+targets:
+  - id: yt_pogingpanda
+    label: "YouTube Shorts (@PogingPanda)"
+    platform: youtube
+    handle: "@PogingPanda"
+    token: secrets/youtube_token.json
+    niches: [gaming, esports, movies_tv, entertainment]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: yt_ericknox
+    label: "YouTube Shorts (@ericknox2802)"
+    platform: youtube
+    handle: "@ericknox2802"
+    token: secrets/youtube_token_ericknox.json
+    niches: [crypto, finance]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: yt_manifestation
+    label: "YouTube Shorts (@modernmanifestationsecrets)"
+    platform: youtube
+    handle: "@modernmanifestationsecrets"
+    token: secrets/youtube_token_manifestation.json
+    niches: [manifestation, selfimprovement, lifestyle]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: ig_kiwinoygamer
+    label: "Instagram Reels (@kiwinoygamer)"
+    platform: instagram
+    handle: kiwinoygamer
+    ig_user_id: ""            # filled by: python -m clipper instagram-auth
+    niches: [gaming, esports, movies_tv, entertainment]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: ig_cryptohustler
+    label: "Instagram Reels (@iamcryptohustler)"
+    platform: instagram
+    handle: iamcryptohustler
+    ig_user_id: ""
+    niches: [crypto, finance]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: ig_manifestation
+    label: "Instagram Reels (@modernmanifestationsecrets)"
+    platform: instagram
+    handle: modernmanifestationsecrets
+    niches: [manifestation, selfimprovement, lifestyle]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: tt_cryptohustler
+    label: "TikTok draft (@iamcryptohustler)"
+    platform: tiktok             # uploads to your TikTok inbox as a draft; you tap publish
+    handle: iamcryptohustler
+    postforme_external_id: whop-crypto
+    niches: [crypto, finance]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: tt_mnfsttnsecrets
+    label: "TikTok draft (@mnfsttnsecrets)"
+    platform: tiktok
+    handle: mnfsttnsecrets
+    postforme_external_id: whop-manifestation
+    niches: [manifestation, selfimprovement, lifestyle]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: yt_faith
+    label: "YouTube Shorts (@destinedforgreatness777)"
+    platform: youtube
+    handle: "@destinedforgreatness777"
+    token: secrets/youtube_token_faith.json
+    niches: [faith, christian, inspirational]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: ig_faith
+    label: "Instagram Reels (@destinedforgreatness777)"
+    platform: instagram
+    handle: destinedforgreatness777
+    niches: [faith, christian, inspirational]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: tt_faith
+    label: "TikTok (@iamdestinedforgreatness)"
+    platform: tiktok
+    handle: iamdestinedforgreatness
+    postforme_external_id: whop-faith
+    niches: [faith, christian, inspirational]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: true
+  - id: x_mostviewedclips
+    label: "X (@MostViewedClips)"
+    platform: x                  # via Post for Me
+    handle: MostViewedClips
+    niches: [gaming, esports, entertainment, movies_tv]
+    whop_linked: false   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: false          # connect in Post for Me later
+  - id: x_cryptoericknox
+    label: "X (@cryptoericknox)"
+    platform: x
+    handle: cryptoericknox
+    niches: [crypto, finance]
+    whop_linked: false   # connected in Content Rewards > Settings > Connected accounts
+    auto_post: false          # connect in Post for Me later
+
+instagram:
+  # Meta app "Whop Clipper" (app id 966773169048932), Instagram API with Instagram Login
+  token: secrets/instagram_tokens.json   # {"<handle>": {"token": "...", "user_id": "..."}}
+
+# posts PER ACCOUNT per day, equally spaced by the scheduler (cron-job.org fires each slot)
+cadence:
+  youtube:   {per_day: 4, spacing_hours: 6}   # x3 channels  = 12 posts/day
+  instagram: {per_day: 3, spacing_hours: 8}   # x3 accounts  =  9 posts/day
+  tiktok:    {per_day: 4, spacing_hours: 6}   # x2 accounts  =  8 posts/day
+
+postforme:
+  # Post for Me project "Whop Clips" — routes TikTok drafts and X posts
+  api_key_file: secrets/postforme_api_key.txt
+
+llm:
+  # claude_cli = uses your logged-in Claude Code (`claude -p`), no API key needed
+  # api        = Anthropic API via ANTHROPIC_API_KEY
+  backend: claude_cli
+  model: claude-opus-5
+
+scout:
+  marketplace_url: https://whop.com/discover/app/app_QRxsQodZgK1r4D/
+  # Only YouTube pay rates matter while we post to YouTube only
+  platform: youtube
+  min_cpm: 0.30             # $ per 1K views on YouTube
+  min_budget_remaining: 500 # $
+  min_budget_remaining_pct: 10
+  max_views_to_min_payout: 20000  # skip if a clip needs more views than this before paying
+  content_types: [clipping] # skip UGC (needs your face/voice)
+  # marketplace searches per account niche (the featured page only shows ~20 campaigns)
+  search_queries:
+    - faith christian bible church
+    - gospel worship jesus
+    - crypto trading finance
+    - real estate investing money
+    - gaming streamer esports
+    - podcast mindset success motivation
+  # @PogingPanda is a gaming / playthrough / trailer channel: prefer campaigns in that niche
+  preferred_niches: [gaming, esports, movies_tv, entertainment, crypto, finance, manifestation, selfimprovement, faith, christian, inspirational]
+  avoid_niches: [gambling]   # channel-policy risk
+  niche_regex: "gam|roblox|valorant|minecraft|fortnite|esport|stream|trailer|movie|film|prime video|netflix|anime|invincible|crypto|coin|token|trading|finance|wealth|mindset|manifest|motivat|self.?improv|discipline|faith|christ|church|bible|pastor|gospel|worship|pray"
+
+editing:
+  width: 1080
+  height: 1920
+  min_seconds: 15
+  max_seconds: 58           # stays under 60s for Shorts
+  clips_per_source: 5
+  layout: blur              # blur = full frame over blurred background; crop = center crop to fill
+  captions: true
+  hook_text: true
+  bg_music_volume: 0.10     # used only if a track is found in assets/music
+  whisper_model: small      # tiny | base | small | medium | large-v3
+  whisper_device: auto      # auto | cuda | cpu
+  whisper_model_long_ci: base  # CPU-only cloud runners: faster model for podcasts/VODs over 20 min
+  font_ci: Archivo Black    # Arial Black isn't on Linux; the cloud producer installs this free font
+
+# daily cloud producer (GitHub Actions, PC off): scout -> analyze -> join -> clip -> audit -> queue
+produce:
+  analyze_per_run: 6          # new campaign briefs read per run (each is one AI call + reference docs)
+  auto_join: true             # join campaigns that pass the scout, fit an account and need no human steps
+  max_new_clips_per_run: 12
+  queue_target_per_campaign: 6  # stop making clips for a campaign while this many are still unposted
+  max_source_mb: 1500         # skip single source files bigger than this
+  channel_videos: 3           # when a campaign's source is a whole channel, take its N newest videos
+  max_source_minutes: 90
+  # campaigns to clip even though the brief has a human-only step (e.g. demographic proof at payout,
+  # which you then provide yourself). Campaign ids as shown by: python -m clipper campaigns
+  override_campaigns: []
+
+youtube:
+  client_secret: secrets/client_secret.json
+  token: secrets/youtube_token.json
+  privacy_on_upload: public
+  max_uploads_per_day: 4    # per YouTube channel
+  # post when US viewers are awake so each Short's first audience is Tier-1 (US Eastern hours, 24h clock)
+  post_window_et: [12, 22]
+  geo_location: "New York, NY"   # campaigns that require a geo-tag; set to your city if you prefer
+  category_id: "24"         # Entertainment
+
+whop:
+  submit_deadline_minutes: 30   # Whop's dialog: "Posted within the last 30 minutes"
+  # dedicated automation browser profile (log in to Whop once)
+  browser_profile: .browser-profile
