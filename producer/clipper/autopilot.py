@@ -21,7 +21,8 @@ CHANNEL = re.compile(r"youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w-]+)/?(videos|
 
 def _auto_ok(campaign: dict) -> bool:
     """The brief needs no human step, or you opted the campaign in (you handle its payout paperwork)."""
-    return bool((campaign.get("checklist") or {}).get("auto_ok")) or         campaign["id"] in (cfg()["produce"].get("override_campaigns") or [])
+    overrides = cfg()["produce"].get("override_campaigns") or []
+    return bool((campaign.get("checklist") or {}).get("auto_ok")) or campaign["id"] in overrides
 
 
 def _linked_targets(campaign: dict) -> list[dict]:
