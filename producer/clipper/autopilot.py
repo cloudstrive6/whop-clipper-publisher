@@ -20,12 +20,6 @@ FETCHABLE = re.compile(r"drive\.google\.com/(file|drive/folders|open)|dropbox\.c
 CHANNEL = re.compile(r"youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w-]+)/?(videos|shorts|streams)?/?$", re.I)
 
 
-def _auto_ok(campaign: dict) -> bool:
-    """The brief needs no human step, or you opted the campaign in (you handle its payout paperwork)."""
-    overrides = cfg()["produce"].get("override_campaigns") or []
-    return bool((campaign.get("checklist") or {}).get("auto_ok")) or campaign["id"] in overrides
-
-
 def _language_ok(campaign: dict) -> bool:
     lang = ((campaign.get("checklist") or {}).get("content_language") or "english").lower()
     return lang in (cfg()["produce"].get("languages") or ["english", "none"])
@@ -71,10 +65,12 @@ def _ytdlp(url: str, dest: Path, campaign_id: str, P: dict) -> None:
     cookies = os.environ.get("YT_COOKIES_FILE")
     if cookies and Path(cookies).exists():
         args += ["--cookies", cookies]
-    if CHANNEL.search(url):  # a whole channel: only its newest uploads
+    if CHANNEL.search(url):  # a whole channel: the next N videos not fetched before, newest first
         url = re.sub(r"/(videos|shorts|streams)?/?$", "", url) + "/videos"
-        args += ["--playlist-end", str(P["channel_videos"])]
-    subprocess.run(args + [url], check=True, timeout=1800)
+        args += ["--playlist-end", "30", "--max-downloads", str(P["channel_videos"])]
+    rc = subprocess.run(args + [url], timeout=1800).returncode
+    if rc not in (0, 101):  # 101 = stopped at --max-downloads, which is the plan
+        raise subprocess.CalledProcessError(rc, "yt-dlp")
 
 
 def _unposted(campaign_id: str) -> int:
@@ -92,24 +88,127 @@ def _unposted(campaign_id: str) -> int:
     return n
 
 
-def produce() -> dict:
-    from . import brief, compliance, whop
+def _producible(campaign: dict) -> tuple[bool, list[str]]:
+    """Can the unattended pipeline make, post and submit clips for it? Returns (ok, reasons it can't).
+
+    Payout-only paperwork (demographic proof once a clip earns, a payout form) doesn't stop production
+    when produce.allow_payout_paperwork is on: the clips post and submit normally, and you do the
+    paperwork for the ones that reach a payout."""
+    ck = campaign.get("checklist") or {}
+    if campaign["id"] in (cfg()["produce"].get("override_campaigns") or []):
+        return True, []
+    if "production_blockers" not in ck:  # analyzed before the split: fall back to the old verdict
+        return bool(ck.get("auto_ok")), list(ck.get("auto_blockers") or ["brief not analyzed yet"])
+    why = list(ck.get("production_blockers") or [])
+    if ck.get("payout_steps") and not cfg()["produce"].get("allow_payout_paperwork"):
+        why += [f"payout paperwork: {s}" for s in ck["payout_steps"]]
+    return not why, why
+
+
+def _queued_for(target_id: str) -> int:
+    """Clips waiting in the publisher queue that this account hasn't posted yet."""
+    from .export import PUBLISHER
+
+    state = PUBLISHER / "state" / "posts.json"
+    posts = json.loads(state.read_text(encoding="utf-8"))["posts"] if state.exists() else []
+    done = {p["clip_id"] for p in posts if p["target_id"] == target_id and p["status"] in ("posted", "draft_uploaded")}
+    n = 0
+    for meta in (PUBLISHER / "queue").glob("*/meta.json"):
+        m = json.loads(meta.read_text(encoding="utf-8"))
+        if target_id in m.get("targets", []) and m["clip_id"] not in done:
+            n += 1
+    return n
+
+
+def _deficits() -> dict[str, float]:
+    """How many more approved clips each account needs to fill its posting slots for the next
+    produce.buffer_days (the queue should never run dry between daily runs)."""
+    P = cfg()["produce"]
+    out = {}
+    for t in targets.all_targets():
+        if not (t.get("auto_post") and t.get("whop_linked")):
+            continue
+        per_day = cfg().get("cadence", {}).get(t["platform"], {}).get("per_day", 3)
+        out[t["id"]] = per_day * P.get("buffer_days", 1.5) - _queued_for(t["id"])
+    return out
+
+
+def _pass_rate() -> float:
+    """Share of rendered clips the audit clears, so enough are made to fill the slots."""
+    done = [c for c in db.rows("clips", "status IN ('approved','queued','held','posted','submitted')")]
+    ok = [c for c in done if c["status"] != "held"]
+    return max(0.3, len(ok) / len(done)) if len(done) >= 6 else 0.4
+
+
+def _search_plan(discover: bool) -> list[str]:
+    """Niche searches for this run: every niche whose accounts have nothing to post comes first."""
+    import datetime
+
+    by_niche = cfg()["scout"].get("search_queries_by_niche", {})
+    live = [c for c in db.rows("campaigns", "status='joined'") if _producible(c)[0] and _language_ok(c)]
+    fed = {t["id"] for c in live for t in _linked_targets(c)}
+    hungry_niches = []
+    for t in targets.all_targets():
+        if t.get("auto_post") and t.get("whop_linked") and t["id"] not in fed:
+            hungry_niches += [n for n in t.get("niches", []) if n in by_niche and n not in hungry_niches]
+    all_q = [q for qs in by_niche.values() for q in qs]
+    if discover:
+        return list(dict.fromkeys(all_q))
+    k = cfg()["produce"].get("searches_per_run", 2)
+    day = datetime.date.today().toordinal()
+    plan = []
+    for n in hungry_niches:  # one per hungry niche, rotating daily
+        qs = by_niche[n]
+        plan.append(qs[day % len(qs)])
+    start = (day * k) % max(len(all_q), 1)
+    plan += (all_q[start:] + all_q[:start])[:k]
+    return list(dict.fromkeys(plan))[:cfg()["produce"].get("max_searches_per_run", 6)]
+
+
+def _approve(campaign_id: str | None, report: dict) -> int:
+    """Auto-approve what the audit cleared for unattended posting; hold the rest. Returns approvals."""
+    from . import compliance
+
+    n = 0
+    where, args = ("status='rendered' AND campaign_id=?", (campaign_id,)) if campaign_id else ("status='rendered'", ())
+    for clip in db.rows("clips", where, *args):
+        audit = (clip.get("qa") or {}).get("audit")
+        if not audit:
+            try:
+                compliance.audit_campaign(clip["campaign_id"], only_new=True)
+            except Exception as err:
+                report["errors"].append(f"audit {clip['id']}: {str(err)[:150]}")
+            clip = db.get("clips", clip["id"])
+            audit = (clip.get("qa") or {}).get("audit") or {}
+        if clip["status"] == "rendered" and audit.get("overall_pass") and audit.get("safe_to_autopost"):
+            db.upsert("clips", {"id": clip["id"], "status": "approved"})
+            report["approved"].append(clip["id"])
+            n += 1
+        else:
+            db.upsert("clips", {"id": clip["id"], "status": "held"})  # waits for you: python -m clipper review
+            report["held"].append({"id": clip["id"], "why": (audit.get("blocking_issues") or
+                                                             audit.get("human_todo") or ["audit not cleared"])[:3]})
+    return n
+
+
+def produce(discover: bool = False) -> dict:
+    """discover=True: every niche search, more campaigns opened, every brief read (a one-off sweep)."""
+    import math
+    import time as _time
+
+    from . import brief, whop
     from .__main__ import cmd_clip
 
     P = cfg()["produce"]
+    t0 = _time.time()
     report = {"scouted": 0, "analyzed": [], "joined": [], "clips_made": 0, "approved": [],
-              "held": [], "blocked_campaigns": {}, "errors": []}
+              "held": [], "blocked_campaigns": {}, "errors": [], "unfilled": {}}
 
     print("== 1. scout (featured + niche searches)")
-    import datetime
-
-    queries = cfg()["scout"].get("search_queries", [])
-    k = P.get("searches_per_run", 2)
-    start = (datetime.date.today().toordinal() * k) % max(len(queries), 1)
-    todays = (queries[start:] + queries[:start])[:k]
-    for q in [None] + todays:
+    for q in [None] + _search_plan(discover):
         try:
-            report["scouted"] += len(whop.scout(query=q, max_details=12 if q is None else 5))
+            report["scouted"] += len(whop.scout(query=q, max_details=(15 if discover else 12) if q is None
+                                                else (8 if discover else 5)))
         except Exception as err:
             report["errors"].append(f"scout {q or 'featured'}: {err.__class__.__name__}: {str(err)[:150]}")
             if "limit" in str(err).lower():
@@ -117,8 +216,8 @@ def produce() -> dict:
 
     print("\n== 2. read briefs + reference materials")
     todo = [c for c in db.rows("campaigns", "status IN ('shortlisted','joined') ORDER BY score DESC")
-            if "content_language" not in (c.get("checklist") or {})][:P["analyze_per_run"]]
-    for c in todo:
+            if "production_blockers" not in (c.get("checklist") or {})]
+    for c in todo[:999 if discover else P["analyze_per_run"]]:
         text = (c.get("data") or {}).get("brief_text")
         if not text:
             continue
@@ -133,7 +232,7 @@ def produce() -> dict:
         ck = c.get("checklist") or {}
         if not ck or not P.get("auto_join"):
             continue
-        why = ([] if _auto_ok(c) else ck.get("auto_blockers") or ["brief needs a human step"])
+        ok, why = _producible(c)
         if (c.get("data") or {}).get("requires_application"):
             why.append("requires an application")
         if not _linked_targets(c):
@@ -148,55 +247,49 @@ def produce() -> dict:
         report["joined"].append(c["id"])
         print(f"   joined {c['title']}")
 
-    print("\n== 4. make clips")
+    print("\n== 4. make clips until every account's slots are covered")
+    deficit = _deficits()
+    rate = _pass_rate()
+    print("   open slots per account: " + ", ".join(f"{k}={v:g}" for k, v in deficit.items()))
     budget = P["max_new_clips_per_run"]
     for c in db.rows("campaigns", "status='joined' ORDER BY score DESC"):
-        if budget <= 0:
+        if budget <= 0 or (_time.time() - t0) / 60 > P.get("max_minutes", 150):
             break
         ck = c.get("checklist") or {}
-        if not _auto_ok(c):
-            report["blocked_campaigns"][c["id"]] = ck.get("auto_blockers") or ["not analyzed yet"]
-            continue
-        if not _linked_targets(c):
+        ok, why = _producible(c)
+        if not ok:
+            report["blocked_campaigns"][c["id"]] = why
             continue
         if not _language_ok(c):
             report["blocked_campaigns"][c["id"]] = [f"{ck.get('content_language')} footage/audience"]
             continue
-        room = P["queue_target_per_campaign"] - _unposted(c["id"])
-        if room <= 0:
-            print(f"   {c['title'][:50]}: queue already full")
+        tg = [t["id"] for t in _linked_targets(c)]
+        need = max([deficit.get(t, 0) for t in tg] or [0])
+        if need <= 0:
             continue
-        print(f"\n-- {c['title'][:60]} (room for {room})")
+        # render more than needed: the audit holds some back
+        room = min(math.ceil(need / rate), P.get("max_clips_per_campaign", 10), budget)
+        print(f"\n-- {c['title'][:60]} (needs {need:g} approved -> rendering up to {room})")
         try:
             vids = fetch_sources(c)
             if not vids:
                 report["errors"].append(f"{c['id']}: no footage could be downloaded")
                 continue
-            made = cmd_clip(c["id"], *map(str, vids), limit=min(room, budget))
+            made = cmd_clip(c["id"], *map(str, vids), limit=room)
             report["clips_made"] += made
             budget -= made
+            approved = _approve(c["id"], report)
+            for t in tg:
+                deficit[t] = deficit.get(t, 0) - approved
         except SystemExit as err:
             report["errors"].append(f"{c['id']}: {err}")
         except Exception as err:
             report["errors"].append(f"{c['id']}: {err.__class__.__name__}: {str(err)[:200]}")
 
-    print("\n== 5. auto-approve what the audit cleared for unattended posting")
-    for clip in db.rows("clips", "status='rendered'"):
-        audit = (clip.get("qa") or {}).get("audit")
-        if not audit:
-            try:
-                compliance.audit_campaign(clip["campaign_id"], only_new=True)
-            except Exception as err:
-                report["errors"].append(f"audit {clip['id']}: {str(err)[:150]}")
-            clip = db.get("clips", clip["id"])
-            audit = (clip.get("qa") or {}).get("audit") or {}
-        if clip["status"] == "rendered" and audit.get("overall_pass") and audit.get("safe_to_autopost"):
-            db.upsert("clips", {"id": clip["id"], "status": "approved"})
-            report["approved"].append(clip["id"])
-        else:
-            db.upsert("clips", {"id": clip["id"], "status": "held"})  # waits for you: python -m clipper review
-            report["held"].append({"id": clip["id"], "why": (audit.get("blocking_issues") or
-                                                             audit.get("human_todo") or ["audit not cleared"])[:3]})
+    print("\n== 5. approve anything left over")
+    _approve(None, report)
+    names = {t["id"]: t["label"] for t in targets.all_targets()}
+    report["unfilled"] = {names.get(k, k): round(v, 1) for k, v in deficit.items() if v > 0}
 
     print("\n== 6. queue for the publisher")
     from . import export
@@ -217,6 +310,9 @@ def summary_md(r: dict) -> str:
         lines += ["### Held for your review (not posted)", *[f"- {h['id']}: {'; '.join(h['why'])[:200]}" for h in r["held"]], ""]
     if r["blocked_campaigns"]:
         lines += ["### Campaigns that need a human", *[f"- {k}: {'; '.join(v)[:200]}" for k, v in r["blocked_campaigns"].items()], ""]
+    if r.get("unfilled"):
+        lines += ["### Slots still empty (clips short per account)",
+                  *[f"- {k}: {v:g}" for k, v in r["unfilled"].items()], ""]
     if r["errors"]:
         lines += ["### Errors", *[f"- {e}" for e in r["errors"]], ""]
     return "\n".join(lines)

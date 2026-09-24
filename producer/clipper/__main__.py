@@ -284,7 +284,7 @@ def main(argv: list[str]) -> None:
         import os
 
         from . import autopilot
-        report = autopilot.produce()
+        report = autopilot.produce(discover="--discover" in args)
         md = autopilot.summary_md(report)
         print("\n" + md)
         (Path(__file__).parent.parent / "data" / "last_run.md").write_text(md, encoding="utf-8")

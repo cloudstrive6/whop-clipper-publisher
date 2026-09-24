@@ -39,12 +39,16 @@ class Checklist(BaseModel):
     content_language: str = Field(
         description="Main spoken language of the source footage and the campaign's target audience, lowercase "
                     "English name (english, portuguese, spanish, hindi, ...). 'none' if the footage has no speech.")
-    auto_ok: bool = Field(
-        description="True only if an unattended pipeline (download footage, cut + caption clips, post, submit the link) "
-                    "can produce fully compliant clips AND get them paid with no human step. False if it needs the "
-                    "creator's face or voice, an application/approval, a login- or terms-gated download, a manual "
-                    "form or screen recording per clip or before payout, or an account the roster doesn't have.")
-    auto_blockers: list[str] = Field(description="The specific human-only steps that make auto_ok false; empty if auto_ok")
+    production_blockers: list[str] = Field(
+        description="Human-only steps needed BEFORE a compliant clip can be made, posted and its link submitted: the "
+                    "creator's face or voice, an application/approval, a login- or terms-gated download, attaching "
+                    "an in-app sound, a brand-new or brand-named account the roster doesn't have, a bio edit, a "
+                    "manual form at submission time. Empty if an unattended pipeline can do all of it.")
+    payout_steps: list[str] = Field(
+        description="Human-only steps needed only AFTER a clip performs, to get it paid: audience-demographic "
+                    "screenshots or screen recordings, a payout form, messaging analytics. Empty if none.")
+    auto_ok: bool = Field(description="True only if production_blockers AND payout_steps are both empty")
+    auto_blockers: list[str] = Field(description="production_blockers + payout_steps (kept for older code)")
 
 
 SYSTEM = (

@@ -132,14 +132,16 @@ scout:
   min_budget_remaining_pct: 10
   max_views_to_min_payout: 20000  # skip if a clip needs more views than this before paying
   content_types: [clipping] # skip UGC (needs your face/voice)
-  # marketplace searches per account niche (the featured page only shows ~20 campaigns)
-  search_queries:
-    - faith christian bible church
-    - gospel worship jesus
-    - crypto trading finance
-    - real estate investing money
-    - gaming streamer esports
-    - podcast mindset success motivation
+  # marketplace searches per account niche (the featured page only shows ~20 campaigns). Niches whose
+  # accounts have nothing to post get searched first, every run.
+  search_queries_by_niche:
+    gaming: [gaming streamer esports, twitch kick streamer clips, video game trailer, call of duty fortnite valorant minecraft, roblox gta gameplay]
+    movies_tv: [movie tv show trailer, anime clips edits]
+    crypto: [crypto trading finance, bitcoin crypto podcast]
+    finance: [real estate investing money, business entrepreneur podcast, stocks day trading]
+    manifestation: [manifestation law of attraction, spirituality meditation mindset]
+    selfimprovement: [podcast mindset success motivation, self improvement discipline, motivational speaker]
+    faith: [faith christian bible church, gospel worship jesus, christian podcast sermon pastor, prayer inspirational]
   # @PogingPanda is a gaming / playthrough / trailer channel: prefer campaigns in that niche
   preferred_niches: [gaming, esports, movies_tv, entertainment, crypto, finance, manifestation, selfimprovement, faith, christian, inspirational]
   avoid_niches: [gambling]   # channel-policy risk
@@ -164,8 +166,11 @@ editing:
 produce:
   analyze_per_run: 10         # new campaign briefs read per run (each is one AI call + reference docs)
   auto_join: true             # join campaigns that pass the scout, fit an account and need no human steps
-  max_new_clips_per_run: 12
-  queue_target_per_campaign: 6  # stop making clips for a campaign while this many are still unposted
+  max_new_clips_per_run: 24
+  max_clips_per_campaign: 10  # per run, so one campaign can't take every slot
+  buffer_days: 1.5            # keep each account's queue this many days of posts deep
+  max_minutes: 150            # stop making clips after this long (GitHub minutes)
+  allow_payout_paperwork: false  # true: also clip campaigns whose only human step comes at payout
   max_source_mb: 1500         # skip single source files bigger than this
   channel_videos: 3           # when a campaign's source is a whole channel, take its N newest videos
   max_source_minutes: 90
@@ -173,7 +178,8 @@ produce:
   # which you then provide yourself). Campaign ids as shown by: python -m clipper campaigns
   override_campaigns: []
   languages: [english, none]  # footage/audience languages the accounts can use
-  searches_per_run: 2         # niche searches per run, rotating through scout.search_queries
+  searches_per_run: 1         # extra rotating search on top of one per niche with nothing to post
+  max_searches_per_run: 6     # each search takes ~4 min
 
 youtube:
   client_secret: secrets/client_secret.json
