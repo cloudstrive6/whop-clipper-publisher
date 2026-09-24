@@ -105,6 +105,44 @@ def instagram(min_age_days: int = 7) -> int:
     return 0
 
 
+def minutes(free: int = 2000) -> int:
+    """This month's GitHub Actions minutes for this repo; Telegram warning at 75% and 90% of the free tier.
+
+    Counts this repo only: other private repos on the account use the same allowance."""
+    from notify import once
+
+    gh = {**os.environ, "GH_TOKEN": os.environ.get("GITHUB_TOKEN", "")}
+    month = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m")
+    by_day: dict[str, int] = {}
+    page = 1
+    while True:
+        r = subprocess.run(["gh", "api", f"repos/{REPO}/actions/runs?created=>={month}-01&per_page=100&page={page}",
+                            "-q", "[.workflow_runs[] | [.id, .run_started_at, .updated_at]]"],
+                           capture_output=True, text=True, env=gh)
+        runs = json.loads(r.stdout or "[]")
+        for _, start, end in runs:
+            if start and end:
+                secs = (datetime.datetime.fromisoformat(end.replace("Z", "+00:00"))
+                        - datetime.datetime.fromisoformat(start.replace("Z", "+00:00"))).total_seconds()
+                # GitHub bills each job rounded up to the minute
+                by_day[start[:10]] = by_day.get(start[:10], 0) + int(secs // 60) + 1
+        if len(runs) < 100:
+            break
+        page += 1
+    used = sum(by_day.values())
+    now = datetime.datetime.now(datetime.timezone.utc)
+    days_in_month = ((now.replace(day=28) + datetime.timedelta(days=4)).replace(day=1) - datetime.timedelta(days=1)).day
+    recent = [by_day[d] for d in sorted(by_day)[-4:-1]] or list(by_day.values()) or [0]  # last full days
+    projected = used + round(sum(recent) / len(recent) * (days_in_month - now.day))
+    print(f"GitHub Actions this month: ~{used} of {free} free minutes (on pace for ~{projected})")
+    for pct in (75, 90):
+        if used >= free * pct / 100:
+            once(f"minutes|{month}|{pct}", f"⏱ GitHub minutes at {pct}%: ~{used} of {free} used this month",
+                 f"On pace for ~{projected} this month. Upgrade to GitHub Pro (3,000 minutes, ~$4/month) or raise "
+                 "the spending limit at github.com/settings/billing, or the workflows stop when the minutes run out.")
+    return 0
+
+
 if __name__ == "__main__":
     cmd, *rest = sys.argv[1:] or ["whop-check"]
     if cmd == "whop-check":
@@ -113,6 +151,8 @@ if __name__ == "__main__":
         sys.exit(save("WHOP_SESSION", rest[0]))
     if cmd == "save":
         sys.exit(save(rest[0], rest[1]))
+    if cmd == "minutes":
+        sys.exit(minutes())
     if cmd == "instagram":
         sys.exit(instagram(int(rest[1]) if rest[:1] == ["--min-age"] else 7))
     sys.exit(f"unknown: {cmd}")

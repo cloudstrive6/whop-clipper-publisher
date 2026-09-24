@@ -21,6 +21,7 @@ concurrency:
 permissions:
   contents: write            # commits the producer database + queue metadata; uploads clips to the release
   issues: write              # alerts (expired Whop login, token refresh failures) arrive as emailed issues
+  actions: read              # counts this month's GitHub minutes for the usage warning
 
 jobs:
   produce:
@@ -91,6 +92,14 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python renew.py instagram
 
+      - name: GitHub minutes check (Telegram warning at 75% / 90% of the free tier)
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python renew.py minutes
+
       - name: Produce clips
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -140,7 +149,7 @@ jobs:
         run: |
           git config user.name "whop-clipper"
           git config user.email "bot@users.noreply.github.com"
-          git add -A queue producer/data   # footage/renders are gitignored
+          git add -A   # state, queue, alert ledger; footage/renders are gitignored
           if git diff --staged --quiet; then echo "no changes"; exit 0; fi
           git commit -m "produced: $(date -u +%FT%TZ)"
           for i in 1 2 3; do
