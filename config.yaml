@@ -18,7 +18,7 @@ targets:
   niches:
   - crypto
   - finance
-  whop_linked: false
+  whop_linked: true
   auto_post: true
   token_env: YOUTUBE_TOKEN_YT_ERICKNOX
 - id: yt_manifestation
@@ -29,7 +29,7 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
-  whop_linked: false
+  whop_linked: true
   auto_post: true
   token_env: YOUTUBE_TOKEN_YT_MANIFESTATION
 - id: ig_kiwinoygamer
@@ -42,7 +42,7 @@ targets:
   - esports
   - movies_tv
   - entertainment
-  whop_linked: false
+  whop_linked: true
   auto_post: true
 - id: ig_cryptohustler
   label: Instagram Reels (@iamcryptohustler)
@@ -52,7 +52,7 @@ targets:
   niches:
   - crypto
   - finance
-  whop_linked: false
+  whop_linked: true
   auto_post: true
 - id: ig_manifestation
   label: Instagram Reels (@modernmanifestationsecrets)
@@ -62,7 +62,7 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
-  whop_linked: false
+  whop_linked: true
   auto_post: true
 - id: tt_cryptohustler
   label: TikTok draft (@iamcryptohustler)
@@ -72,7 +72,7 @@ targets:
   niches:
   - crypto
   - finance
-  whop_linked: false
+  whop_linked: true
   auto_post: true
 - id: tt_mnfsttnsecrets
   label: TikTok draft (@mnfsttnsecrets)
@@ -83,7 +83,39 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
-  whop_linked: false
+  whop_linked: true
+  auto_post: true
+- id: yt_faith
+  label: YouTube Shorts (@destinedforgreatness777)
+  platform: youtube
+  handle: '@destinedforgreatness777'
+  niches:
+  - faith
+  - christian
+  - inspirational
+  whop_linked: true
+  auto_post: true
+  token_env: YOUTUBE_TOKEN_YT_FAITH
+- id: ig_faith
+  label: Instagram Reels (@destinedforgreatness777)
+  platform: instagram
+  handle: destinedforgreatness777
+  niches:
+  - faith
+  - christian
+  - inspirational
+  whop_linked: true
+  auto_post: true
+- id: tt_faith
+  label: TikTok (@iamdestinedforgreatness)
+  platform: tiktok
+  handle: iamdestinedforgreatness
+  postforme_external_id: whop-faith
+  niches:
+  - faith
+  - christian
+  - inspirational
+  whop_linked: true
   auto_post: true
 - id: x_mostviewedclips
   label: X (@MostViewedClips)
