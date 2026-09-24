@@ -38,6 +38,10 @@ jobs:
         with:
           node-version: "22"
 
+      - uses: denoland/setup-deno@v2   # yt-dlp needs a JS runtime to solve YouTube's download challenges
+        with:
+          deno-version: v2.x
+
       - name: Install ffmpeg, fonts, Claude Code, Python deps
         run: |
           sudo apt-get update -qq
