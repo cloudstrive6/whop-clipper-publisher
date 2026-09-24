@@ -18,7 +18,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 QUEUE = ROOT / "queue"
-STATE = ROOT / "state" / "posts.json"
+STATE = ROOT / "state" / "posts.json"      # older records
+POSTS_DIR = ROOT / "state" / "posts.d"      # one file per post: overlapping runs never clash in git
 RELEASE = "queue"  # cloud-made clips live as assets of this GitHub release, not in git
 
 
@@ -27,12 +28,47 @@ def now() -> str:
 
 
 def load_state() -> dict:
-    return json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {"posts": []}
+    posts = json.loads(STATE.read_text(encoding="utf-8"))["posts"] if STATE.exists() else []
+    for f in sorted(POSTS_DIR.glob("*.json")):
+        posts.append(json.loads(f.read_text(encoding="utf-8")) | {"_file": f.name})
+    return {"posts": posts}
 
 
 def save_state(state: dict) -> None:
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+    """New records (and their later 'submitted' updates) live in their own files."""
+    POSTS_DIR.mkdir(parents=True, exist_ok=True)
+    for p in state["posts"]:
+        if "_file" not in p and p.get("status") != "dry_run" and "at" in p and p.get("_new"):
+            p["_file"] = f"{p['at'].replace(':', '')}_{p['target_id']}.json"
+        if p.get("_file"):
+            rec = {k: v for k, v in p.items() if not k.startswith("_")}
+            (POSTS_DIR / p["_file"]).write_text(json.dumps(rec, indent=2), encoding="utf-8")
+
+
+def git(*args: str) -> bool:
+    return subprocess.run(["git", "-c", "user.name=whop-clipper", "-c", "user.email=bot@users.noreply.github.com",
+                           *args], cwd=ROOT, capture_output=True).returncode == 0
+
+
+def share_state(msg: str) -> None:
+    """Push post records immediately, so a run that overlaps this one sees them (no double posts)."""
+    if not os.environ.get("GITHUB_ACTIONS"):
+        return
+    git("add", "state")
+    if git("diff", "--staged", "--quiet"):
+        return
+    git("commit", "-m", msg)
+    for _ in range(3):
+        if git("pull", "--rebase", "--autostash") and git("push"):
+            return
+    print("::warning::could not share post records yet (they're saved again at the end of the run)")
+
+
+def refresh_state() -> dict:
+    """Latest records from other runs before deciding what to post."""
+    if os.environ.get("GITHUB_ACTIONS"):
+        git("pull", "--rebase", "--autostash")
+    return load_state()
 
 
 def config() -> dict:
@@ -163,6 +199,7 @@ def main() -> int:
     for t in targets:
         cadence = cfg.get("cadence", {}).get(t["platform"], {})
         cap = cadence.get("per_day", 3)
+        state = refresh_state()
         done = posted_count(state, t["id"])
         if done >= cap:
             print(f"{t['label']}: daily cap reached ({done}/{cap})")
@@ -180,8 +217,10 @@ def main() -> int:
         if args.dry_run:
             continue
         state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
-                               "status": status, "url": url, "note": note, "at": now(), "submitted": False})
+                               "status": status, "url": url, "note": note, "at": now(), "submitted": False,
+                               "_new": True})
         save_state(state)
+        share_state(f"posted {clip['clip_id']} to {t['id']}")
         if status == "posted" and not url:  # e.g. TikTok published but its video link never showed up
             exit_code = 1
             unsubmitted_alert(clip, t, f"(no link found - open the latest post on {t['label']})",
