@@ -134,7 +134,7 @@ def main() -> int:
                                "status": status, "url": url, "note": note, "at": now(), "submitted": False})
         save_state(state)
 
-        # Whop pays only if the post is submitted inside the campaign's window (often 1h, sometimes 10min)
+        # Whop pays only if the post is submitted inside the campaign's window (30 min on most campaigns)
         if status == "posted" and url and not args.dry_run:
             try:
                 import whop_submit
@@ -144,6 +144,7 @@ def main() -> int:
                 print(f"  whop submission: {'done' if ok else 'FAILED'}")
                 if not ok:
                     exit_code = 1
+                    print("  !! post is live but UNSUBMITTED - submit it by hand now, it earns nothing otherwise")
             except Exception as err:
                 print(f"  whop submission error: {err.__class__.__name__}: {err}")
                 exit_code = 1

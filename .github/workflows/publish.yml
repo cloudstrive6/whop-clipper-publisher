@@ -18,7 +18,8 @@ on:
     - cron: "30 1,7,13,19 * * *"
 
 concurrency:
-  group: publish
+  # one lane per platform: a TikTok trigger must not cancel a queued Instagram run
+  group: publish-${{ github.event.action || github.event.inputs.platform || 'all' }}
   cancel-in-progress: false
 
 jobs:
