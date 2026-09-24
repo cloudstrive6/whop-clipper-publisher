@@ -106,7 +106,12 @@ def main() -> int:
         print("queue is empty - run the local producer and push new clips")
         return 0
 
-    targets = [t for t in cfg["targets"] if t.get("auto_post")]
+    # an account not connected inside Whop's Content Rewards app can't have its posts submitted,
+    # so posting from it would burn a clip for nothing
+    targets = [t for t in cfg["targets"] if t.get("auto_post") and t.get("whop_linked")]
+    skipped = [t["label"] for t in cfg["targets"] if t.get("auto_post") and not t.get("whop_linked")]
+    if skipped:
+        print("not linked in Content Rewards (skipped): " + ", ".join(skipped))
     if args.platform != "all":
         targets = [t for t in targets if t["platform"] == args.platform]
     if args.account:

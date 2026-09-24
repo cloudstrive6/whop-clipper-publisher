@@ -8,6 +8,7 @@ targets:
   - esports
   - movies_tv
   - entertainment
+  whop_linked: true
   auto_post: true
   token_env: YOUTUBE_TOKEN_YT_POGINGPANDA
 - id: yt_ericknox
@@ -17,6 +18,7 @@ targets:
   niches:
   - crypto
   - finance
+  whop_linked: false
   auto_post: true
   token_env: YOUTUBE_TOKEN_YT_ERICKNOX
 - id: yt_manifestation
@@ -27,6 +29,7 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
+  whop_linked: false
   auto_post: true
   token_env: YOUTUBE_TOKEN_YT_MANIFESTATION
 - id: ig_kiwinoygamer
@@ -39,6 +42,7 @@ targets:
   - esports
   - movies_tv
   - entertainment
+  whop_linked: false
   auto_post: true
 - id: ig_cryptohustler
   label: Instagram Reels (@iamcryptohustler)
@@ -48,6 +52,7 @@ targets:
   niches:
   - crypto
   - finance
+  whop_linked: false
   auto_post: true
 - id: ig_manifestation
   label: Instagram Reels (@modernmanifestationsecrets)
@@ -57,6 +62,7 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
+  whop_linked: false
   auto_post: true
 - id: tt_cryptohustler
   label: TikTok draft (@iamcryptohustler)
@@ -66,6 +72,7 @@ targets:
   niches:
   - crypto
   - finance
+  whop_linked: false
   auto_post: true
 - id: tt_mnfsttnsecrets
   label: TikTok draft (@mnfsttnsecrets)
@@ -76,6 +83,7 @@ targets:
   - manifestation
   - selfimprovement
   - lifestyle
+  whop_linked: false
   auto_post: true
 - id: x_mostviewedclips
   label: X (@MostViewedClips)
@@ -86,6 +94,7 @@ targets:
   - esports
   - entertainment
   - movies_tv
+  whop_linked: false
   auto_post: false
 - id: x_cryptoericknox
   label: X (@cryptoericknox)
@@ -94,6 +103,7 @@ targets:
   niches:
   - crypto
   - finance
+  whop_linked: false
   auto_post: false
 cadence:
   youtube:
@@ -113,4 +123,4 @@ youtube:
   geo_location: New York, NY
   category_id: '24'
 whop:
-  submit_deadline_minutes: 60
+  submit_deadline_minutes: 30
