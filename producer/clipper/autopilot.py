@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from pydantic import BaseModel, Field
+
 from . import db, targets
 from .config import campaign_dir, cfg
 
@@ -191,6 +193,56 @@ def _approve(campaign_id: str | None, report: dict) -> int:
     return n
 
 
+class _Submission(BaseModel):
+    campaign: str = Field(description="campaign title as shown")
+    date: str = Field(description="submission date as shown")
+    views: int = Field(description="view count shown for the clip (0 if none)")
+    status: str = Field(description="pending | approved | rejected | other")
+
+
+class _SubmissionList(BaseModel):
+    submissions: list[_Submission]
+
+
+def paperwork_check(report: dict) -> None:
+    """Campaigns with payout paperwork: when a submitted clip reaches its minimum payout, message you on
+    Telegram (a GitHub issue if Telegram isn't set up) saying exactly what to send, so the earnings aren't lost."""
+    import os
+
+    from . import llm, whop
+
+    campaigns = [c for c in db.rows("campaigns", "status IN ('joined','ended')")
+                 if (c.get("checklist") or {}).get("payout_steps")]
+    if not campaigns:
+        return
+    with whop.browser(headless=True) as page:
+        page.goto(cfg()["scout"]["marketplace_url"], wait_until="domcontentloaded", timeout=90000)
+        frame = whop._app_frame(page, 60)
+        page.wait_for_timeout(3000)
+        frame.get_by_text("Submissions", exact=True).first.click(force=True)
+        page.wait_for_timeout(8000)
+        whop._scroll_all(frame, 6)
+        text = frame.inner_text("body")
+    subs = llm.ask(f"List every submission on this Whop 'Your submissions' page.\n\n{text}", _SubmissionList).submissions
+    for c in campaigns:
+        d, ck = c.get("data") or {}, c["checklist"]
+        cpm = d.get("youtube_cpm") or d.get("best_other_cpm") or 0
+        min_views = 1000 * (d.get("youtube_min_payout") or 0) / cpm if cpm else 0
+        prefix = whop._prefix(c["title"])
+        for s in subs:
+            if whop._prefix(s.campaign) != prefix or s.status == "rejected" or s.views < max(min_views, 1):
+                continue
+            title = f"Payout paperwork due: {s.campaign} ({s.date}, {s.views:,} views)"
+            body = (f"A clip for **{s.campaign}** has {s.views:,} views, past the minimum payout "
+                    f"(~{min_views:,.0f} views). To get it paid:\n\n" + "\n".join(f"- {x}" for x in ck["payout_steps"])
+                    + "\n\nOpen Whop → Content Rewards → Submissions → View details on that clip for its submission ID.")
+            report.setdefault("paperwork", []).append(title)
+            if os.environ.get("GITHUB_ACTIONS"):  # one Telegram message per clip, the first day it qualifies
+                from .notify import once
+
+                once(f"paperwork|{s.campaign}|{s.date}|{s.views // 1000}", "💰 " + title, body)
+
+
 def produce(discover: bool = False) -> dict:
     """discover=True: every niche search, more campaigns opened, every brief read (a one-off sweep)."""
     import math
@@ -213,6 +265,12 @@ def produce(discover: bool = False) -> dict:
             report["errors"].append(f"scout {q or 'featured'}: {err.__class__.__name__}: {str(err)[:150]}")
             if "limit" in str(err).lower():
                 break
+
+    print("\n== payout paperwork check")
+    try:
+        paperwork_check(report)
+    except Exception as err:
+        report["errors"].append(f"paperwork check: {err.__class__.__name__}: {str(err)[:150]}")
 
     print("\n== 2. read briefs + reference materials")
     todo = [c for c in db.rows("campaigns", "status IN ('shortlisted','joined') ORDER BY score DESC")
@@ -299,6 +357,21 @@ def produce(discover: bool = False) -> dict:
     return report
 
 
+def summary_telegram(r: dict) -> str:
+    """The daily run in a few lines, for your phone."""
+    lines = [f"🎬 Daily clips: {len(r['approved'])} queued, {len(r['held'])} held, {r['clips_made']} made",
+             f"🔎 {r['scouted']} campaigns checked, {len(r['analyzed'])} briefs read"]
+    if r["joined"]:
+        lines.append("✅ Joined: " + ", ".join(r["joined"]))
+    if r.get("unfilled"):
+        lines.append("🕳 Empty slots: " + ", ".join(f"{k} {v:g}" for k, v in r["unfilled"].items()))
+    if r.get("paperwork"):
+        lines.append(f"💰 {len(r['paperwork'])} clip(s) need payout paperwork (separate messages)")
+    if r["errors"]:
+        lines.append(f"⚠️ {len(r['errors'])} error(s) - see the run summary on GitHub")
+    return "\n".join(lines)
+
+
 def summary_md(r: dict) -> str:
     lines = [f"**Scouted** {r['scouted']} · **analyzed** {len(r['analyzed'])} · **joined** {len(r['joined'])} · "
              f"**clips made** {r['clips_made']} · **auto-approved** {len(r['approved'])} · **held** {len(r['held'])}", ""]
@@ -310,6 +383,8 @@ def summary_md(r: dict) -> str:
         lines += ["### Held for your review (not posted)", *[f"- {h['id']}: {'; '.join(h['why'])[:200]}" for h in r["held"]], ""]
     if r["blocked_campaigns"]:
         lines += ["### Campaigns that need a human", *[f"- {k}: {'; '.join(v)[:200]}" for k, v in r["blocked_campaigns"].items()], ""]
+    if r.get("paperwork"):
+        lines += ["### Payout paperwork due (an issue is opened for each)", *[f"- {x}" for x in r["paperwork"]], ""]
     if r.get("unfilled"):
         lines += ["### Slots still empty (clips short per account)",
                   *[f"- {k}: {v:g}" for k, v in r["unfilled"].items()], ""]

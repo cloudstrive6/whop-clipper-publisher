@@ -291,6 +291,9 @@ def main(argv: list[str]) -> None:
         if os.environ.get("GITHUB_STEP_SUMMARY"):
             with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
                 fh.write(md)
+        if os.environ.get("GITHUB_ACTIONS"):
+            from .notify import telegram
+            telegram(autopilot.summary_telegram(report))
     elif cmd == "sync-producer":
         from . import export
         export.sync_producer(with_state="--with-state" in args, push="--no-push" not in args)
