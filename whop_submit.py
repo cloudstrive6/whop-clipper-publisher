@@ -83,20 +83,30 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
             box = dlg.locator("input[type=url], input[type=text], input[placeholder*='link' i], "
                               "input[placeholder*='http' i]").first
             box.fill(url)
-            page.wait_for_timeout(800)
-            # "I've read the requirements and accept that non-compliant submissions may be auto-rejected."
-            checks = dlg.locator("input[type=checkbox]")
-            for i in range(checks.count()):
-                try:
-                    checks.nth(i).check(timeout=5000)
-                except Exception:
-                    pass
+            box.press("Tab")  # blur triggers Whop's checks: linked account / not submitted / < 30 min
+            page.wait_for_timeout(4000)
+
+            # "I've read the requirements..." is a custom control, not a native checkbox: click its label.
+            consent = dlg.get_by_text("I've read the requirements", exact=False).first
+            consent.click(timeout=10000)
+            page.wait_for_timeout(1500)
+
+            submit_btn = dlg.locator("button:has-text('Submit clip')").last
+            for _ in range(20):  # wait until Whop's validations pass and the button enables
+                if submit_btn.is_enabled():
+                    break
+                page.wait_for_timeout(1000)
             page.screenshot(path=str(artifacts / f"{clip['clip_id']}-before-submit.png"))
-            dlg.locator("button:has-text('Submit clip')").last.click(timeout=20000)
+            if not submit_btn.is_enabled():
+                problems = dlg.inner_text()[:600]
+                raise RuntimeError(f"Whop kept Submit disabled (a check failed): {problems}")
+            submit_btn.click(timeout=20000)
             page.wait_for_timeout(8000)
             page.screenshot(path=str(artifacts / f"{clip['clip_id']}-after-submit.png"))
             body = frame.inner_text("body").lower()
-            return any(w in body for w in ("submitted", "under review", "pending review", "in review", "thanks"))
+            # success dialog: "Clip submitted - Your clip got submitted and is now part of the campaign."
+            return any(w in body for w in ("clip submitted", "now part of the campaign", "under review",
+                                           "pending review", "in review"))
         finally:
             ctx.close()
             browser.close()
