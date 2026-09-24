@@ -75,12 +75,20 @@ def _ytdlp(url: str, dest: Path, campaign_id: str, P: dict) -> None:
         raise subprocess.CalledProcessError(rc, "yt-dlp")
 
 
+def _publisher_posts() -> list[dict]:
+    """The publisher's post records: state/posts.json (older) plus one file per post in state/posts.d/."""
+    from .export import PUBLISHER
+
+    state = PUBLISHER / "state"
+    posts = json.loads((state / "posts.json").read_text(encoding="utf-8"))["posts"] if (state / "posts.json").exists() else []
+    return posts + [json.loads(f.read_text(encoding="utf-8")) for f in sorted((state / "posts.d").glob("*.json"))]
+
+
 def _unposted(campaign_id: str) -> int:
     """Clips of this campaign still waiting in the publisher queue for at least one account."""
     from .export import PUBLISHER
 
-    state = PUBLISHER / "state" / "posts.json"
-    posts = json.loads(state.read_text(encoding="utf-8"))["posts"] if state.exists() else []
+    posts = _publisher_posts()
     done = {(p["clip_id"], p["target_id"]) for p in posts if p["status"] in ("posted", "draft_uploaded")}
     n = 0
     for meta in (PUBLISHER / "queue").glob("*/meta.json"):
@@ -111,8 +119,7 @@ def _queued_for(target_id: str) -> int:
     """Clips waiting in the publisher queue that this account hasn't posted yet."""
     from .export import PUBLISHER
 
-    state = PUBLISHER / "state" / "posts.json"
-    posts = json.loads(state.read_text(encoding="utf-8"))["posts"] if state.exists() else []
+    posts = _publisher_posts()
     done = {p["clip_id"] for p in posts if p["target_id"] == target_id and p["status"] in ("posted", "draft_uploaded")}
     n = 0
     for meta in (PUBLISHER / "queue").glob("*/meta.json"):
