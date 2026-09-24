@@ -166,10 +166,10 @@ editing:
 produce:
   analyze_per_run: 10         # new campaign briefs read per run (each is one AI call + reference docs)
   auto_join: true             # join campaigns that pass the scout, fit an account and need no human steps
-  max_new_clips_per_run: 24
+  max_new_clips_per_run: 40   # ~16 approved clips a day at a ~40% audit pass rate: every slot filled
   max_clips_per_campaign: 10  # per run, so one campaign can't take every slot
   buffer_days: 1.5            # keep each account's queue this many days of posts deep
-  max_minutes: 150            # stop making clips after this long (GitHub minutes)
+  max_minutes: 230            # stop making clips after this long (the job times out at 300)
   allow_payout_paperwork: true   # also clip campaigns whose only human step comes at payout (you do that paperwork)
   max_source_mb: 1500         # skip single source files bigger than this
   channel_videos: 3           # when a campaign's source is a whole channel, take its N newest videos
