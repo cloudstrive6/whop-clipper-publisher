@@ -13,6 +13,33 @@ PUBLISHER = Path(os.environ.get("PUBLISHER_DIR", ROOT / "publisher"))
 QUEUE_RELEASE = os.environ.get("QUEUE_RELEASE")  # cloud: videos go to this GitHub release, not into git
 
 
+def platform_mentions(checklist: dict | None) -> dict:
+    """{platform: {"@required": "@handle_on_that_platform"}} for creators whose handle differs by platform.
+
+    The brief's links show the real accounts (youtube.com/@alichoucairr, instagram.com/alichoucair); a
+    required tag that's a near-match of one of them is swapped for it on that platform only."""
+    import re
+    from difflib import SequenceMatcher
+
+    ck = checklist or {}
+    found = {}
+    for url in ck.get("source_assets", []) or []:
+        for platform, pat in (("youtube", r"youtube\.com/@([\w.-]+)"), ("tiktok", r"tiktok\.com/@([\w.]+)"),
+                              ("instagram", r"instagram\.com/(?!p/|reel/|reels/|stories/)([\w.]+)")):
+            m = re.search(pat, url, re.I)
+            if m:
+                found.setdefault(platform, m.group(1).rstrip("."))
+    required = {t for req in ck.get("required_in_caption", []) or [] for t in re.findall(r"@[\w.]+", req)}
+    out: dict = {}
+    for tag in required:
+        base = tag[1:].rstrip(".").lower()
+        for platform, handle in found.items():
+            h = handle.lower()
+            if h != base and SequenceMatcher(None, h, base).ratio() >= 0.8:
+                out.setdefault(platform, {})[tag.rstrip(".")] = "@" + handle
+    return out
+
+
 def export_queue() -> int:
     """Copies every approved, audited clip into publisher/queue/<clip_id>/."""
     queue = PUBLISHER / "queue"
@@ -53,6 +80,7 @@ def export_queue() -> int:
             "targets": tgts,
             "submit_within_minutes": cfg()["whop"]["submit_deadline_minutes"],
             **({"video_asset": asset} if asset else {}),
+            "mentions": platform_mentions(campaign.get("checklist")),
         }, indent=2), encoding="utf-8")
         db.upsert("clips", {"id": c["id"], "status": "queued"})
         n += 1
