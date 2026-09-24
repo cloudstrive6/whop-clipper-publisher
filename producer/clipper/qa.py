@@ -22,9 +22,14 @@ def check(file: Path, meta: dict, checklist: dict | None) -> dict:
     if not p["has_audio"]:
         issues.append("no audio track")
     text = " ".join([meta.get("title", ""), meta.get("description", ""), " ".join(meta.get("hashtags", []))]).lower()
+    import re
+
     for req in ck.get("required_in_caption", []):
-        if req.lower() not in text:
-            issues.append(f"caption missing required text: {req!r}")
+        # same reading as _enforce_caption: "Tag @x in every post" requires "@x", not the sentence
+        tokens = re.findall(r"https?://\S+|[@#][\w.]+", req) if " " in req.strip() else [req.strip()]
+        for tok in (t.rstrip(".,;:)") for t in tokens):
+            if tok and tok.lower() not in text:
+                issues.append(f"caption missing required text: {tok!r}")
     # the campaign panel's own bullets are binding: enforce what is measurable, surface the rest
     for req in ck.get("content_requirements_verbatim", []) + ck.get("creator_requirements_verbatim", []):
         m = re.search(r"minimum (?:video )?length[^\d]*(\d+)\s*s", req, re.I)
