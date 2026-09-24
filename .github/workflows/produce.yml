@@ -8,6 +8,11 @@ on:
   repository_dispatch:
     types: [produce]         # cron-job.org can fire this too (GitHub's own cron sometimes skips runs)
   workflow_dispatch:
+    inputs:
+      discover:
+        description: "Full discovery sweep: every niche search, every brief read"
+        type: boolean
+        default: false
 
 concurrency:
   group: produce
@@ -103,7 +108,7 @@ jobs:
             export YT_COOKIES_FILE="$RUNNER_TEMP/yt_cookies.txt"
           fi
           cd producer
-          python -u -m clipper produce
+          python -u -m clipper produce ${{ inputs.discover && '--discover' || '' }}
 
       - name: Keep Whop's refreshed login
         if: always()
