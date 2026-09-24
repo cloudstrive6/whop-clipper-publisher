@@ -11,7 +11,9 @@ class Moment(BaseModel):
     end: float = Field(description="Clip end in seconds, right after the payoff")
     hook_text: str = Field(description="Short curiosity hook shown at the top of the screen, max 8 words, no emojis")
     title: str = Field(description="YouTube Shorts title, max 90 chars, curiosity-driven, not clickbait lies")
-    description: str = Field(description="YouTube description, 1-2 sentences; include every required caption item")
+    description: str = Field(description="Viewer-facing description, 1-2 sentences, written for the audience. "
+                                         "Weave in the literal required handles/links (e.g. 'via @creator'); "
+                                         "never write instructions or brief wording such as 'Tag @x'")
     hashtags: list[str] = Field(description="3-6 hashtags incl. #shorts and any required ones")
     hook_type: str = Field(description="wild_statement | chaos_start | visual_action | peak_reaction | trend | question")
     why_viral: str = Field(description="One sentence: the emotion/intrigue that keeps people watching")

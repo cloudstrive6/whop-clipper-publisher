@@ -24,7 +24,10 @@ class Checklist(BaseModel):
     min_seconds: int | None = Field(description="Minimum clip length in seconds, if stated")
     max_seconds: int | None = Field(description="Maximum clip length in seconds, if stated")
     required_on_screen: list[str] = Field(description="Things that must appear in the video (logos, text, CTA, demographic info, etc.)")
-    required_in_caption: list[str] = Field(description="Exact hashtags, @mentions, links or phrases required in title/description")
+    required_in_caption: list[str] = Field(
+        description="The literal text that must appear in the title/description, one item each, exactly as it should "
+                    "be published: '@handle', '#hashtag', a URL, or a required phrase. Not the instruction around "
+                    "it: 'Tag @alichoucair in every post' -> '@alichoucair'")
     required_in_bio: list[str] = Field(description="Things required in the channel description/bio (e.g. 'sponsored by X')")
     forbidden: list[str] = Field(description="Things that get clips rejected (other brands, overly promotional tone, reuploads, etc.)")
     source_assets: list[str] = Field(description="URLs of footage/asset folders we may clip from")

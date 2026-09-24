@@ -58,6 +58,7 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
         out = cdir / "clips" / f"{cid}.mp4"
         render.render(video, segs, m.start, m.end, m.hook_text, out, music=use_music, disclosure=disclosure)
         meta = _enforce_caption(m.model_dump(), checklist)
+        meta["disclosure"] = disclosure  # the audit states exactly what was burned in
         report = qa.check(out, meta, checklist)
         db.upsert("clips", {"id": cid, "campaign_id": campaign_id, "source": str(video), "start": m.start,
                             "end": m.end, "meta": meta, "file": str(out), "qa": report,
@@ -132,14 +133,22 @@ def render_probe(p: Path) -> dict:
 
 def _enforce_caption(meta: dict, checklist: dict | None) -> dict:
     """Required caption items (disclosures, tags, links) are added in code, never left to the model."""
-    text = f"{meta.get('title', '')} {meta.get('description', '')} {' '.join(meta.get('hashtags', []))}".lower()
+    import re
+
+    def text() -> str:
+        return f"{meta.get('title', '')} {meta.get('description', '')} {' '.join(meta.get('hashtags', []))}".lower()
+
     for req in (checklist or {}).get("required_in_caption", []):
-        if req.lower() in text:
-            continue
-        if req.startswith("#") and " " not in req:
-            meta["hashtags"] = [req] + [h for h in meta.get("hashtags", []) if h.lower() != req.lower()]
-        else:
-            meta["description"] = f"{meta.get('description', '').rstrip()}\n{req}"
+        # a requirement is often phrased as an instruction ("Tag @x in every post"): add only the literal
+        # tags/handles/links it names, never the instruction itself
+        tokens = re.findall(r"https?://\S+|[@#][\w.]+", req) if " " in req.strip() else [req.strip()]
+        for tok in (t.rstrip(".,;:)") for t in tokens):
+            if not tok or tok.lower() in text():
+                continue
+            if tok.startswith("#"):
+                meta["hashtags"] = [tok] + [h for h in meta.get("hashtags", []) if h.lower() != tok.lower()]
+            else:
+                meta["description"] = f"{meta.get('description', '').rstrip()}\n\n{tok}"
     return meta
 
 

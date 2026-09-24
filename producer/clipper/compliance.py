@@ -109,7 +109,9 @@ source file: {Path(clip['source']).name}
 KNOWN FACTS you may rely on (verified by the pipeline, treat as established):
 - the source file was downloaded directly from this campaign's official asset folder; provenance is confirmed
 - no music or audio was added: the audio is exactly the source clip's own audio, untouched
-- the only additions are the text overlays listed above (hook, captions, disclosure badge) rendered over the frame
+- the only additions are text overlays rendered over the frame: the hook text, word-by-word captions (horizontal sources only){f", and a '{meta['disclosure']}' disclosure badge (top right, whole clip)" if meta.get('disclosure') else ''}.
+  {'' if meta.get('disclosure') else 'No on-screen disclosure badge was added, because the campaign rules do not ask for one.'}
+- TikTok posts are published with TikTok's branded-content flag switched on
 - destinations are exactly: {destinations}. Nothing is posted anywhere else.
 - at publish time the post carries the location "{geo}" in the platform's recording-location field
   (YouTube Shorts has no native geo-tag control; this is the closest equivalent the platform offers)
@@ -121,7 +123,12 @@ transcript of this segment:
 Check every requirement, including: required caption text/tags/disclosure present; length; forbidden words or
 claims in the title, description, hook and speech; footage came from the approved source; on-screen elements;
 tone (does it read as a real clip rather than an ad?). Mark account-level rules (bio, follows, audience
-geography, keeping the post up) as needs_human."""
+geography, keeping the post up) as needs_human.
+The title and description are published verbatim: FAIL them if they contain brief/instruction wording aimed at
+clippers (e.g. "Tag @x in every post") instead of viewer-facing text.
+Judge disclosure only against what the campaign's own rules and reference materials require. General
+platform-policy questions (e.g. whether YouTube's paid-promotion box should be ticked) go in human_todo and do not
+make safe_to_autopost false by themselves."""
     return llm.ask(prompt, Audit, SYSTEM, files=[str(sheet)])
 
 
