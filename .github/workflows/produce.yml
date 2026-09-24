@@ -81,6 +81,7 @@ jobs:
       - name: Produce clips
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY_BACKUP: ${{ secrets.ANTHROPIC_API_KEY_BACKUP }}   # optional: used only once the plan limit is hit
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           PUBLISHER_DIR: ${{ github.workspace }}
           QUEUE_RELEASE: queue
