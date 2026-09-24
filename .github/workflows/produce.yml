@@ -78,6 +78,8 @@ jobs:
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
           GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python renew.py whop-check
 
       - name: Renew Instagram tokens (each one weekly)
@@ -85,6 +87,8 @@ jobs:
           INSTAGRAM_TOKENS: ${{ secrets.INSTAGRAM_TOKENS }}
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
           GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python renew.py instagram
 
       - name: Produce clips
@@ -94,6 +98,8 @@ jobs:
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           PUBLISHER_DIR: ${{ github.workspace }}
           QUEUE_RELEASE: queue
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           YT_COOKIES: ${{ secrets.YT_COOKIES }}   # optional: a throwaway Google account's youtube.com cookies
         run: |
           if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then

@@ -26,10 +26,14 @@ jobs:
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
           GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python renew.py whop-check
       - name: Instagram tokens
         env:
           INSTAGRAM_TOKENS: ${{ secrets.INSTAGRAM_TOKENS }}
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
           GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python renew.py instagram

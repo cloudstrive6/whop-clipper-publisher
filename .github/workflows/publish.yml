@@ -67,6 +67,8 @@ jobs:
           POSTFORME_API_KEY: ${{ secrets.POSTFORME_API_KEY }}
           WHOP_SESSION: ${{ secrets.WHOP_SESSION }}
           WHOP_SESSION_OUT: ${{ runner.temp }}/whop_session.json
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python publish.py --platform "${{ steps.which.outputs.platform }}" \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}

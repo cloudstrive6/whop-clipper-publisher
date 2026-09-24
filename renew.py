@@ -36,13 +36,10 @@ def set_secret(name: str, value: str) -> bool:
 
 
 def alert(title: str, body: str) -> None:
-    """A GitHub issue emails the repo owner; one open issue per problem."""
-    gh = {**os.environ, "GH_TOKEN": os.environ.get("GITHUB_TOKEN", "")}
-    existing = subprocess.run(["gh", "issue", "list", "--repo", REPO, "--state", "open", "--search", title,
-                               "--json", "title"], capture_output=True, text=True, env=gh).stdout
-    if title in existing:
-        return
-    subprocess.run(["gh", "issue", "create", "--repo", REPO, "--title", title, "--body", body], env=gh)
+    """Telegram, or a GitHub issue if Telegram isn't set up."""
+    from notify import alert as send
+
+    send(title, body)
 
 
 def whop_check() -> int:

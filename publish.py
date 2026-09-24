@@ -83,6 +83,15 @@ def with_mentions(text: str, clip: dict, platform: str) -> str:
     return text
 
 
+def unsubmitted_alert(clip: dict, target: dict, url: str, why: str) -> None:
+    """Whop only accepts a link for ~30 minutes after posting: tell you straight away."""
+    from notify import alert
+
+    alert(f"⚠️ Submit this on Whop now (30-min window): {target['label']}",
+          f"Campaign: {clip['campaign_title']}\nLink: {url}\n\nThe automatic submission failed ({why}).\n"
+          "Whop → Content Rewards → the campaign → Submit clip → paste the link.")
+
+
 def ensure_video(clip: dict) -> None:
     if clip["file"].exists() or not clip.get("video_asset"):
         return
@@ -173,6 +182,10 @@ def main() -> int:
         state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
                                "status": status, "url": url, "note": note, "at": now(), "submitted": False})
         save_state(state)
+        if status == "posted" and not url:  # e.g. TikTok published but its video link never showed up
+            exit_code = 1
+            unsubmitted_alert(clip, t, f"(no link found - open the latest post on {t['label']})",
+                              "the platform didn't return the video link")
 
         # Whop pays only if the post is submitted inside the campaign's window (30 min on most campaigns)
         if status == "posted" and url and not args.dry_run:
@@ -185,9 +198,11 @@ def main() -> int:
                 if not ok:
                     exit_code = 1
                     print("  !! post is live but UNSUBMITTED - submit it by hand now, it earns nothing otherwise")
+                    unsubmitted_alert(clip, t, url, "no confirmation from Whop")
             except Exception as err:
                 print(f"  whop submission error: {err.__class__.__name__}: {err}")
                 exit_code = 1
+                unsubmitted_alert(clip, t, url, f"{err.__class__.__name__}: {str(err)[:200]}")
             save_state(state)
     if not args.dry_run:
         retire_finished(state, clips)
