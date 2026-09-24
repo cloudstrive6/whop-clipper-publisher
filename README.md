@@ -60,6 +60,12 @@ The PAT needs only `Contents: read/write` and `Metadata: read` on this repo (fin
 | `POSTFORME_API_KEY` | Post for Me project key (TikTok drafts, X) |
 | `WHOP_SESSION` | Playwright storage_state for whop.com, from `python -m clipper export-session` |
 
+## Before an account can earn
+
+Every account must be connected **inside the Content Rewards app**: Discover → Content Rewards →
+Settings → Connected accounts → Connect account. The Whop profile's "Social accounts" list is separate
+and is **not** what the "Posted from one of your linked accounts" check uses.
+
 ## When something breaks
 
 - **Whop submission fails / "session is stale"** — run `python -m clipper export-session` locally and
@@ -68,6 +74,8 @@ The PAT needs only `Contents: read/write` and `Metadata: read` on this repo (fin
   to production in the Google Auth Platform console.
 - **TikTok posts appear as drafts** — Post for Me refused a direct post; open TikTok and publish the
   draft with the caption saved beside the clip.
+- **"rejected: Posted from one of your linked accounts"** — that account isn't connected inside the
+  Content Rewards app (see above). The post can't be rescued once 30 minutes pass.
 - **"nothing queued"** — the local producer hasn't pushed new clips. Run a local batch.
 
 Proof screenshots of each Whop submission are attached to every workflow run as artifacts.
