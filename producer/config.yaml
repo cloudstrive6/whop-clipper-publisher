@@ -162,7 +162,7 @@ editing:
 
 # daily cloud producer (GitHub Actions, PC off): scout -> analyze -> join -> clip -> audit -> queue
 produce:
-  analyze_per_run: 6          # new campaign briefs read per run (each is one AI call + reference docs)
+  analyze_per_run: 10         # new campaign briefs read per run (each is one AI call + reference docs)
   auto_join: true             # join campaigns that pass the scout, fit an account and need no human steps
   max_new_clips_per_run: 12
   queue_target_per_campaign: 6  # stop making clips for a campaign while this many are still unposted

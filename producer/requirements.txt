@@ -1,6 +1,6 @@
 # cloud producer (GitHub Actions, CPU only)
 faster-whisper==1.2.1
-yt-dlp==2026.8.19
+yt-dlp[default]==2026.8.19   # [default] adds the YouTube JS-challenge solver (runs on Deno)
 gdown==6.4.0
 playwright==1.63.0
 pydantic==2.13.5
