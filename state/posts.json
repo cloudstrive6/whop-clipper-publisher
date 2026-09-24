@@ -4,21 +4,11 @@
       "clip_id": "coinbase-x-valorant-clip-1v1-0",
       "target_id": "yt_pogingpanda",
       "campaign_id": "coinbase-x-valorant-clipping",
-      "status": "dry_run",
-      "url": "",
-      "note": "would post coinbase-x-valorant-clip-1v1-0 to YouTube Shorts (@PogingPanda)",
-      "at": "2026-09-24T09:11:46+00:00",
-      "submitted": false
-    },
-    {
-      "clip_id": "coinbase-x-valorant-clip-1v1-0",
-      "target_id": "ig_kiwinoygamer",
-      "campaign_id": "coinbase-x-valorant-clipping",
-      "status": "dry_run",
-      "url": "",
-      "note": "would post coinbase-x-valorant-clip-1v1-0 to Instagram Reels (@kiwinoygamer)",
-      "at": "2026-09-24T09:11:46+00:00",
-      "submitted": false
+      "status": "posted",
+      "url": "https://www.youtube.com/shorts/jMay5hZgb30",
+      "note": "first live post; submitted by hand after the selector bug",
+      "at": "2026-09-24T09:55:58+00:00",
+      "submitted": true
     }
   ]
 }
