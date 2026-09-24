@@ -16,7 +16,7 @@ def download(url: str, dest: Path) -> list[Path]:
         if "/folders/" in url:
             gdown.download_folder(url, output=str(dest), quiet=False, remaining_ok=True)
         else:
-            gdown.download(url, output=str(dest) + "/", quiet=False, fuzzy=True)
+            gdown.download(url=url, output=str(dest) + "/", quiet=False)
     else:
         subprocess.run(
             [sys.executable, "-m", "yt_dlp", "-f", "bv*[height<=1080]+ba/b[height<=1080]/b",

@@ -33,6 +33,9 @@ class Checklist(BaseModel):
     needs_manual_action: list[str] = Field(description="Things the pipeline cannot do automatically and the human must do")
     application_answers_needed: list[str] = Field(description="Questions asked by the application/waitlist form, if any")
     red_flags: list[str] = Field(description="Reasons this campaign may not be worth it (low pay, strict rules, near-empty budget)")
+    content_language: str = Field(
+        description="Main spoken language of the source footage and the campaign's target audience, lowercase "
+                    "English name (english, portuguese, spanish, hindi, ...). 'none' if the footage has no speech.")
     auto_ok: bool = Field(
         description="True only if an unattended pipeline (download footage, cut + caption clips, post, submit the link) "
                     "can produce fully compliant clips AND get them paid with no human step. False if it needs the "

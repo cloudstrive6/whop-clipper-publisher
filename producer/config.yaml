@@ -172,6 +172,8 @@ produce:
   # campaigns to clip even though the brief has a human-only step (e.g. demographic proof at payout,
   # which you then provide yourself). Campaign ids as shown by: python -m clipper campaigns
   override_campaigns: []
+  languages: [english, none]  # footage/audience languages the accounts can use
+  searches_per_run: 2         # niche searches per run, rotating through scout.search_queries
 
 youtube:
   client_secret: secrets/client_secret.json

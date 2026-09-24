@@ -6,6 +6,7 @@ scout -> read briefs + reference docs -> join -> download footage -> clip -> com
 Every step is best-effort per campaign: one broken campaign never stops the others.
 """
 import json
+import os
 import re
 import subprocess
 import sys
@@ -23,6 +24,11 @@ def _auto_ok(campaign: dict) -> bool:
     """The brief needs no human step, or you opted the campaign in (you handle its payout paperwork)."""
     overrides = cfg()["produce"].get("override_campaigns") or []
     return bool((campaign.get("checklist") or {}).get("auto_ok")) or campaign["id"] in overrides
+
+
+def _language_ok(campaign: dict) -> bool:
+    lang = ((campaign.get("checklist") or {}).get("content_language") or "english").lower()
+    return lang in (cfg()["produce"].get("languages") or ["english", "none"])
 
 
 def _linked_targets(campaign: dict) -> list[dict]:
@@ -62,6 +68,9 @@ def _ytdlp(url: str, dest: Path, campaign_id: str, P: dict) -> None:
             "--match-filter", f"duration < {P['max_source_minutes'] * 60} & !is_live",
             "--download-archive", str(campaign_dir(campaign_id) / "yt_archive.txt"),
             "-o", str(dest / "%(title).80s [%(id)s].%(ext)s")]
+    cookies = os.environ.get("YT_COOKIES_FILE")
+    if cookies and Path(cookies).exists():
+        args += ["--cookies", cookies]
     if CHANNEL.search(url):  # a whole channel: only its newest uploads
         url = re.sub(r"/(videos|shorts|streams)?/?$", "", url) + "/videos"
         args += ["--playlist-end", str(P["channel_videos"])]
@@ -92,7 +101,13 @@ def produce() -> dict:
               "held": [], "blocked_campaigns": {}, "errors": []}
 
     print("== 1. scout (featured + niche searches)")
-    for q in [None] + cfg()["scout"].get("search_queries", []):
+    import datetime
+
+    queries = cfg()["scout"].get("search_queries", [])
+    k = P.get("searches_per_run", 2)
+    start = (datetime.date.today().toordinal() * k) % max(len(queries), 1)
+    todays = (queries[start:] + queries[:start])[:k]
+    for q in [None] + todays:
         try:
             report["scouted"] += len(whop.scout(query=q, max_details=12 if q is None else 5))
         except Exception as err:
@@ -102,7 +117,7 @@ def produce() -> dict:
 
     print("\n== 2. read briefs + reference materials")
     todo = [c for c in db.rows("campaigns", "status IN ('shortlisted','joined') ORDER BY score DESC")
-            if "auto_ok" not in (c.get("checklist") or {})][:P["analyze_per_run"]]
+            if "content_language" not in (c.get("checklist") or {})][:P["analyze_per_run"]]
     for c in todo:
         text = (c.get("data") or {}).get("brief_text")
         if not text:
@@ -123,6 +138,8 @@ def produce() -> dict:
             why.append("requires an application")
         if not _linked_targets(c):
             why.append("no linked account in its niche/platforms")
+        if not _language_ok(c):
+            why.append(f"footage/audience is {ck.get('content_language')}; the accounts' audiences are English")
         if why:
             report["blocked_campaigns"][c["id"]] = why
             continue
@@ -141,6 +158,9 @@ def produce() -> dict:
             report["blocked_campaigns"][c["id"]] = ck.get("auto_blockers") or ["not analyzed yet"]
             continue
         if not _linked_targets(c):
+            continue
+        if not _language_ok(c):
+            report["blocked_campaigns"][c["id"]] = [f"{ck.get('content_language')} footage/audience"]
             continue
         room = P["queue_target_per_campaign"] - _unposted(c["id"])
         if room <= 0:
