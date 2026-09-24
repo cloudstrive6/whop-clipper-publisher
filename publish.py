@@ -157,6 +157,8 @@ def main() -> int:
             status, url, note = "failed", "", f"{err.__class__.__name__}: {err}"[:400]
             exit_code = 1
         print(f"{t['label']}: {status} {clip['clip_id']} {url} {note}".rstrip())
+        if args.dry_run:
+            continue
         state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
                                "status": status, "url": url, "note": note, "at": now(), "submitted": False})
         save_state(state)
