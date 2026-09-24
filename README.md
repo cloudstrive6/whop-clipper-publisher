@@ -15,6 +15,17 @@ The producer code is a copy of the PC's `clipper/` package in `producer/`. After
 `config.yaml` on the PC, run `python -m clipper sync-producer`. The cloud owns the database
 (`producer/data/state.db`); `python -m clipper pull-state` brings it back to the PC.
 
+## Safety checks on every post (all accounts, all platforms)
+
+1. **Never twice.** Before posting, the publisher asks the platform itself (YouTube uploads, Instagram media,
+   TikTok feed) whether the clip is already on the account, and claims the slot in the repo before uploading,
+   so overlapping runs can't double-post.
+2. **Only what can be submitted.** Before posting, it opens the campaign's Whop Submit dialog (and cancels
+   it). If Whop isn't reachable, or the campaign has ended, the clip is **held for a later slot** instead of
+   posted, and you get a Telegram note. Nothing is posted that would need a hand submission.
+3. **Submission retries** run for up to ~25 minutes of Whop's 30-minute window. If the first attempt fails
+   you're told on Telegram straight away.
+
 ## Schedule (cron-job.org)
 
 Create three jobs. Each one is a POST to:

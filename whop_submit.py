@@ -161,7 +161,7 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
     artifacts.mkdir(exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=True, channel=os.environ.get("PW_CHANNEL") or None)
         ctx = browser.new_context(storage_state=json.loads(session), viewport={"width": 1440, "height": 900})
         page = ctx.new_page()
         try:
@@ -226,3 +226,48 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
         finally:
             ctx.close()
             browser.close()
+
+
+def preflight(clip: dict, tries: int = 2) -> str | None:
+    """Can this campaign's clips be submitted right now? Opens the Submit dialog and cancels it.
+
+    Returns None when ready, otherwise the reason. Run before posting: a post that can't be submitted
+    earns nothing, so it's better held for the next slot than posted."""
+    from playwright.sync_api import sync_playwright
+
+    session = os.environ.get("WHOP_SESSION")
+    if not session:
+        return "missing secret WHOP_SESSION"
+    reason = "unknown"
+    for attempt in range(tries):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, channel=os.environ.get("PW_CHANNEL") or None)
+            ctx = browser.new_context(storage_state=json.loads(session), viewport={"width": 1440, "height": 900})
+            page = ctx.new_page()
+            try:
+                page.goto(MARKETPLACE, wait_until="domcontentloaded", timeout=90000)
+                frame = _app_frame(page)
+                page.wait_for_timeout(3000)
+                if "/login" in page.url:
+                    return "the Whop login has expired"
+                _scroll(frame)
+                frame = _open_campaign(page, frame, clip["campaign_title"])
+                if frame is None:
+                    reason = f"campaign {clip['campaign_title']!r} not found on Whop (ended or renamed)"
+                    continue
+                frame.locator("button:has-text('Submit clip')").first.click(timeout=20000)
+                page.wait_for_timeout(3000)
+                dlg = frame.locator("[role=dialog]").last
+                if "submit video link" not in dlg.inner_text().lower():
+                    reason = "the Submit dialog didn't open"
+                    continue
+                dlg.get_by_text("Cancel", exact=True).first.click(timeout=5000)
+                return None
+            except Exception as err:
+                reason = f"{err.__class__.__name__}: {str(err)[:150]}"
+            finally:
+                ctx.close()
+                browser.close()
+        page_wait = 20 * (attempt + 1)
+        time.sleep(page_wait)
+    return reason

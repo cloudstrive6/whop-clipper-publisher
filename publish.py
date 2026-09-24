@@ -91,13 +91,13 @@ def queue_items() -> list[dict]:
 def posted_count(state: dict, target_id: str, hours: int = 24) -> int:
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
     return sum(1 for p in state["posts"]
-               if p["target_id"] == target_id and p["status"] in ("posted", "draft_uploaded")
+               if p["target_id"] == target_id and p["status"] in ("posted", "draft_uploaded", "posting")
                and datetime.fromisoformat(p["at"]) > cutoff)
 
 
 def already_posted(state: dict, clip_id: str, target_id: str) -> bool:
     return any(p["clip_id"] == clip_id and p["target_id"] == target_id
-               and p["status"] in ("posted", "draft_uploaded") for p in state["posts"])
+               and p["status"] in ("posted", "draft_uploaded", "posting") for p in state["posts"])
 
 
 def next_clip(state: dict, target: dict, clips: list[dict]) -> dict | None:
@@ -196,6 +196,8 @@ def main() -> int:
         targets = [t for t in targets if t["id"] == args.account]
 
     exit_code = 0
+    whop_ready: dict[str, str | None] = {}  # campaign -> None if submittable, else why not
+    held_alerted: set[str] = set()
     for t in targets:
         cadence = cfg.get("cadence", {}).get(t["platform"], {})
         cap = cadence.get("per_day", 3)
@@ -208,17 +210,60 @@ def main() -> int:
         if not clip:
             print(f"{t['label']}: nothing queued for this account")
             continue
+        if args.dry_run:
+            print(f"{t['label']}: would post {clip['clip_id']}")
+            continue
+
+        # guard 1: never twice - ask the platform itself whether this clip is already on the account
+        caption = with_mentions(clip["caption"], clip, t["platform"])
+        try:
+            import guards
+
+            found = guards.already_on_account(t, clip, caption)
+        except Exception as err:
+            found = None
+            print(f"  (couldn't check the account for duplicates: {err.__class__.__name__})")
+        if found:
+            url, at = found
+            print(f"{t['label']}: {clip['clip_id']} is already on the account ({url}) - not posting it again")
+            state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
+                                   "status": "posted", "url": url, "note": "found on the account", "_new": True,
+                                   "at": at.astimezone(timezone.utc).isoformat(timespec="seconds"), "submitted": False})
+            save_state(state)
+            share_state(f"record existing post of {clip['clip_id']} on {t['id']}")
+            continue
+
+        # guard 2: only post what can be submitted - the campaign's Whop Submit dialog must open right now
+        import whop_submit
+
+        if clip["campaign_id"] not in whop_ready:
+            whop_ready[clip["campaign_id"]] = whop_submit.preflight(clip)
+        if whop_ready[clip["campaign_id"]]:
+            why = whop_ready[clip["campaign_id"]]
+            print(f"{t['label']}: holding {clip['clip_id']} - Whop isn't ready ({why}); it posts in a later slot")
+            if clip["campaign_id"] not in held_alerted:
+                held_alerted.add(clip["campaign_id"])
+                from notify import alert
+
+                alert(f"⏸ Posts held: Whop submission unavailable for {clip['campaign_title']}",
+                      f"Reason: {why}\n\nNothing was posted, so nothing is lost: the clips wait for the next slot. "
+                      "If this repeats, the campaign may have ended or the Whop login may need renewing.")
+            exit_code = 1
+            continue
+
+        # guard 3: claim the slot in the repo before uploading, so an overlapping run skips this clip
+        state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
+                               "status": "posting", "url": "", "note": "", "at": now(), "submitted": False,
+                               "_new": True})
+        save_state(state)
+        share_state(f"posting {clip['clip_id']} to {t['id']}")
         try:
             status, url, note = post_clip(clip, t, cfg, args.dry_run)
         except Exception as err:
             status, url, note = "failed", "", f"{err.__class__.__name__}: {err}"[:400]
             exit_code = 1
         print(f"{t['label']}: {status} {clip['clip_id']} {url} {note}".rstrip())
-        if args.dry_run:
-            continue
-        state["posts"].append({"clip_id": clip["clip_id"], "target_id": t["id"], "campaign_id": clip["campaign_id"],
-                               "status": status, "url": url, "note": note, "at": now(), "submitted": False,
-                               "_new": True})
+        state["posts"][-1].update(status=status, url=url, note=note, at=now())
         save_state(state)
         share_state(f"posted {clip['clip_id']} to {t['id']}")
         if status == "posted" and not url:  # e.g. TikTok published but its video link never showed up
