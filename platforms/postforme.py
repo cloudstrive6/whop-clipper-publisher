@@ -4,6 +4,7 @@ TikTok: tries a direct public post first (Post for Me is an audited TikTok partn
 rejects direct posting, it falls back to a draft, which you publish from the TikTok app.
 """
 import os
+import time
 import urllib.request
 from pathlib import Path
 
@@ -39,6 +40,25 @@ def upload(client, file: Path) -> str:
     return slot.media_url
 
 
+def video_url(c, acct: str, post_id: str, caption: str, wait_s: int = 300) -> str:
+    """The TikTok video's own link, which Whop needs (Post for Me's result only has the profile link).
+
+    Waits for the publish to finish, then finds the video in the account's feed by its caption."""
+    want = caption.strip()[:60]
+    end = time.time() + wait_s
+    while time.time() < end:
+        time.sleep(15)
+        results = c.social_post_results.list(post_id=[post_id]).data
+        if not results:
+            continue
+        if results[0].success is False:
+            return ""
+        for item in c.social_account_feeds.list(acct, limit=10).data:
+            if (getattr(item, "caption", "") or "").strip()[:60] == want and getattr(item, "platform_url", None):
+                return item.platform_url.split("?")[0]
+    return ""
+
+
 def post(file: Path, caption: str, target: dict, *, sponsored: bool = True) -> tuple[str, str, bool]:
     """Returns (url, note, is_draft)."""
     c = _client()
@@ -60,7 +80,8 @@ def post(file: Path, caption: str, target: dict, *, sponsored: bool = True) -> t
         return "", f"post id {created.id}", False
     try:
         created = create(False)  # direct public post
-        return "", f"post id {created.id} (direct)", False
+        url = video_url(c, acct, created.id, caption)
+        return url, f"post id {created.id} (direct)", False
     except Exception as err:
         created = create(True)   # fall back to a draft
         return "", (f"direct post refused ({err.__class__.__name__}); sent as draft to @{target['handle']} "

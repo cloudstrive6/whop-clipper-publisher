@@ -34,10 +34,16 @@ def _scroll(frame, rounds: int = 6) -> None:
         frame.page.wait_for_timeout(600)
 
 
-def _open_campaign(page, frame, title: str) -> bool:
-    """Campaign cards open a full page in the member layout; try every copy of the title."""
-    matches = frame.get_by_text(title, exact=True)
-    for i in range(matches.count()):
+def _prefix(title: str) -> str:
+    """The stable part of a campaign title: brands rename campaigns ("Clip Ali Choucair – Real Estate
+    Content" became "Clip Ali Choucair – 21 y/o, 51 Rentals"), but the part before the dash stays."""
+    import re
+
+    return re.split(r"\s[–—|-]\s|\s\|", title, maxsplit=1)[0].strip()
+
+
+def _click_through(page, frame, matches) -> bool:
+    for i in range(min(matches.count(), 6)):
         for how in ("real", "dom"):
             try:
                 if how == "real":
@@ -51,6 +57,23 @@ def _open_campaign(page, frame, title: str) -> bool:
                 if frame.locator("button:has-text('Submit clip')").count():
                     return True
     return False
+
+
+def _open_campaign(page, frame, title: str) -> bool:
+    """Exact title on the marketplace first; otherwise search Whop for the title's stable prefix."""
+    if _click_through(page, frame, frame.get_by_text(title, exact=True)):
+        return True
+    prefix = _prefix(title)
+    print(f"  campaign title changed? searching Whop for {prefix!r}")
+    page.goto(MARKETPLACE, wait_until="domcontentloaded", timeout=90000)
+    frame = _app_frame(page)
+    page.wait_for_timeout(3000)
+    box = frame.locator("input[placeholder*='campaigns' i]").first
+    box.click(force=True)
+    box.fill(prefix)
+    box.press("Enter")
+    page.wait_for_timeout(9000)
+    return _click_through(page, frame, frame.get_by_text(prefix, exact=False))
 
 
 CHECKS = ("Posted from one of your linked accounts", "Not already submitted to this campaign",
@@ -69,7 +92,11 @@ class SubmissionRejected(RuntimeError):
 
 
 def submit_with_retry(clip: dict, url: str, target: dict, window_minutes: int = 28) -> bool:
-    """Retries timing-type rejections until shortly before Whop's 30-minute window closes."""
+    """Retries until shortly before Whop's 30-minute window closes.
+
+    Anything short of a clear answer is retried: slow page loads, a submission whose confirmation didn't
+    show in time (the retry then sees "already submitted" and counts it as done), or the ownership
+    check failing because the platform hasn't published the post yet."""
     import time as _t
 
     waits = [0, 90, 180, 300, 420, 540]  # seconds between attempts, ~25 min in total
@@ -82,12 +109,18 @@ def submit_with_retry(clip: dict, url: str, target: dict, window_minutes: int = 
             print(f"  retrying Whop submission in {w}s (attempt {i + 1})")
             _t.sleep(w)
         try:
-            return submit(clip, url, target)
+            if submit(clip, url, target):
+                return True
+            last = RuntimeError("no confirmation from Whop after clicking Submit")
+            print("  no confirmation yet - checking again (a repeat shows 'already submitted' if it went through)")
         except SubmissionRejected as err:
             last = err
             print(f"  {err}")
             if not err.retryable:
                 raise
+        except Exception as err:  # page didn't load, campaign not found, selector timeout...
+            last = err
+            print(f"  attempt failed: {err.__class__.__name__}: {str(err)[:160]}")
     raise last or RuntimeError("Whop submission did not succeed inside the window")
 
 
@@ -158,12 +191,25 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
             if failed:
                 raise SubmissionRejected(failed)
             submit_btn.click(timeout=20000)
-            page.wait_for_timeout(8000)
-            page.screenshot(path=str(artifacts / f"{clip['clip_id']}-after-submit.png"))
-            body = frame.inner_text("body").lower()
             # success dialog: "Clip submitted - Your clip got submitted and is now part of the campaign."
-            return any(w in body for w in ("clip submitted", "now part of the campaign", "under review",
-                                           "pending review", "in review"))
+            # Whop can sit on "Submitting..." for a while, so wait up to a minute for the answer.
+            ok = False
+            for _ in range(30):
+                page.wait_for_timeout(2000)
+                body = frame.inner_text("body").lower()
+                if any(w in body for w in ("clip submitted", "now part of the campaign", "under review",
+                                           "pending review", "in review")):
+                    ok = True
+                    break
+                failed = _failed_checks(dlg) if dlg.count() else []
+                if any("already submitted" in f.lower() for f in failed):
+                    ok = True
+                    break
+                if failed:
+                    page.screenshot(path=str(artifacts / f"{clip['clip_id']}-after-submit.png"))
+                    raise SubmissionRejected(failed)
+            page.screenshot(path=str(artifacts / f"{clip['clip_id']}-after-submit.png"))
+            return ok
         finally:
             ctx.close()
             browser.close()

@@ -72,6 +72,17 @@ def next_clip(state: dict, target: dict, clips: list[dict]) -> dict | None:
     return max(eligible, key=lambda c: c.get("score", 0), default=None)
 
 
+def with_mentions(text: str, clip: dict, platform: str) -> str:
+    """Swaps a creator's handle for their handle on this platform (e.g. @alichoucair on Instagram
+    is @alichoucairr on YouTube), so the tag points at the right account everywhere."""
+    import re
+
+    for handle, local in (clip.get("mentions") or {}).get(platform, {}).items():
+        # not part of a longer handle (@alichoucairr, @ali.choucair); a sentence's full stop is fine
+        text = re.sub(re.escape(handle) + r"(?!\w|\.\w)", local, text, flags=re.I)
+    return text
+
+
 def ensure_video(clip: dict) -> None:
     if clip["file"].exists() or not clip.get("video_asset"):
         return
@@ -92,7 +103,7 @@ def retire_finished(state: dict, clips: list[dict]) -> None:
 
 def post_clip(clip: dict, target: dict, cfg: dict, dry: bool) -> tuple[str, str, str]:
     """Returns (status, url, note)."""
-    caption = clip["caption"]
+    caption = with_mentions(clip["caption"], clip, target["platform"])
     if dry:
         return "dry_run", "", f"would post {clip['clip_id']} to {target['label']}"
     ensure_video(clip)

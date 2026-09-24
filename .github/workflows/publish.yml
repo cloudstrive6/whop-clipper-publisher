@@ -91,7 +91,7 @@ jobs:
         run: |
           git config user.name "whop-clipper"
           git config user.email "bot@users.noreply.github.com"
-          git add -A state queue   # queue: clips posted everywhere are retired
+          git add -A   # state + retired queue entries (artifacts/ is gitignored)
           if git diff --staged --quiet; then
             echo "no state change"
             exit 0
