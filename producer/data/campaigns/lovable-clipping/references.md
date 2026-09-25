@@ -1,6 +1,8 @@
 ### Reference: https://mediamaxxing.notion.site/lovable-clipping
 Skip to content
 Lovable Clipping
+Get Notion free
+Lovable Clipping
 If we get good results, budget will continue to be re-topped
 Majority tier 1 viewership
 Must show Anton and/or Lovable. Can’t clip parts of the podcasts without it being about lovable. Must only use podcasts provided.

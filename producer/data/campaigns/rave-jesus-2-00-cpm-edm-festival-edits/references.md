@@ -119,6 +119,7 @@ For You
 Shop
 Explore
 Following
+Short dramas
 LIVE
 Upload
 Profile
@@ -140,34 +141,7 @@ Log in
 Log In
 Sign Up
 Audio
-29.5K
-33K
-33.7K
-24K
-1,599
-2,204
-214
-117
-46.9K
-146
-130
-143
-1,168
-149
-223
-227
-42.3K
-188
-151
-1,261
-108
-186
-41.9K
-110
-47.4K
-4,276
-184
-14.2K
+36.2K
 Meta
 About
 Blog

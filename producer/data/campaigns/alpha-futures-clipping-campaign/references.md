@@ -6,7 +6,7 @@ SUBMIT CLIPS
 ACTIVE
 NEWEST DROP
 
-DROPPED 19 DAYS AGO
+DROPPED 20 DAYS AGO
 
 Epic 2v2 Golf Match (They Bet Their Funded Accounts)
 YouTube

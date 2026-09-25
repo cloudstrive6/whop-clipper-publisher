@@ -5,43 +5,43 @@ Home
 Browse
 Following
 Recommended
-Sliggy
-VALORANT
-3.1K
-Stake_Pulse
-Counter-Strike 2
-879
+LosPollosTV
+Just Chatting
+19K
 DeenTheGreat
 IRL
-12.3K
-Jinnytty
-IRL
-147
-FrankDimes
+13.6K
+TheBurntPeanut
+Rust
+3.3K
+schlump
 Slots & Casino
-1.9K
-LONEWOLFanCUB
-IRL
-LIVE
-4HEAD
-Grand Theft Auto V (GTA)
-3.2K
-hanvee
-Slots & Casino
-574
-DrChubzDPT
-ARC Raiders
 1.1K
-starladder
-Counter-Strike 2
-804
+chessbrah
+Just Chatting
+464
+12amcupid
+Slots & Casino
+757
+TheLostDrake
+Marvel's Wolverine
+LIVE
+Buddha
+Grand Theft Auto V (GTA)
+5.2K
+PaymoneyWubby
+Rust
+4.3K
+akademiks
+Just Chatting
+2.5K
 Show More
 Show Less
 OFFLINE
 dumbmoneyhunter is offline
 dumbmoneyhunter
 3.3K followers
-Last live 23 hours ago
+Last live 13 hours ago
 Follow
 Subscribe
 Home
@@ -52,48 +52,54 @@ Schedule
 NEW
 Stream Videos
 View all
-43:32
-365 views
+01:08:18
+291 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 23 hours ago
-57:53
-436 views
+· 14 hours ago
+43:32
+397 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
 · 2 days ago
+57:53
+456 views
+dumbmoneyhunter
+pocket change protocol
+Crypto & Trading
+· 3 days ago
 52:47
-557 views
+571 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 3 days ago
+· 4 days ago
 02:40
-436 views
+442 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 3 days ago
+· 4 days ago
 07:28
-486 views
+488 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 3 days ago
+· 4 days ago
 05:53
-305 views
+308 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 3 days ago
+· 4 days ago
 01:58:02
 483 views
 dumbmoneyhunter
 pocket change protocol
 Crypto & Trading
-· 6 days ago
+· 7 days ago
 Popular Clips
 View all
 00:50
@@ -103,61 +109,61 @@ ICT is too Complicated
 Crypto & Trading
 · 2 years ago
 00:15
-470 views
+471 views
 dumbmoneyhunter
 hmm hmmm
 Crypto & Trading
 · 2 years ago
 00:30
-384 views
+385 views
 dumbmoneyhunter
 come and join in and have fun
 Crypto & Trading
 · 1 year ago
 00:27
-224 views
+225 views
 dumbmoneyhunter
 Btc next level
 Crypto & Trading
 · 1 year ago
 01:00
-142 views
+144 views
 dumbmoneyhunter
 Psychology tips with hunter
 Crypto & Trading
 · 1 year ago
 00:50
-119 views
+120 views
 dumbmoneyhunter
 TRADING PSYCHOLOGY
 Crypto & Trading
 · 1 year ago
 00:15
-89 views
+90 views
 dumbmoneyhunter
 DMC strategy
 Crypto & Trading
 · 1 year ago
 00:30
-88 views
+89 views
 dumbmoneyhunter
 Get the Bag
 Crypto & Trading
-· 3 months ago
+· 4 months ago
 02:09
-48 views
+49 views
 dumbmoneyhunter
 Another win for Claude. DMC (Dumb Money Concepts)
 Crypto & Trading
 · 2 months ago
 01:00
-45 views
+46 views
 dumbmoneyhunter
 consistency rule
 Crypto & Trading
 · 1 year ago
 Recently Streamed Categories
-20K
+336
 Crypto & Trading
 IRL
 Crypto
@@ -166,52 +172,50 @@ guyddd
 1
 guyddd
 1
-JoeyBonez
-: !shop
 BotRix
-: JoeyBonez you can see the channel shop at: https://botrix.live/k/dumbmoneyhunter/shop
-JoeyBonez
-: !2komo
+: @Liquiditysl has 699 points.
+Shiva9
+: Bye
+moana25001
+: !top
 BotRix
-: Thank you for redeeming Maven 2k OMO @JoeyBonez take a screenshot of this and open a ticket in discord
-kiidruby
-: !POINTS
+: You can find the list of users that supported the most: https://botrix.live/k/dumbmoneyhunter/leaderboard
+seuncoco
+: !points
 BotRix
-: @kiidruby has 77 points.
-kiidruby
-: !POINTS
+: @seuncoco has 587 points.
+jooshset
+: !xp
 BotRix
-: @kiidruby has 77 points.
-JoeyBonez
-: dmc
-heytherebuddy00
-: !shop
-BotRix
-: heytherebuddy00 you can see the channel shop at: https://botrix.live/k/dumbmoneyhunter/shop
+: @jooshset has 540/900XP to level up.
 Jokamau212
 : !points
 BotRix
-: @Jokamau212 has 379 points.
+: @Jokamau212 has 394 points.
 EduV21
 : !points
 BotRix
-: @EduV21 has 808 points.
+: @EduV21 has 832 points.
+Liquiditysl
+: DMC
+Jokamau212
+: !points
 BotRix
-: Thank you for the follow @thatboytanner
-thatboytanner
-: !discord
-Hanz666
-: 16min
-Hanz666
-: 
-jooshset
-: 
-Hanz666
-: 
-Jokamau212
-: 
-Jokamau212
-: 
+: @Jokamau212 has 406 points.
+EduV21
+: !shop
+BotRix
+: EduV21 you can see the channel shop at: https://botrix.live/k/dumbmoneyhunter/shop
+Alirazza997
+: !points
+BotRix
+: @Alirazza997 has 248 points.
+Alirazza997
+: !gamble100
+akafx111
+: !points
+BotRix
+: @akafx111 has 725 points.
 Followers only
 
 
@@ -240,7 +244,7 @@ Best performing clips
 Aug 8
 —
 Hunter livestream clips
-Sep 23
+Sep 24
 —
 maven daily clips
 Sep 10
@@ -263,8 +267,8 @@ Get started today
 ### Reference: https://discord.gg/p6AmEU6VfU
 Hunter (hunterfx) invited you to join
 Hunter's Dumb Money Concepts
-2,899 Online
-30,666 Members
+1,926 Online
+30,708 Members
 Display Name
 This is how others see you. You can use special characters and emoji.
 Date of Birth
@@ -280,6 +284,8 @@ Year
 By clicking “Create Account,” you agree to Discord's Terms of Service and have read the Privacy Policy
 Create Account
 Already have an account? Log in
+What’s Discord?
+Chat, stream, and chill
 
 ### Media links
 https://www.youtube.com/hunterfx

@@ -434,18 +434,11 @@ Showcase
 Sign
 Albums
 3
-Close preview
-MoonPay_Logo_Black (3).png
-contains
-2 files
-Download all
-Edit content
-Name
-Z
-zak
-Z
-zak
-Report this transfer
+You’realmost there
+
+To continue, please agree to our Terms of Service, and acknowledge our Privacy Policy.
+
+I agree
 Features
 Pricing
 Use cases
@@ -454,9 +447,6 @@ Log in
 Sign up
 
 We and our third-party partners use cookies and similar technologies to process information about your interactions on our websites, including to perform analytics, improve your experience, provide social media features, show advertising, and enable site functionality in accordance with our Privacy Policy. By continuing to use our sites, you consent to the use of these technologies. See Do Not Sell or Share My Personal Information for opt-out options.
-You're viewing a preview
-Browse the files in this transfer directly on WeTransfer — no download needed.
-Next
 
 ### Reference: https://tally.so/r/ODRebY
 MoonPay Submission Form
