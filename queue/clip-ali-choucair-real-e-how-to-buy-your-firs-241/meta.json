@@ -24,5 +24,11 @@
     "youtube": {
       "@alichoucair": "@alichoucairr"
     }
-  }
+  },
+  "niche": "finance",
+  "platforms": [
+    "tiktok",
+    "instagram",
+    "youtube"
+  ]
 }

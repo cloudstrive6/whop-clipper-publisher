@@ -117,6 +117,17 @@ targets:
   - inspirational
   whop_linked: true
   auto_post: true
+- id: tt_kiwinoygaming
+  label: TikTok (@kiwinoygaming)
+  platform: tiktok
+  handle: kiwinoygaming
+  postforme_external_id: whop-gaming
+  per_day: 2
+  niches:
+  - gaming
+  - esports
+  whop_linked: true
+  auto_post: true
 - id: x_mostviewedclips
   label: X (@MostViewedClips)
   platform: x

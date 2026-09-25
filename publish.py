@@ -100,11 +100,19 @@ def already_posted(state: dict, clip_id: str, target_id: str) -> bool:
                and p["status"] in ("posted", "draft_uploaded", "posting") for p in state["posts"])
 
 
+def fits(clip: dict, target: dict) -> bool:
+    """The clip was queued for this account, or the account was added later and fits the campaign
+    (same niche, a platform the campaign allows)."""
+    if target["id"] in clip.get("targets", []):
+        return True
+    niche, platforms = clip.get("niche"), clip.get("platforms") or []
+    return bool(niche) and niche in [n.lower() for n in target.get("niches", [])] and target["platform"] in platforms
+
+
 def next_clip(state: dict, target: dict, clips: list[dict]) -> dict | None:
     """Highest-scoring approved clip for this account's campaigns that it hasn't posted yet."""
     eligible = [c for c in clips
-                if target["id"] in c.get("targets", [])
-                and not already_posted(state, c["clip_id"], target["id"])]
+                if fits(c, target) and not already_posted(state, c["clip_id"], target["id"])]
     return max(eligible, key=lambda c: c.get("score", 0), default=None)
 
 
@@ -136,10 +144,11 @@ def ensure_video(clip: dict) -> None:
     (clip["dir"] / clip["video_asset"]).rename(clip["file"])
 
 
-def retire_finished(state: dict, clips: list[dict]) -> None:
+def retire_finished(state: dict, clips: list[dict], all_targets: list[dict]) -> None:
     """A clip posted to every one of its accounts leaves the queue (and its release asset is deleted)."""
     for c in clips:
-        if all(already_posted(state, c["clip_id"], t) for t in c.get("targets", [])):
+        accounts = [t["id"] for t in all_targets if fits(c, t)] or c.get("targets", [])
+        if all(already_posted(state, c["clip_id"], t) for t in accounts):
             if c.get("video_asset"):
                 subprocess.run(["gh", "release", "delete-asset", RELEASE, c["video_asset"], "-y"], cwd=ROOT)
             shutil.rmtree(c["dir"], ignore_errors=True)
@@ -241,6 +250,7 @@ def main() -> int:
     # an account not connected inside Whop's Content Rewards app can't have its posts submitted,
     # so posting from it would burn a clip for nothing
     targets = [t for t in cfg["targets"] if t.get("auto_post") and t.get("whop_linked")]
+    all_linked = list(targets)  # every account, before this run narrows to one platform
     skipped = [t["label"] for t in cfg["targets"] if t.get("auto_post") and not t.get("whop_linked")]
     if skipped:
         print("not linked in Content Rewards (skipped): " + ", ".join(skipped))
@@ -339,7 +349,7 @@ def main() -> int:
                 unsubmitted_alert(clip, t, url, f"{err.__class__.__name__}: {str(err)[:200]}")
             save_state(state)
     if not args.dry_run:
-        retire_finished(state, clips)
+        retire_finished(state, clips, all_linked)
     return exit_code
 
 
