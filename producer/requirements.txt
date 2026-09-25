@@ -8,3 +8,4 @@ pypdf==6.19.0
 PyYAML==6.0.3
 requests==2.34.2
 beautifulsoup4==4.15.0
+opencv-python-headless<5   # face detection for the 4:5 talking-head layout

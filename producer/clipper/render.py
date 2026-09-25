@@ -71,6 +71,42 @@ def _music() -> Path | None:
     return random.choice(tracks) if tracks else None
 
 
+def talking_head_window(video: Path, start: float, end: float, src_w: int, src_h: int) -> int | None:
+    """Left edge of a 4:5 crop that keeps the speaker's face, or None when the shot isn't a single talking
+    head (no steady face, or people spread wider than 4:5 would allow): then the full frame is kept."""
+    import cv2
+    import numpy
+
+    win = int(src_h * 4 / 5)
+    if win >= src_w:
+        return None
+    sw, sh = 640, max(2, round(640 * src_h / src_w / 2) * 2)
+    # YuNet (OpenCV's face model) also finds angled and profile faces, unlike the old Haar cascades
+    det = cv2.FaceDetectorYN.create(str(ROOT / "assets" / "models" / "face_detection_yunet_2023mar.onnx"),
+                                    "", (sw, sh), 0.6)
+    spans, frames_with_face = [], 0
+    for i in range(6):
+        t = start + (end - start) * (i + 0.5) / 6
+        raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1",
+                              "-vf", f"scale={sw}:{sh}", "-f", "image2pipe", "-vcodec", "png", "-"],
+                             capture_output=True).stdout
+        img = cv2.imdecode(numpy.frombuffer(raw, numpy.uint8), cv2.IMREAD_COLOR) if raw else None
+        if img is None:
+            continue
+        k = src_w / sw
+        _, faces = det.detect(img)
+        faces = [] if faces is None else faces
+        if len(faces):
+            frames_with_face += 1
+        spans += [(f[0] * k, (f[0] + f[2]) * k) for f in faces]
+    if frames_with_face < 4:  # the speaker isn't on screen most of the time
+        return None
+    lo, hi = min(a for a, _ in spans), max(b for _, b in spans)
+    if hi - lo > win * 0.85:  # two people side by side, or a wide shot: cropping would cut someone off
+        return None
+    return int(min(max((lo + hi) / 2 - win / 2, 0), src_w - win))
+
+
 def render(video: Path, segments: list[dict], start: float, end: float, hook: str | None, out: Path,
            music: bool = True, disclosure: str | None = None) -> Path:
     e = cfg()["editing"]
@@ -83,8 +119,18 @@ def render(video: Path, segments: list[dict], start: float, end: float, hook: st
     ass = out.with_suffix(".ass")
     ass.write_text(build_ass(segments, start, end, hook if e["hook_text"] else None, captions, disclosure),
                    encoding="utf-8")
+    x = None
+    if not vertical and e["layout"] != "crop" and e.get("talking_head_4x5", True):
+        x = talking_head_window(video, start, end, int(v["width"]), int(v["height"]))
     if e["layout"] == "crop" or vertical:
         vf = f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1[base]"
+    elif x is not None:  # talking head: a 4:5 crop on the speaker, big, on a 9:16 blurred canvas
+        win = int(int(v["height"]) * 4 / 5)
+        vf = (f"[0:v]split[a][b];"
+              f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=30:2,eq=brightness=-0.15[bg];"
+              f"[b]crop={win}:ih:{x}:0,scale={W}:-2[fg];"
+              f"[bg][fg]overlay=(W-w)/2:{int(H * 0.19)},setsar=1[base]")
+        print(f"   layout: 4:5 talking head (crop x={x})")
     else:  # blurred background + full frame, nudged up so captions sit below it
         vf = (f"[0:v]split[a][b];"
               f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=30:2,eq=brightness=-0.15[bg];"

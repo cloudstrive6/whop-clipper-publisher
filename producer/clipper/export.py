@@ -184,6 +184,7 @@ def sync_producer(with_state: bool = False, push: bool = True) -> None:
         shutil.copy2(f, dst / "clipper" / f.name)
     shutil.copy2(ROOT / "config.yaml", dst / "config.yaml")
     shutil.copy2(ROOT / "requirements-producer.txt", dst / "requirements.txt")
+    shutil.copytree(ROOT / "assets" / "models", dst / "assets" / "models", dirs_exist_ok=True)  # face model
     for camp in (ROOT / "data" / "campaigns").glob("*"):
         for f in camp.iterdir():  # briefs' reference docs and PDFs, never footage or renders
             if f.is_file() and f.suffix.lower() in {".md", ".pdf", ".txt", ".json"}:
