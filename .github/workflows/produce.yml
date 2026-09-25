@@ -31,6 +31,8 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v5
         with:
@@ -153,7 +155,7 @@ jobs:
           if git diff --staged --quiet; then echo "no changes"; exit 0; fi
           git commit -m "produced: $(date -u +%FT%TZ)"
           for i in 1 2 3; do
-            git pull --rebase --autostash && git push && exit 0
+            git pull --rebase --autostash -X theirs && git push && exit 0
             sleep 5
           done
           echo "::error::could not push producer state"; exit 1
