@@ -263,6 +263,47 @@ def paperwork_check(report: dict) -> None:
                 once(f"paperwork|{s.campaign}|{s.date}|{s.views // 1000}", "💰 " + title, body)
 
 
+def _free_gb() -> float:
+    import shutil
+
+    from .config import DATA
+
+    return shutil.disk_usage(DATA).free / 1e9
+
+
+def _drop_used_sources(campaign_id: str) -> None:
+    """Delete source videos that have been cut into clips (their transcripts stay): keeps the disk free."""
+    used = {Path(c["source"]).name for c in db.rows("clips", "campaign_id=?", campaign_id)}
+    for f in (campaign_dir(campaign_id) / "sources").rglob("*"):
+        if f.name in used and f.suffix.lower() in {".mp4", ".mov", ".mkv", ".webm", ".m4v"}:
+            f.unlink(missing_ok=True)
+
+
+def _checkpoint(msg: str) -> None:
+    """Cloud: queue what's approved and push the database now, so a crash later loses nothing."""
+    if not os.environ.get("GITHUB_ACTIONS"):
+        return
+    from . import export
+
+    try:
+        export.publisher_config()
+        export.export_queue()
+    except Exception as err:
+        print(f"   (checkpoint export failed: {err.__class__.__name__})")
+    git = ["git", "-c", "user.name=whop-clipper", "-c", "user.email=bot@users.noreply.github.com"]
+    root = export.PUBLISHER
+    subprocess.run(git + ["add", "-A"], cwd=root)
+    if subprocess.run(git + ["diff", "--staged", "--quiet"], cwd=root).returncode == 0:
+        return
+    subprocess.run(git + ["commit", "-qm", f"produce checkpoint: {msg}"], cwd=root)
+    for _ in range(3):
+        if subprocess.run(git + ["pull", "-q", "--rebase", "--autostash", "-X", "theirs"], cwd=root).returncode == 0 \
+                and subprocess.run(git + ["push", "-q"], cwd=root).returncode == 0:
+            print(f"   saved progress ({msg})")
+            return
+    print("   (couldn't push this checkpoint; the end of the run tries again)")
+
+
 def _apply(c: dict, report: dict) -> None:
     """Fill and submit the campaign's application with the accounts that fit it (honest answers only)."""
     from . import whop
@@ -438,6 +479,7 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
     print("\n== 3. join campaigns that fit an account and need no human steps")
     _join_fitting(report)
     check_applications(report)
+    _checkpoint("briefs read, campaigns joined")
 
     print("\n== 3b. drop joined campaigns that have vanished from Whop (paused or ended by the brand)")
     try:
@@ -470,6 +512,9 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
         need = max([deficit.get(t, 0) for t in tg] or [0])
         if need <= 0:
             continue
+        if _free_gb() < P.get("min_free_gb", 5):
+            report["errors"].append(f"disk nearly full ({_free_gb():.1f} GB free): stopped before {c['id']}")
+            break
         # render more than needed: the audit holds some back
         room = min(math.ceil(need / rate), P.get("max_clips_per_campaign", 10), budget)
         print(f"\n-- {c['title'][:60]} (needs {need:g} approved -> rendering up to {room})")
@@ -488,6 +533,8 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
             report["errors"].append(f"{c['id']}: {err}")
         except Exception as err:
             report["errors"].append(f"{c['id']}: {err.__class__.__name__}: {str(err)[:200]}")
+        _drop_used_sources(c["id"])
+        _checkpoint(f"clips for {c['id']}")
 
     print("\n== 5. approve anything left over")
     _approve(None, report)

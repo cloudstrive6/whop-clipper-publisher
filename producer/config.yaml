@@ -172,7 +172,8 @@ produce:
   buffer_days: 1.5            # keep each account's queue this many days of posts deep
   max_minutes: 230            # stop making clips after this long (the job times out at 300)
   allow_payout_paperwork: true   # also clip campaigns whose only human step comes at payout (you do that paperwork)
-  max_source_mb: 1500         # skip single source files bigger than this
+  max_source_mb: 800          # skip single source files bigger than this (runner disks are small)
+  min_free_gb: 5              # stop making clips (cleanly, progress saved) below this much free disk
   channel_videos: 3           # when a campaign's source is a whole channel, take its N newest videos
   max_source_minutes: 90
   # campaigns to clip even though the brief has a human-only step (e.g. demographic proof at payout,
