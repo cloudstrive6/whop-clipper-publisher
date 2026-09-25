@@ -96,7 +96,7 @@ targets:
     per_day: 2          # this account also posts ~3/day from the Kiwinoy system: keep the total sane
     niches: [gaming, esports]
     whop_linked: true   # connected in Content Rewards > Settings > Connected accounts (2026-09-26)
-    auto_post: false    # on once it's connected in Post for Me (Whop Clips project)
+    auto_post: true     # Post for Me: 'KG's Classic Gaming' (whop-gaming), connected 2026-09-26
   - id: x_mostviewedclips
     label: "X (@MostViewedClips)"
     platform: x                  # via Post for Me
