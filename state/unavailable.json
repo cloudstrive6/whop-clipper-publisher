@@ -1,8 +1,8 @@
 {
   "clip-ali-choucair-real-estate-content": {
     "since": "2026-09-25T06:16:48+00:00",
-    "checked": "2026-09-25T19:05:47+00:00",
-    "why": "TimeoutError: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\"button:has-text('Submit clip')\").first\n    - locator resolved to <button d"
+    "checked": "2026-09-25T22:04:35+00:00",
+    "why": "campaign 'Clip Ali Choucair \u2013 21 y/o, 51 Rentals' not found on Whop (ended or renamed)"
   },
   "michael-sartain-s-clipping-army": {
     "since": "2026-09-25T12:52:00+00:00",
