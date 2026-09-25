@@ -294,7 +294,7 @@ def watch() -> dict:
     report = {"scouted": 0, "analyzed": [], "joined": [], "clips_made": 0, "approved": [], "held": [],
               "blocked_campaigns": {}, "errors": []}
     before = {c["id"] for c in db.rows("campaigns", "1=1")}
-    for q in [None] + _search_plan(False)[:3]:
+    for q in [None] + _search_plan(False)[:2]:
         try:
             report["scouted"] += len(whop.scout(query=q, max_details=6, new_only=True))
         except Exception as err:
