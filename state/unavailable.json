@@ -11,7 +11,7 @@
   },
   "buy-turnkey-investments-from-harry-gold": {
     "since": "2026-09-25T12:54:47+00:00",
-    "checked": "2026-09-25T12:54:47+00:00",
-    "why": "TimeoutError: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\"button:has-text('Submit clip')\").first\n    - locator resolved to <button t"
+    "checked": "2026-09-25T16:02:04+00:00",
+    "why": "the Submit dialog didn't open"
   }
 }
