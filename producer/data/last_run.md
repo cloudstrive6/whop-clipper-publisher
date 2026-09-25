@@ -1,7 +1,10 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 1 · **clips made** 9 · **auto-approved** 0 · **held** 0
+**Scouted** 12 · **analyzed** 2 · **joined** 1 · **clips made** 9 · **auto-approved** 0 · **held** 1
 
 ### Joined
-- call-of-duty-mw4-warzone-operator-skin-toggle
+- tjr-23-100-weekly-clipping-campaign
+
+### Held for your review (not posted)
+- average-rob-clips-omdat-het-kan-averag-8: Language: the audio contains Dutch/Flemish words ("snelle planger", "vermoeta"), and the burned-in captions reproduce "SNELLE" on screen. The campaign forbids clips that are not in English. A human mu
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -50,6 +53,7 @@
 - lucas-clipping-cycle-2: Brand-new dedicated 'Lucasonly'-type accounts on TikTok/Instagram/YouTube that the roster does not have; Profile picture must be a unique screenshot from one of Lucas's videos; Exact per-platform bio 
 - jacob-nachinson-clipping-2: Dedicated fitness/health account required on TikTok, Instagram and YouTube - no such account exists on the roster; Bio edit required: must start with 'Main YT: @jacobnach', include an approved tagline
 - ja-z-in-hbo-series-clipping-campaign: Approved footage and the required CTA ending live in permission-gated Google Drive folders that must be opened and downloaded by a human; The required CTA ending MP4 must be downloaded and appended af
+- yonna-x-b-a-duvet-clipping-phase-2: Requires a TikTok account with a history of posting streamer / pop culture content and a US/UK/CA/AU audience; the roster has no TikTok account that clearly qualifies, so a suitable account must be es
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -62,9 +66,9 @@
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
+- TikTok (@kiwinoygaming): 3
 
 ### Errors
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - call-of-duty-mw4-warzone-operator-skin-toggle: RuntimeError: replay variant came out 13.1s, under 15s
-- sega-crazy-taxi-japan-map-reveal-clipping: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
