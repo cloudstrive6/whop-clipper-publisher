@@ -154,7 +154,7 @@ editing:
   max_seconds: 58           # stays under 60s for Shorts
   clips_per_source: 5
   layout: blur              # blur = full frame over blurred background; crop = center crop to fill
-  talking_head_4x5: true    # one speaker on screen: sharp 4:5 crop on their face over the blurred full-screen copy
+  talking_head_4x5: true    # faces on screen: sharp 4:5 window that cuts to whoever is talking, feathered into the blurred full-screen copy
   captions: true
   hook_text: true
   bg_music_volume: 0.10     # used only if a track is found in assets/music
