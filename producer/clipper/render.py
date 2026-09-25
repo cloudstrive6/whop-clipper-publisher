@@ -121,7 +121,10 @@ def render(video: Path, segments: list[dict], start: float, end: float, hook: st
                    encoding="utf-8")
     x = None
     if not vertical and e["layout"] != "crop" and e.get("talking_head_4x5", True):
-        x = talking_head_window(video, start, end, int(v["width"]), int(v["height"]))
+        try:
+            x = talking_head_window(video, start, end, int(v["width"]), int(v["height"]))
+        except Exception as err:  # face detection is a nicety: never lose a clip over it
+            print(f"   (face detection unavailable: {err.__class__.__name__}; keeping the full frame)")
     if e["layout"] == "crop" or vertical:
         vf = f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1[base]"
     elif x is not None:  # talking head: a 4:5 crop on the speaker, big, on a 9:16 blurred canvas

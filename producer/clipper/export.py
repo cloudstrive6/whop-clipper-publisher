@@ -47,6 +47,10 @@ def export_queue() -> int:
     n = 0
     for c in db.rows("clips", "status='approved'"):
         campaign = db.get("campaigns", c["campaign_id"])
+        if campaign.get("status") == "ended":  # paused/ended by the brand: can't be submitted
+            db.upsert("clips", {"id": c["id"], "status": "held"})
+            print(f"skip {c['id']}: {campaign['title']} has ended")
+            continue
         tgts = [t["id"] for t in targets.for_campaign(campaign)]
         if not tgts:
             print(f"skip {c['id']}: no account matches {campaign['title']}")
