@@ -1,35 +1,7 @@
-**Scouted** 69 · **analyzed** 63 · **joined** 9 · **clips made** 28 · **auto-approved** 13 · **held** 3
+**Scouted** 0 · **analyzed** 0 · **joined** 1 · **clips made** 9 · **auto-approved** 0 · **held** 0
 
 ### Joined
-- average-rob-clips
-- cft-clipping-campaign-1-5-1000-views
-- buy-turnkey-investments-from-harry-gold
-- ryan-zofay-clipping-campaign-01
-- reality-tv-clips-1-50-cpm-100-bonus
-- sega-crazy-taxi-japan-map-reveal-clipping
-- millionaire-hot-takes-viral-clipping
-- organic-tarzan-clipping
-- aaron-golub-september-clipping-campaign
-
-### Queued for posting
-- michael-sartain-s-clippi-michael-reacts-to-ma-48
-- michael-sartain-s-clippi-michael-reacts-to-ma-148
-- michael-sartain-s-clippi-michael-reacts-to-ma-215
-- michael-sartain-s-clippi-michael-reacts-to-ma-432
-- michael-sartain-s-clippi-michael-reacts-to-ma-815
-- michael-sartain-s-clippi-michael-reacts-to-ma-76
-- michael-sartain-s-clippi-michael-reacts-to-ma-630
-- michael-sartain-s-clippi-michael-reacts-to-ma-677
-- michael-sartain-s-clippi-michael-reacts-to-ma-1125
-- buy-turnkey-investments--a-intro-1-410
-- buy-turnkey-investments--a-intro-1-461
-- buy-turnkey-investments--a-intro-1-366
-- buy-turnkey-investments--a-intro-1-513
-
-### Held for your review (not posted)
-- michael-sartain-s-clippi-michael-reacts-to-ma-345: The on-screen hook, title and description present a serious allegation about a named living politician as established fact. The underlying transcript is Sartain relaying a Scott Galloway clip - second
-- buy-turnkey-investments--a-intro-1-162: The title claims a 'Free Workshop', which the evidence does not support — the speaker only says there is 'no upsell here today', not that attendance was free. Because the title publishes verbatim, rem
-- buy-turnkey-investments--a-intro-1-28: The clip's subject matter is convention networking, not rental or turnkey real estate. The campaign tag is 'Rental Property' and the brand's stated goal is to get viewers excited about buying turnkey 
+- call-of-duty-mw4-warzone-operator-skin-toggle
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -77,6 +49,7 @@
 - nely-galan: OBEX (Obscure Xhibit) creator account must be created and joined to the ClipHaus brand profile before clips count; Every clip must also be submitted manually on OBEX, with a different edit than the on
 - lucas-clipping-cycle-2: Brand-new dedicated 'Lucasonly'-type accounts on TikTok/Instagram/YouTube that the roster does not have; Profile picture must be a unique screenshot from one of Lucas's videos; Exact per-platform bio 
 - jacob-nachinson-clipping-2: Dedicated fitness/health account required on TikTok, Instagram and YouTube - no such account exists on the roster; Bio edit required: must start with 'Main YT: @jacobnach', include an approved tagline
+- ja-z-in-hbo-series-clipping-campaign: Approved footage and the required CTA ending live in permission-gated Google Drive folders that must be opened and downloaded by a human; The required CTA ending MP4 must be downloaded and appended af
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -92,7 +65,6 @@
 
 ### Errors
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
-- millionaire-hot-takes-viral-clipping: no footage could be downloaded
-- clipback-ccat: no footage could be downloaded
+- call-of-duty-mw4-warzone-operator-skin-toggle: RuntimeError: replay variant came out 13.1s, under 15s
 - sega-crazy-taxi-japan-map-reveal-clipping: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
