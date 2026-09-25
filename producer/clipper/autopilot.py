@@ -156,7 +156,7 @@ def _deficits() -> dict[str, float]:
     for t in targets.all_targets():
         if not (t.get("auto_post") and t.get("whop_linked")):
             continue
-        per_day = cfg().get("cadence", {}).get(t["platform"], {}).get("per_day", 3)
+        per_day = t.get("per_day", cfg().get("cadence", {}).get(t["platform"], {}).get("per_day", 3))
         out[t["id"]] = per_day * P.get("buffer_days", 1.5) - _queued_for(t["id"])
     return out
 

@@ -88,6 +88,15 @@ targets:
     niches: [faith, christian, inspirational]
     whop_linked: true   # connected in Content Rewards > Settings > Connected accounts
     auto_post: true
+  - id: tt_kiwinoygaming
+    label: "TikTok (@kiwinoygaming)"
+    platform: tiktok
+    handle: kiwinoygaming
+    postforme_external_id: whop-gaming
+    per_day: 2          # this account also posts ~3/day from the Kiwinoy system: keep the total sane
+    niches: [gaming, esports]
+    whop_linked: true   # connected in Content Rewards > Settings > Connected accounts (2026-09-26)
+    auto_post: false    # on once it's connected in Post for Me (Whop Clips project)
   - id: x_mostviewedclips
     label: "X (@MostViewedClips)"
     platform: x                  # via Post for Me
