@@ -253,7 +253,7 @@ def main() -> int:
     whop_ready: dict[str, str | None] = {}  # campaign -> None if submittable, else why not
     for t in targets:
         cadence = cfg.get("cadence", {}).get(t["platform"], {})
-        cap = cadence.get("per_day", 3)
+        cap = t.get("per_day", cadence.get("per_day", 3))  # an account can have its own daily limit
         state = refresh_state()
         done = posted_count(state, t["id"])
         if done >= cap:
