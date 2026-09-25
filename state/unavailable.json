@@ -6,8 +6,8 @@
   },
   "michael-sartain-s-clipping-army": {
     "since": "2026-09-25T12:52:00+00:00",
-    "checked": "2026-09-25T19:09:09+00:00",
-    "why": "TimeoutError: Locator.inner_text: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"[role=dialog]\").last\n"
+    "checked": "2026-09-25T22:06:03+00:00",
+    "why": "the Submit dialog didn't open"
   },
   "buy-turnkey-investments-from-harry-gold": {
     "since": "2026-09-25T12:54:47+00:00",
