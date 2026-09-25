@@ -146,6 +146,60 @@ def retire_finished(state: dict, clips: list[dict]) -> None:
             print(f"retired {c['clip_id']} (posted everywhere)")
 
 
+UNAVAILABLE = ROOT / "state" / "unavailable.json"  # campaigns Whop can't take submissions for, and since when
+RECHECK_HOURS, RETIRE_HOURS = 2, 24
+
+
+def campaign_ready(clip: dict, cache: dict, clips: list[dict], state: dict) -> str | None:
+    """None if the clip's campaign can take a submission right now, else why not.
+
+    Guard 2: only post what can be submitted. The Submit dialog is opened (and cancelled) before posting.
+    A campaign that fails is rechecked every 2 hours, not every slot; after 24 hours unavailable it is
+    treated as ended and its queued clips are removed."""
+    import whop_submit
+    from notify import alert, once
+
+    cid = clip["campaign_id"]
+    if cid in cache:
+        return cache[cid]
+    ledger = json.loads(UNAVAILABLE.read_text(encoding="utf-8")) if UNAVAILABLE.exists() else {}
+    entry = ledger.get(cid)
+    t_now = datetime.now(timezone.utc)
+    if entry and t_now - datetime.fromisoformat(entry["checked"]) < timedelta(hours=RECHECK_HOURS):
+        cache[cid] = entry["why"]
+        return entry["why"]
+    why = whop_submit.preflight(clip)
+    cache[cid] = why
+    if why is None:
+        if entry:
+            ledger.pop(cid)
+            alert(f"▶️ {clip['campaign_title']} is taking submissions again", "Its clips are posting again.")
+    else:
+        entry = entry or {"since": t_now.isoformat(timespec="seconds")}
+        entry.update(checked=t_now.isoformat(timespec="seconds"), why=why)
+        ledger[cid] = entry
+        hours = (t_now - datetime.fromisoformat(entry["since"])).total_seconds() / 3600
+        if hours >= RETIRE_HOURS:
+            gone = [c for c in clips if c["campaign_id"] == cid]
+            for c in gone:
+                if c.get("video_asset"):
+                    subprocess.run(["gh", "release", "delete-asset", RELEASE, c["video_asset"], "-y"], cwd=ROOT)
+                shutil.rmtree(c["dir"], ignore_errors=True)
+            clips[:] = [c for c in clips if c["campaign_id"] != cid]
+            ledger.pop(cid)
+            alert(f"🛑 {clip['campaign_title']} looks ended - {len(gone)} queued clip(s) removed",
+                  f"Whop hasn't taken submissions for it for {hours:.0f} hours ({why}). Its slots go to other campaigns.")
+        else:
+            once(f"unavailable|{cid}|{entry['since']}", f"⏸ {clip['campaign_title']} can't take submissions right now",
+                 f"Reason: {why}\n\nNothing of it gets posted, so nothing needs submitting by hand. Other campaigns' "
+                 f"clips fill those slots meanwhile. Rechecked every {RECHECK_HOURS}h; if it's still unavailable after "
+                 f"{RETIRE_HOURS}h it's treated as ended and its queued clips are removed.")
+    UNAVAILABLE.parent.mkdir(parents=True, exist_ok=True)
+    UNAVAILABLE.write_text(json.dumps(ledger, indent=2), encoding="utf-8")
+    share_state(f"campaign availability: {cid}")
+    return why
+
+
 def post_clip(clip: dict, target: dict, cfg: dict, dry: bool) -> tuple[str, str, str]:
     """Returns (status, url, note)."""
     caption = with_mentions(clip["caption"], clip, target["platform"])
@@ -197,7 +251,6 @@ def main() -> int:
 
     exit_code = 0
     whop_ready: dict[str, str | None] = {}  # campaign -> None if submittable, else why not
-    held_alerted: set[str] = set()
     for t in targets:
         cadence = cfg.get("cadence", {}).get(t["platform"], {})
         cap = cadence.get("per_day", 3)
@@ -206,9 +259,25 @@ def main() -> int:
         if done >= cap:
             print(f"{t['label']}: daily cap reached ({done}/{cap})")
             continue
-        clip = next_clip(state, t, clips)
+        # pick the best clip whose campaign can take submissions right now; a campaign that can't
+        # (paused, ended, Whop hiccup) is skipped and the next campaign's clip fills the slot
+        unusable: dict[str, str] = {}
+        clip = None
+        while True:
+            clip = next_clip(state, t, [c for c in clips if c["campaign_id"] not in unusable])
+            if not clip or args.dry_run:
+                break
+            why = campaign_ready(clip, whop_ready, clips, state)
+            if why is None:
+                break
+            unusable[clip["campaign_id"]] = why
+            print(f"{t['label']}: skipping {clip['campaign_title']} - {why}")
         if not clip:
-            print(f"{t['label']}: nothing queued for this account")
+            if unusable:
+                print(f"{t['label']}: no queued campaign can take submissions right now - nothing posted this slot")
+                exit_code = 1
+            else:
+                print(f"{t['label']}: nothing queued for this account")
             continue
         if args.dry_run:
             print(f"{t['label']}: would post {clip['clip_id']}")
@@ -231,24 +300,6 @@ def main() -> int:
                                    "at": at.astimezone(timezone.utc).isoformat(timespec="seconds"), "submitted": False})
             save_state(state)
             share_state(f"record existing post of {clip['clip_id']} on {t['id']}")
-            continue
-
-        # guard 2: only post what can be submitted - the campaign's Whop Submit dialog must open right now
-        import whop_submit
-
-        if clip["campaign_id"] not in whop_ready:
-            whop_ready[clip["campaign_id"]] = whop_submit.preflight(clip)
-        if whop_ready[clip["campaign_id"]]:
-            why = whop_ready[clip["campaign_id"]]
-            print(f"{t['label']}: holding {clip['clip_id']} - Whop isn't ready ({why}); it posts in a later slot")
-            if clip["campaign_id"] not in held_alerted:
-                held_alerted.add(clip["campaign_id"])
-                from notify import alert
-
-                alert(f"⏸ Posts held: Whop submission unavailable for {clip['campaign_title']}",
-                      f"Reason: {why}\n\nNothing was posted, so nothing is lost: the clips wait for the next slot. "
-                      "If this repeats, the campaign may have ended or the Whop login may need renewing.")
-            exit_code = 1
             continue
 
         # guard 3: claim the slot in the repo before uploading, so an overlapping run skips this clip
