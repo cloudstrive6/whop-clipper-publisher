@@ -273,9 +273,8 @@ def main() -> int:
             unusable[clip["campaign_id"]] = why
             print(f"{t['label']}: skipping {clip['campaign_title']} - {why}")
         if not clip:
-            if unusable:
+            if unusable:  # held on purpose (you were told on Telegram): not a failed run
                 print(f"{t['label']}: no queued campaign can take submissions right now - nothing posted this slot")
-                exit_code = 1
             else:
                 print(f"{t['label']}: nothing queued for this account")
             continue

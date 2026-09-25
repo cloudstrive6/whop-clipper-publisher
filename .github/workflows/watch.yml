@@ -5,6 +5,8 @@ name: watch
 on:
   schedule:
     - cron: "40 */2 * * *"   # every 2 hours
+  repository_dispatch:
+    types: [watch]           # fired by cron-job.org every 2h (GitHub's own cron skips runs)
   workflow_dispatch:
 
 concurrency:
