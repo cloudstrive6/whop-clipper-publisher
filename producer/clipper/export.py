@@ -116,6 +116,13 @@ def export_queue() -> int:
         db.upsert("clips", {"id": c["id"], "status": "queued"})
         n += 1
         print(f"queued {c['id']} -> {', '.join(tgts)}")
+    for mf in queue.glob("*/meta.json"):  # clips queued by older runs: add what accounts added later match on
+        d = json.loads(mf.read_text(encoding="utf-8"))
+        if "niche" not in d:
+            ck = (db.get("campaigns", d["campaign_id"]) or {}).get("checklist") or {}
+            d["niche"] = (ck.get("niche") or "").lower()
+            d["platforms"] = [x.lower() for x in ck.get("allowed_platforms", [])]
+            mf.write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\n{n} clip(s) in {queue}")
     if QUEUE_RELEASE:
         _drop_orphan_videos(queue)
