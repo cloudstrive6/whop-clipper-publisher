@@ -158,6 +158,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      - name: Save application screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: applications-${{ github.run_id }}
+          path: producer/data/applications/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Record results
         if: always()
         run: |

@@ -75,6 +75,15 @@ jobs:
           SECRETS_PAT: ${{ secrets.SECRETS_PAT }}
         run: python renew.py whop-save "$RUNNER_TEMP/whop_session.json"
 
+      - name: Save application screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: applications-${{ github.run_id }}
+          path: producer/data/applications/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Record results
         if: steps.busy.outputs.busy == 'no' && always()
         run: |
