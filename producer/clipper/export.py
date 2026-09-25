@@ -109,6 +109,9 @@ def export_queue() -> int:
             "submit_within_minutes": cfg()["whop"]["submit_deadline_minutes"],
             **({"video_asset": asset} if asset else {}),
             "mentions": platform_mentions(campaign.get("checklist")),
+            # lets accounts added later (same niche, allowed platform) pick up clips already queued
+            "niche": ((campaign.get("checklist") or {}).get("niche") or "").lower(),
+            "platforms": [x.lower() for x in (campaign.get("checklist") or {}).get("allowed_platforms", [])],
         }, indent=2), encoding="utf-8")
         db.upsert("clips", {"id": c["id"], "status": "queued"})
         n += 1
