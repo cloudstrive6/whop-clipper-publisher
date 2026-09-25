@@ -19,6 +19,8 @@ from .config import campaign_dir, cfg
 
 # links in a brief that are footage we can fetch without a login or a terms click
 FETCHABLE = re.compile(r"drive\.google\.com/(file|drive/folders|open)|dropbox\.com|youtube\.com|youtu\.be", re.I)
+APPLICATION = re.compile(r"\b(appl(y|ies|ied|ying|ication)|approv(al|ed) (to|before) (join|particip))", re.I)
+PER_CLIP = re.compile(r"each clip|every clip|per clip|each post|every post|before (publishing|posting|it goes live)", re.I)
 CHANNEL = re.compile(r"youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w-]+)/?(videos|shorts|streams)?/?$", re.I)
 
 
@@ -119,6 +121,8 @@ def _producible(campaign: dict) -> tuple[bool, list[str]]:
     if "production_blockers" not in ck:  # analyzed before the split: fall back to the old verdict
         return bool(ck.get("auto_ok")), list(ck.get("auto_blockers") or ["brief not analyzed yet"])
     why = list(ck.get("production_blockers") or [])
+    if cfg()["produce"].get("auto_apply"):  # the one-time application is handled by apply(), not a human
+        why = [b for b in why if not (APPLICATION.search(b) and not PER_CLIP.search(b))]
     if ck.get("payout_steps") and not cfg()["produce"].get("allow_payout_paperwork"):
         why += [f"payout paperwork: {s}" for s in ck["payout_steps"]]
     return not why, why
@@ -259,6 +263,54 @@ def paperwork_check(report: dict) -> None:
                 once(f"paperwork|{s.campaign}|{s.date}|{s.views // 1000}", "💰 " + title, body)
 
 
+def _apply(c: dict, report: dict) -> None:
+    """Fill and submit the campaign's application with the accounts that fit it (honest answers only)."""
+    from . import whop
+    from .notify import once, telegram
+
+    accounts = _linked_targets(c)
+    try:
+        status, detail = whop.apply(c, accounts, cfg().get("applicant", {}).get("facts", ""))
+    except Exception as err:
+        status, detail = "error", f"{err.__class__.__name__}: {str(err)[:200]}"
+    print(f"   application for {c['title']}: {status}")
+    if status == "applied":
+        db.upsert("campaigns", {"id": c["id"], "status": "applied",
+                                "data": {**(c.get("data") or {}), "application": {"at": db.now(), "sent": detail}}})
+        report.setdefault("applied", []).append(c["id"])
+        telegram(f"📝 Applied to {c['title']}\n\n{detail[:3000]}\n\nI'll check for approval every 2 hours.")
+    elif status == "approved":
+        db.upsert("campaigns", {"id": c["id"], "status": "joined"})
+        report["joined"].append(c["id"])
+    elif status == "needs_human":
+        report["blocked_campaigns"][c["id"]] = [f"application needs you: {detail}"]
+        once(f"apply-needs-you|{c['id']}", f"📝 Application needs you: {c['title']}",
+             f"{detail}\n\nEverything else about this campaign can run automatically. Apply on Whop yourself, "
+             "then it joins the rotation once you're approved.")
+    else:
+        report["errors"].append(f"apply {c['id']}: {detail}")
+
+
+def check_applications(report: dict) -> None:
+    """Applied campaigns: approved -> joined (clips start); rejected -> dropped. Telegram either way."""
+    from . import whop
+    from .notify import telegram
+
+    for c in db.rows("campaigns", "status='applied'"):
+        try:
+            state = whop.application_status(c["title"])
+        except Exception as err:
+            report["errors"].append(f"application check {c['id']}: {err.__class__.__name__}")
+            continue
+        if state == "approved":
+            db.upsert("campaigns", {"id": c["id"], "status": "joined"})
+            report["joined"].append(c["id"])
+            telegram(f"✅ Approved: {c['title']} - it's in the rotation, clips are coming.")
+        elif state == "rejected":
+            db.upsert("campaigns", {"id": c["id"], "status": "rejected"})
+            telegram(f"✖️ Not accepted: {c['title']}.")
+
+
 def _join_fitting(report: dict) -> None:
     """Join shortlisted campaigns that fit a linked account and can run unattended."""
     P = cfg()["produce"]
@@ -267,7 +319,8 @@ def _join_fitting(report: dict) -> None:
         if not ck or not P.get("auto_join"):
             continue
         ok, why = _producible(c)
-        if (c.get("data") or {}).get("requires_application"):
+        needs_application = bool((c.get("data") or {}).get("requires_application"))
+        if needs_application and not P.get("auto_apply"):
             why.append("requires an application")
         if not _linked_targets(c):
             why.append("no linked account in its niche/platforms")
@@ -275,6 +328,9 @@ def _join_fitting(report: dict) -> None:
             why.append(f"footage/audience is {ck.get('content_language')}; the accounts' audiences are English")
         if why:
             report["blocked_campaigns"][c["id"]] = why
+            continue
+        if needs_application:
+            _apply(c, report)
             continue
         # the current Content Rewards layout has no join step: the first submission joins
         db.upsert("campaigns", {"id": c["id"], "status": "joined"})
@@ -311,6 +367,7 @@ def watch() -> dict:
             except Exception as err:
                 report["errors"].append(f"analyze {c['id']}: {str(err)[:120]}")
     _join_fitting(report)
+    check_applications(report)
 
     # worth-your-time campaigns that need a human step: one Telegram message each
     P = cfg()["produce"]
@@ -380,6 +437,7 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
 
     print("\n== 3. join campaigns that fit an account and need no human steps")
     _join_fitting(report)
+    check_applications(report)
 
     print("\n== 3b. drop joined campaigns that have vanished from Whop (paused or ended by the brand)")
     try:

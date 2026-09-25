@@ -358,6 +358,147 @@ def join(campaign_id: str) -> None:
 
 # ---------- submit ----------
 
+# ---------- applications ----------
+
+class ApplicationDraft(BaseModel):
+    can_answer_truthfully: bool = Field(
+        description="False if any question needs facts that are not in the material given (personal details, "
+                    "earnings, analytics, a phone number, email, a screenshot/file, a promise about the account "
+                    "owner's own actions): those must come from the human.")
+    needs_human: list[str] = Field(description="The questions that can't be answered truthfully, and why")
+    motivation: str = Field(description="2-3 sentences for 'I'm a good fit because...': specific to this campaign "
+                                        "and these accounts, confident, no hype, no invented numbers")
+    answers: list[str] = Field(description="One answer per screening question, in order; short and factual")
+
+
+PLATFORM_NAMES = {"youtube": "YouTube", "instagram": "Instagram", "tiktok": "TikTok", "x": "X"}
+
+
+def _open_by_search(page, title: str):
+    """Opens a campaign page via Whop's search (works for campaigns not on the home page)."""
+    frame = _search(page, _prefix(title))
+    return frame if open_campaign(page, frame, title) else None
+
+
+def application_status(title: str) -> str:
+    """approved (can submit clips) | pending | rejected | apply (not applied yet) | unknown."""
+    with browser(headless=True) as page:
+        frame = _open_by_search(page, title)
+        if frame is None:
+            return "unknown"
+        frame = _app_frame(page)
+        text = frame.inner_text("body").lower()
+        if frame.locator("button:has-text('Submit clip')").count():
+            return "approved"
+        if any(w in text for w in ("rejected", "declined", "not approved")):
+            return "rejected"
+        if any(w in text for w in ("pending", "under review", "application submitted", "applied")):
+            return "pending"
+        if frame.get_by_role("button", name="Apply").count():
+            return "apply"
+        return "unknown"
+
+
+def apply(campaign: dict, accounts: list[dict], facts: str, dry_run: bool = False) -> tuple[str, str]:
+    """Fills and submits the campaign's application. Returns (status, detail):
+    applied | approved (already in) | needs_human (not submitted: why) | error."""
+    title = campaign["title"]
+    with browser(headless=True) as page:
+        frame = _open_by_search(page, title)
+        if frame is None:
+            return "error", "campaign not found on Whop"
+        frame = _app_frame(page)
+        if frame.locator("button:has-text('Submit clip')").count():
+            return "approved", "already accepted"
+        btn = frame.get_by_role("button", name="Apply")
+        if not btn.count():
+            return "error", "no Apply button (maybe already applied, or a waitlist)"
+        btn.first.click()
+        page.wait_for_timeout(4000)
+        dlg = frame.locator("[role=dialog]").last
+
+        def cancel():
+            try:
+                dlg.get_by_role("button", name="Cancel").first.click(timeout=5000)
+            except Exception:
+                page.keyboard.press("Escape")
+
+        # 1. apply with the accounts that fit this campaign
+        picked = []
+        for t in accounts:
+            handle, plat = t["handle"].lstrip("@").lower(), PLATFORM_NAMES.get(t["platform"], t["platform"])
+            for b in dlg.locator("button[aria-pressed]").all():
+                txt = b.inner_text().lower()
+                if f"@{handle}" in txt and plat.lower() in txt:
+                    if b.get_attribute("aria-pressed") != "true":
+                        b.click()
+                    picked.append(f"@{handle} ({plat})")
+                    break
+        if not picked:
+            cancel()
+            return "needs_human", "none of the fitting accounts is connected in Whop's Content Rewards app"
+
+        # 2. anything we can't fill honestly (uploads, dropdowns) stops the application
+        if dlg.locator("input[type=file], select, [role=combobox]").count():
+            cancel()
+            return "needs_human", "the form asks for a file or a choice from a list"
+        motivation_box = dlg.locator("textarea").first
+        qs = dlg.locator("input[name^=q], textarea[name^=q]")
+        questions = []
+        for i in range(qs.count()):
+            label = qs.nth(i).evaluate("e => e.closest('div')?.parentElement?.innerText || ''").strip()
+            questions.append(label.split("\n")[0][:300] or f"question {i + 1}")
+
+        refs = campaign_refs(campaign["id"])
+        draft = llm.ask(
+            f"Write an honest application for this Whop clipping campaign.\n\n<campaign>{title}</campaign>\n"
+            f"<brief>\n{(campaign.get('data') or {}).get('brief_text', '')[:6000]}\n</brief>\n"
+            f"<reference_materials>\n{refs[:12000]}\n</reference_materials>\n"
+            f"<applying_with>{', '.join(picked)}</applying_with>\n<facts_about_us>\n{facts}\n</facts_about_us>\n"
+            f"<screening_questions>\n" + "\n".join(f"{i + 1}. {q}" for i, q in enumerate(questions)) +
+            "\n</screening_questions>\n\nUse only facts given here. Questions about the creator/brand are "
+            "answered from the brief and reference materials. Never invent statistics, earnings, personal "
+            "details or promises.", ApplicationDraft)
+        if not draft.can_answer_truthfully or len(draft.answers) < len(questions):
+            cancel()
+            return "needs_human", "; ".join(draft.needs_human) or "some questions need you"
+
+        # 3. fill in and submit
+        if motivation_box.count():
+            motivation_box.fill(draft.motivation)
+        for i in range(qs.count()):
+            qs.nth(i).fill(draft.answers[i])
+        page.wait_for_timeout(1000)
+        shots = DATA / "applications"
+        shots.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(shots / f"{campaign['id']}-before.png"), full_page=True)
+        if dry_run:  # rehearsal: everything filled in, then cancelled
+            cancel()
+            return "dry_run", (f"Accounts: {', '.join(picked)}\nMotivation: {draft.motivation}\n" +
+                               "\n".join(f"Q: {q}\nA: {a}" for q, a in zip(questions, draft.answers)))
+        dlg.get_by_role("button", name="Submit application").click(timeout=10000)
+        for _ in range(20):
+            page.wait_for_timeout(1500)
+            text = frame.inner_text("body").lower()
+            if not frame.locator("[role=dialog]").count() or any(
+                    w in text for w in ("application submitted", "pending", "under review", "applied")):
+                break
+        page.screenshot(path=str(shots / f"{campaign['id']}-after.png"), full_page=True)
+        still_open = frame.locator("[role=dialog]").count() and "submit application" in \
+            frame.locator("[role=dialog]").last.inner_text().lower()
+        if still_open:
+            cancel()
+            return "error", "Whop didn't accept the application form (a required field may be missing)"
+        summary = (f"Accounts: {', '.join(picked)}\nMotivation: {draft.motivation}\n" +
+                   "\n".join(f"Q: {q}\nA: {a}" for q, a in zip(questions, draft.answers)))
+        return "applied", summary
+
+
+def campaign_refs(campaign_id: str) -> str:
+    p = DATA / "campaigns" / campaign_id / "references.md"
+    return p.read_text(encoding="utf-8", errors="replace") if p.exists() else ""
+
+
 def submit(clip: dict, campaign: dict) -> bool:
     """Opens the campaign, fills the Submit form with the post URL + raw file, and waits for your confirmation."""
     with browser() as page:

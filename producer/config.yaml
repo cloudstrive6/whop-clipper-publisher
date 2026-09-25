@@ -183,6 +183,7 @@ produce:
   max_searches_per_run: 6     # each search takes ~4 min
   alert_min_cpm: 1.5          # Telegram you about new campaigns that need a human step, if they pay this much
   alert_min_budget: 10000     # ...or have this much budget left
+  auto_apply: true            # fill and submit applications for campaigns that need one (honest answers only)
 
 youtube:
   client_secret: secrets/client_secret.json
@@ -193,6 +194,21 @@ youtube:
   post_window_et: [12, 22]
   geo_location: "New York, NY"   # campaigns that require a geo-tag; set to your city if you prefer
   category_id: "24"         # Entertainment
+
+# Facts the agent may use when filling campaign applications. Only true statements; it never invents
+# numbers. Add anything else that's true and useful (follower counts, results, experience).
+applicant:
+  facts: |
+    - We run a small network of niche pages and post clips every day, on a fixed schedule:
+      YouTube Shorts 4 a day, Instagram Reels 3 a day, TikTok 4 a day, per account.
+    - @PogingPanda (YouTube) is an established gaming / playthrough / trailer channel; about half of its
+      audience is in the US (top countries: US ~44%, Philippines ~23%, UK ~3%, Canada ~2%).
+    - @destinedforgreatness777 (YouTube) is a faith / Christian / inspirational channel with about 8.4K subscribers.
+    - Other pages: @ericknox2802 (YouTube, crypto/finance), @iamcryptohustler (Instagram + TikTok, crypto/finance),
+      @modernmanifestationsecrets (YouTube + Instagram, manifestation/self-improvement), @mnfsttnsecrets (TikTok,
+      manifestation), @kiwinoygamer (Instagram, gaming), @iamdestinedforgreatness (TikTok, faith).
+    - Every clip is cut from the campaign's own footage, captioned, given a hook, and checked against the
+      campaign's rules and reference materials before it's posted. Posts stay up.
 
 whop:
   submit_deadline_minutes: 30   # Whop's dialog: "Posted within the last 30 minutes"
