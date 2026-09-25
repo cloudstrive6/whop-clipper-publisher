@@ -13,6 +13,10 @@ on:
         description: "Full discovery sweep: every niche search, every brief read"
         type: boolean
         default: false
+      quick:
+        description: "Skip the search (the campaign watcher just did it) and go straight to clips"
+        type: boolean
+        default: false
 
 concurrency:
   group: produce
@@ -30,6 +34,14 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Wait for a running campaign watcher to save first (both update the database)
+        run: |
+          for i in $(seq 1 40); do
+            n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow watch.yml --status in_progress --json databaseId -q length)
+            [ "$n" -eq 0 ] && exit 0
+            sleep 30
+          done
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
@@ -125,7 +137,7 @@ jobs:
             export YT_COOKIES_FILE="$RUNNER_TEMP/yt_cookies.txt"
           fi
           cd producer
-          python -u -m clipper produce ${{ inputs.discover && '--discover' || '' }}
+          python -u -m clipper produce ${{ inputs.discover && '--discover' || '' }} ${{ inputs.quick && '--quick' || '' }}
 
       - name: Keep Whop's refreshed login
         if: always()
