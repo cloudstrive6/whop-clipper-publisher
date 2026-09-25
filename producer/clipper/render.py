@@ -19,7 +19,7 @@ def _esc(text: str) -> str:
 
 
 def build_ass(segments: list[dict], start: float, end: float, hook: str | None, captions: bool,
-              disclosure: str | None = None) -> str:
+              disclosure: str | None = None, verbatim: bool = False) -> str:
     e = cfg()["editing"]
     W, H = e["width"], e["height"]
     head = f"""[Script Info]
@@ -40,7 +40,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     lines = []
     dur = end - start
     if hook:
-        lines.append(f"Dialogue: 1,{_ts(0)},{_ts(dur)},Hook,,0,0,0,,{_esc(hook.upper())}")
+        # a brand-approved line is shown exactly as written (case included)
+        lines.append(f"Dialogue: 1,{_ts(0)},{_ts(dur)},Hook,,0,0,0,,{_esc(hook if verbatim else hook.upper())}")
     if disclosure:  # visible paid-partnership disclosure, kept on screen for the whole clip
         lines.append(f"Dialogue: 2,{_ts(0)},{_ts(dur)},Disc,,0,0,0,,{_esc(disclosure)}")
     if captions:
@@ -182,20 +183,24 @@ def _feather_mask(w: int, h: int, folder: Path, edge: int = 90) -> Path:
 
 
 def render(video: Path, segments: list[dict], start: float, end: float, hook: str | None, out: Path,
-           music: bool = True, disclosure: str | None = None) -> Path:
+           music: bool = True, disclosure: str | None = None, captions: bool | None = None,
+           full_frame: bool = False, verbatim_hook: bool = False) -> Path:
+    """captions=False: no word captions (brand forbids our own text). full_frame: never crop (branded
+    footage whose logos, UI or legal lines must stay visible). verbatim_hook: approved line, exact case."""
     e = cfg()["editing"]
     W, H = e["width"], e["height"]
     out.parent.mkdir(parents=True, exist_ok=True)
     v = next(s for s in _probe(video)["streams"] if s["codec_type"] == "video")
     vertical = v["height"] / v["width"] > 1.5  # already 9:16-ish (e.g. pre-cut portrait clips)
     # pre-edited vertical cuts usually carry burned-in captions already; don't double them
-    captions = e["captions"] and not vertical
+    captions = (e["captions"] and not vertical) if captions is None else captions
     ass = out.with_suffix(".ass")
-    ass.write_text(build_ass(segments, start, end, hook if e["hook_text"] else None, captions, disclosure),
+    show_hook = hook if (e["hook_text"] or verbatim_hook) else None
+    ass.write_text(build_ass(segments, start, end, show_hook, captions, disclosure, verbatim_hook),
                    encoding="utf-8")
     src_w, src_h = int(v["width"]), int(v["height"])
     track = None
-    if not vertical and e["layout"] != "crop" and e.get("talking_head_4x5", True):
+    if not vertical and not full_frame and e["layout"] != "crop" and e.get("talking_head_4x5", True):
         try:
             track = speaker_track(video, start, end, src_w, src_h, segments)
         except Exception as err:  # face tracking is a nicety: never lose a clip over it

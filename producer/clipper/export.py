@@ -40,6 +40,30 @@ def platform_mentions(checklist: dict | None) -> dict:
     return out
 
 
+DISCLOSURES = {"#ad", "#sponsored", "#paidpartnership", "#partner", "#paidpromotion"}
+
+
+def build_caption(meta: dict, checklist: dict | None) -> str:
+    """Post text, then any disclosure tag alone on its own line (the FTC-style placement brands ask for),
+    then the other hashtags, capped when the rules allow only a few."""
+    import re
+
+    ck = checklist or {}
+    tags = meta.get("hashtags", [])
+    disclosure = [t for t in tags if t.lower() in DISCLOSURES]
+    others = [t for t in tags if t.lower() not in DISCLOSURES]
+    rules = " ".join((ck.get("style_notes") or []) + (ck.get("required_in_caption") or []))
+    cap = re.search(r"up to (\d+) (?:additional |extra |more )?hashtags", rules, re.I)
+    if cap:
+        others = others[:int(cap.group(1))]
+    parts = [meta["description"].rstrip()]
+    if disclosure:
+        parts.append(disclosure[0])
+    if others:
+        parts.append(" ".join(others))
+    return "\n\n".join(parts) if not disclosure else f"{parts[0]}\n\n" + "\n".join(parts[1:])
+
+
 def export_queue() -> int:
     """Copies every approved, audited clip into publisher/queue/<clip_id>/."""
     queue = PUBLISHER / "queue"
@@ -78,7 +102,7 @@ def export_queue() -> int:
             "campaign_title": campaign["title"],
             "campaign_url": (campaign.get("data") or {}).get("campaign_url", ""),
             "title": m["title"],
-            "caption": f"{m['description']}\n\n{' '.join(m['hashtags'])}",
+            "caption": build_caption(m, campaign.get("checklist")),
             "hashtags": m["hashtags"],
             "score": m.get("score", 0),
             "targets": tgts,

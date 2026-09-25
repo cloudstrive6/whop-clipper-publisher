@@ -113,6 +113,7 @@ source file: {Path(clip['source']).name}
 KNOWN FACTS you may rely on (verified by the pipeline, treat as established):
 - the source file was downloaded directly from this campaign's official asset folder; provenance is confirmed
 - no music or audio was added: the audio is exactly the source clip's own audio, untouched
+- {meta.get('edit_note') or 'the clip is a straight cut of the source'}
 - the only additions are text overlays rendered over the frame: the hook text, word-by-word captions (horizontal sources only){f", and a '{meta['disclosure']}' disclosure badge (top right, whole clip)" if meta.get('disclosure') else ''}.
   {'' if meta.get('disclosure') else 'No on-screen disclosure badge was added, because the campaign rules do not ask for one.'}
 - TikTok posts are published with TikTok's branded-content flag switched on

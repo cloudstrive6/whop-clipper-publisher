@@ -42,6 +42,9 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
     for s in sources:
         videos += [Path(s)] if Path(s).exists() else source.download(s, cdir / "sources")
     videos = _dedupe(videos)
+    min_len = max(cfg()["editing"]["min_seconds"], (checklist or {}).get("min_seconds") or 0)
+    if videos and all(render.probe_summary(v)["duration"] < min_len for v in videos):
+        return _clip_short_assets(campaign_id, camp, videos, min_len, limit)
     # by file name: the same footage has a Windows path locally and a Linux path in the cloud
     already = {Path(c["source"]).name for c in db.rows("clips", "campaign_id=?", campaign_id)}
     videos = [v for v in videos if v.name not in already]
@@ -90,6 +93,58 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
     if limit is not None:
         return made
     print("\nNext: python -m clipper review")
+    return made
+
+
+def _clip_short_assets(campaign_id: str, camp: dict, videos: list[Path], min_len: float,
+                       limit: int | None) -> int:
+    """The official footage is shorter than the minimum: make distinct 10s+ edits from it alone
+    (slow-motion replay / double play / slowed), each with a different approved on-screen line."""
+    from . import compliance, qa, render, shortasset, source
+
+    ck = camp.get("checklist") or {}
+    lines = shortasset.approved_lines(ck)
+    no_text = shortasset.no_own_text(ck)
+    cdir = campaign_dir(campaign_id)
+    have = {c["id"] for c in db.rows("clips", "campaign_id=?", campaign_id)}
+    plan = []
+    for v in videos:
+        for kind in shortasset.VARIANTS:
+            for li in range(max(len(lines), 1)):
+                cid = f"{campaign_id[:24]}-{source.slug(v.stem)[:12]}-{kind}-{li}"
+                if cid not in have:
+                    plan.append((cid, v, kind, li))
+    # spread over edit types and lines first, so consecutive posts look different
+    plan.sort(key=lambda x: (x[3], shortasset.VARIANTS.index(x[2])))
+    plan = plan[:limit or 6]
+    if not plan:
+        print("   every edit of this footage has been made already")
+        return 0
+    copies = shortasset.captions(ck, len(plan), (camp.get("data") or {}).get("brief_text", ""))
+    made = 0
+    for (cid, v, kind, li), copy in zip(plan, copies):
+        variant = shortasset.make_variant(v, kind, min_len, cdir / "variants" / f"{v.stem}_{kind}.mp4")
+        dur = render.probe_summary(variant)["duration"]
+        line = lines[li] if lines else None
+        out = cdir / "clips" / f"{cid}.mp4"
+        disclosure = None if no_text else _disclosure(ck)
+        render.render(variant, [], 0, dur, line, out, music=False, disclosure=disclosure,
+                      captions=False if no_text else None, full_frame=True, verbatim_hook=bool(lines))
+        meta = _enforce_caption(copy.model_dump() | {"hook_text": line or ""}, ck)
+        meta["disclosure"] = disclosure
+        what = {"replay": "the clip, then a slow-motion replay of its middle",
+                "double": "the clip played twice", "slow": "the whole clip slowed down"}[kind]
+        meta["edit_note"] = (f"Only the official clip {v.name} and its own audio: {what}. "
+                             + (f"On-screen text: only the approved line \"{line}\", word for word; no captions, "
+                                "no badge, no music." if line else "No text, captions or music added."))
+        report = qa.check(out, meta, ck)
+        db.upsert("clips", {"id": cid, "campaign_id": campaign_id, "source": str(v), "start": 0, "end": dur,
+                            "meta": meta, "file": str(out), "qa": report,
+                            "status": "rendered" if report["ok"] else "qa_failed"})
+        made += 1
+        print(f"   [{'OK ' if report['ok'] else 'FIX'}] {cid}  {dur:.1f}s  {line!r}  {report['issues']}")
+    print("\n== compliance audit (every clip vs every campaign rule)")
+    compliance.audit_campaign(campaign_id, only_new=True)
     return made
 
 

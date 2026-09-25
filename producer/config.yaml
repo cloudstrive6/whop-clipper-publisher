@@ -179,6 +179,10 @@ produce:
   # campaigns to clip even though the brief has a human-only step (e.g. demographic proof at payout,
   # which you then provide yourself). Campaign ids as shown by: python -m clipper campaigns
   override_campaigns: []
+  # campaigns whose gated footage you downloaded by hand; the files live in the cloud's 'footage' release
+  # (named <campaign id>__<file>), and their download blocker no longer counts
+  manual_footage:
+    - call-of-duty-mw4-warzone-operator-skin-toggle
   languages: [english, none]  # footage/audience languages the accounts can use
   searches_per_run: 1         # extra rotating search on top of one per niche with nothing to post
   max_searches_per_run: 6     # each search takes ~4 min

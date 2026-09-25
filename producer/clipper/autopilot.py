@@ -21,6 +21,7 @@ from .config import campaign_dir, cfg
 FETCHABLE = re.compile(r"drive\.google\.com/(file|drive/folders|open)|dropbox\.com|youtube\.com|youtu\.be", re.I)
 APPLICATION = re.compile(r"\b(appl(y|ies|ied|ying|ication)|approv(al|ed) (to|before) (join|particip))", re.I)
 PER_CLIP = re.compile(r"each clip|every clip|per clip|each post|every post|before (publishing|posting|it goes live)", re.I)
+DOWNLOAD = re.compile(r"download|footage|mediasilo|wetransfer|we\.tl|dropbox|drive|gated|review link", re.I)
 CHANNEL = re.compile(r"youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w-]+)/?(videos|shorts|streams)?/?$", re.I)
 
 
@@ -39,6 +40,9 @@ def fetch_sources(campaign: dict) -> list[Path]:
     ck = campaign.get("checklist") or {}
     dest = campaign_dir(campaign["id"]) / "sources"
     dest.mkdir(parents=True, exist_ok=True)
+    if campaign["id"] in (P.get("manual_footage") or []):  # downloaded by hand (gated link), stored in the cloud
+        subprocess.run(["gh", "release", "download", "footage", "-p", f"{campaign['id']}__*", "-D", str(dest),
+                        "--skip-existing"], cwd=campaign_dir(campaign["id"]))
     urls = list(ck.get("source_assets", []))
     for url in list(urls):  # briefs often point at a Google Doc whose links are the actual footage
         if "docs.google.com/document" in url:
@@ -121,6 +125,8 @@ def _producible(campaign: dict) -> tuple[bool, list[str]]:
     if "production_blockers" not in ck:  # analyzed before the split: fall back to the old verdict
         return bool(ck.get("auto_ok")), list(ck.get("auto_blockers") or ["brief not analyzed yet"])
     why = list(ck.get("production_blockers") or [])
+    if campaign["id"] in (cfg()["produce"].get("manual_footage") or []):  # you downloaded the gated footage
+        why = [b for b in why if not DOWNLOAD.search(b)]
     if cfg()["produce"].get("auto_apply"):  # the one-time application is handled by apply(), not a human
         why = [b for b in why if not (APPLICATION.search(b) and not PER_CLIP.search(b))]
     if ck.get("payout_steps") and not cfg()["produce"].get("allow_payout_paperwork"):
