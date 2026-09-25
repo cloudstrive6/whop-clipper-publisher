@@ -86,7 +86,20 @@ def export_queue() -> int:
         n += 1
         print(f"queued {c['id']} -> {', '.join(tgts)}")
     print(f"\n{n} clip(s) in {queue}")
+    if QUEUE_RELEASE:
+        _drop_orphan_videos(queue)
     return n
+
+
+def _drop_orphan_videos(queue: Path) -> None:
+    """Videos in the queue release that no queued clip refers to (e.g. from a run whose save failed)."""
+    wanted = {json.loads(m.read_text(encoding="utf-8")).get("video_asset") for m in queue.glob("*/meta.json")}
+    r = subprocess.run(["gh", "release", "view", QUEUE_RELEASE, "--json", "assets", "-q", ".assets[].name"],
+                       cwd=PUBLISHER, capture_output=True, text=True)
+    for name in r.stdout.split():
+        if name not in wanted:
+            subprocess.run(["gh", "release", "delete-asset", QUEUE_RELEASE, name, "-y"], cwd=PUBLISHER)
+            print(f"removed orphan video {name}")
 
 
 def export_session() -> Path:

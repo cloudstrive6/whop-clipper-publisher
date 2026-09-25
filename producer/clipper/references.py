@@ -18,6 +18,26 @@ def links_from_brief(brief_text: str) -> list[str]:
     return [u for u in dict.fromkeys(urls) if "whop.com" not in u]
 
 
+def doc_links(url: str) -> list[str]:
+    """Every link inside a Google Doc, including ones written as words ("footage: Here"), which the
+    plain-text export drops. Google wraps them as google.com/url?q=<real link>."""
+    import html
+    import urllib.parse
+
+    doc_id = re.search(r"/document/d/([\w-]+)", url).group(1)
+    req = urllib.request.Request(f"https://docs.google.com/document/d/{doc_id}/export?format=html",
+                                 headers={"User-Agent": "Mozilla/5.0"})
+    page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+    out = []
+    for href in re.findall(r'href="([^"]+)"', page):
+        href = html.unescape(href)
+        if "google.com/url?" in href:
+            href = urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get("q", [href])[0]
+        if href.startswith("http") and href not in out:
+            out.append(href)
+    return out
+
+
 def _gdoc(url: str) -> str:
     doc_id = re.search(r"/document/d/([\w-]+)", url).group(1)
     req = urllib.request.Request(f"https://docs.google.com/document/d/{doc_id}/export?format=txt",

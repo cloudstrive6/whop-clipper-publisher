@@ -37,7 +37,16 @@ def fetch_sources(campaign: dict) -> list[Path]:
     ck = campaign.get("checklist") or {}
     dest = campaign_dir(campaign["id"]) / "sources"
     dest.mkdir(parents=True, exist_ok=True)
-    for url in ck.get("source_assets", []):
+    urls = list(ck.get("source_assets", []))
+    for url in list(urls):  # briefs often point at a Google Doc whose links are the actual footage
+        if "docs.google.com/document" in url:
+            try:
+                from .references import doc_links
+
+                urls += [u for u in doc_links(url) if FETCHABLE.search(u) and u not in urls]
+            except Exception as err:
+                print(f"   couldn't read links in {url[:70]} ({err.__class__.__name__})")
+    for url in urls:
         if not FETCHABLE.search(url):
             print(f"   skip source (needs a human or isn't footage): {url[:90]}")
             continue

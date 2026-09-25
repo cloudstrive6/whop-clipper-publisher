@@ -91,6 +91,10 @@ sampled across the clip (left to right = start to end).
 <required_on_screen>{ck.get('required_on_screen')}</required_on_screen>
 <required_in_bio>{ck.get('required_in_bio')}</required_in_bio>
 <forbidden>{ck.get('forbidden')}</forbidden>
+<handled_by_the_human_at_payout>{ck.get('payout_steps') or 'none'}</handled_by_the_human_at_payout>
+(Requirements listed under handled_by_the_human_at_payout - e.g. "include demographic information", audience
+screenshots, payout forms - are supplied by the account owner when a clip reaches payout, not by the video or
+caption. Do not fail the clip or set safe_to_autopost false because of them; list them in human_todo.)
 <style_notes>{ck.get('style_notes')}</style_notes>
 <length_rules>min={ck.get('min_seconds')}s max={ck.get('max_seconds')}s</length_rules>
 
