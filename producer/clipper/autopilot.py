@@ -259,7 +259,84 @@ def paperwork_check(report: dict) -> None:
                 once(f"paperwork|{s.campaign}|{s.date}|{s.views // 1000}", "💰 " + title, body)
 
 
-def produce(discover: bool = False) -> dict:
+def _join_fitting(report: dict) -> None:
+    """Join shortlisted campaigns that fit a linked account and can run unattended."""
+    P = cfg()["produce"]
+    for c in db.rows("campaigns", "status='shortlisted'"):
+        ck = c.get("checklist") or {}
+        if not ck or not P.get("auto_join"):
+            continue
+        ok, why = _producible(c)
+        if (c.get("data") or {}).get("requires_application"):
+            why.append("requires an application")
+        if not _linked_targets(c):
+            why.append("no linked account in its niche/platforms")
+        if not _language_ok(c):
+            why.append(f"footage/audience is {ck.get('content_language')}; the accounts' audiences are English")
+        if why:
+            report["blocked_campaigns"][c["id"]] = why
+            continue
+        # the current Content Rewards layout has no join step: the first submission joins
+        db.upsert("campaigns", {"id": c["id"], "status": "joined"})
+        report["joined"].append(c["id"])
+        print(f"   joined {c['title']}")
+
+
+def watch() -> dict:
+    """Every few hours: look for campaigns never seen before, read and join the ones that fit, and start
+    a production run right away if they can fill empty slots. Cheap when nothing is new."""
+    import os
+    import subprocess
+
+    from . import brief, whop
+    from .notify import once, telegram
+
+    report = {"scouted": 0, "analyzed": [], "joined": [], "clips_made": 0, "approved": [], "held": [],
+              "blocked_campaigns": {}, "errors": []}
+    before = {c["id"] for c in db.rows("campaigns", "1=1")}
+    for q in [None] + _search_plan(False)[:3]:
+        try:
+            report["scouted"] += len(whop.scout(query=q, max_details=6, new_only=True))
+        except Exception as err:
+            report["errors"].append(f"scout {q or 'featured'}: {err.__class__.__name__}")
+            if "limit" in str(err).lower():
+                break
+    new = [c for c in db.rows("campaigns", "status='shortlisted'") if c["id"] not in before]
+    for c in new:
+        text = (c.get("data") or {}).get("brief_text")
+        if text:
+            try:
+                brief.analyze(c["id"], text)
+                report["analyzed"].append(c["id"])
+            except Exception as err:
+                report["errors"].append(f"analyze {c['id']}: {str(err)[:120]}")
+    _join_fitting(report)
+
+    # worth-your-time campaigns that need a human step: one Telegram message each
+    P = cfg()["produce"]
+    for c in (db.get("campaigns", x["id"]) for x in new):
+        if c["id"] in report["joined"] or c["id"] not in report["blocked_campaigns"]:
+            continue
+        d = c.get("data") or {}
+        cpm = d.get("youtube_cpm") or d.get("best_other_cpm") or 0
+        left = d.get("budget_remaining") or 0
+        if cpm >= P.get("alert_min_cpm", 1.5) or left >= P.get("alert_min_budget", 10000):
+            why = "; ".join(report["blocked_campaigns"][c["id"]])[:500]
+            once(f"needs-you|{c['id']}", f"👀 New campaign worth a look: {c['title']}",
+                 f"${cpm:g}/1K, ${left:,.0f} budget left.\nIt can't run unattended because: {why}\n\n"
+                 "If you sort that out (e.g. apply, or add a dedicated account), tell Claude and it joins the rotation.")
+    if report["joined"]:
+        telegram("🆕 Joined new campaign(s): " + ", ".join(report["joined"]))
+        hungry = [t for t, v in _deficits().items() if v > 0]
+        feeds = {t["id"] for cid in report["joined"] for t in _linked_targets(db.get("campaigns", cid))}
+        if os.environ.get("GITHUB_ACTIONS") and feeds & set(hungry):
+            # make clips now instead of waiting for tomorrow's run
+            subprocess.run(["gh", "workflow", "run", "produce.yml", "-f", "quick=true"])
+            print("started a production run for the new campaign(s)")
+    return report
+
+
+def produce(discover: bool = False, quick: bool = False) -> dict:
     """discover=True: every niche search, more campaigns opened, every brief read (a one-off sweep)."""
     import math
     import time as _time
@@ -273,7 +350,7 @@ def produce(discover: bool = False) -> dict:
               "held": [], "blocked_campaigns": {}, "errors": [], "unfilled": {}}
 
     print("== 1. scout (featured + niche searches)")
-    for q in [None] + _search_plan(discover):
+    for q in ([] if quick else [None] + _search_plan(discover)):
         try:
             report["scouted"] += len(whop.scout(query=q, max_details=(15 if discover else 12) if q is None
                                                 else (8 if discover else 5)))
@@ -302,24 +379,7 @@ def produce(discover: bool = False) -> dict:
             report["errors"].append(f"analyze {c['id']}: {str(err)[:150]}")
 
     print("\n== 3. join campaigns that fit an account and need no human steps")
-    for c in db.rows("campaigns", "status='shortlisted'"):
-        ck = c.get("checklist") or {}
-        if not ck or not P.get("auto_join"):
-            continue
-        ok, why = _producible(c)
-        if (c.get("data") or {}).get("requires_application"):
-            why.append("requires an application")
-        if not _linked_targets(c):
-            why.append("no linked account in its niche/platforms")
-        if not _language_ok(c):
-            why.append(f"footage/audience is {ck.get('content_language')}; the accounts' audiences are English")
-        if why:
-            report["blocked_campaigns"][c["id"]] = why
-            continue
-        # the current Content Rewards layout has no join step: the first submission joins
-        db.upsert("campaigns", {"id": c["id"], "status": "joined"})
-        report["joined"].append(c["id"])
-        print(f"   joined {c['title']}")
+    _join_fitting(report)
 
     print("\n== 3b. drop joined campaigns that have vanished from Whop (paused or ended by the brand)")
     try:

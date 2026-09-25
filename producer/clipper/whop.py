@@ -167,7 +167,7 @@ def _known_id(title: str) -> str:
     return cid
 
 
-def scout(max_details: int = 12, query: str | None = None) -> list[dict]:
+def scout(max_details: int = 12, query: str | None = None, new_only: bool = False) -> list[dict]:
     """Featured marketplace by default; with `query`, the marketplace search results instead."""
     s = cfg()["scout"]
     raw_dir = DATA / "scout_raw"
@@ -194,6 +194,8 @@ def scout(max_details: int = 12, query: str | None = None) -> list[dict]:
             cid = _known_id(L.title)
             prev = db.get("campaigns", cid)
             if prev and prev["status"] in ("waitlisted", "applied"):
+                continue
+            if new_only and prev:  # the watcher only opens campaigns it has never seen
                 continue
             pr = _prerank(L, s)
             if prev and prev["status"] == "joined":

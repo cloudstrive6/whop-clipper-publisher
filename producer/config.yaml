@@ -181,6 +181,8 @@ produce:
   languages: [english, none]  # footage/audience languages the accounts can use
   searches_per_run: 1         # extra rotating search on top of one per niche with nothing to post
   max_searches_per_run: 6     # each search takes ~4 min
+  alert_min_cpm: 1.5          # Telegram you about new campaigns that need a human step, if they pay this much
+  alert_min_budget: 10000     # ...or have this much budget left
 
 youtube:
   client_secret: secrets/client_secret.json

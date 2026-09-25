@@ -284,7 +284,7 @@ def main(argv: list[str]) -> None:
         import os
 
         from . import autopilot
-        report = autopilot.produce(discover="--discover" in args)
+        report = autopilot.produce(discover="--discover" in args, quick="--quick" in args)
         md = autopilot.summary_md(report)
         print("\n" + md)
         (Path(__file__).parent.parent / "data" / "last_run.md").write_text(md, encoding="utf-8")
@@ -294,6 +294,10 @@ def main(argv: list[str]) -> None:
         if os.environ.get("GITHUB_ACTIONS"):
             from .notify import telegram
             telegram(autopilot.summary_telegram(report))
+    elif cmd == "watch":  # every few hours: new campaigns only (GitHub Actions)
+        from . import autopilot
+        r = autopilot.watch()
+        print(f"\nnew campaigns read: {len(r['analyzed'])}, joined: {r['joined'] or 'none'}, errors: {len(r['errors'])}")
     elif cmd == "sync-producer":
         from . import export
         export.sync_producer(with_state="--with-state" in args, push="--no-push" not in args)
