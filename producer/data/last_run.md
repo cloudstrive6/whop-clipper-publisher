@@ -1,10 +1,4 @@
-**Scouted** 12 · **analyzed** 2 · **joined** 1 · **clips made** 9 · **auto-approved** 0 · **held** 1
-
-### Joined
-- tjr-23-100-weekly-clipping-campaign
-
-### Held for your review (not posted)
-- average-rob-clips-omdat-het-kan-averag-8: Language: the audio contains Dutch/Flemish words ("snelle planger", "vermoeta"), and the burned-in captions reproduce "SNELLE" on screen. The campaign forbids clips that are not in English. A human mu
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 9 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -54,6 +48,11 @@
 - jacob-nachinson-clipping-2: Dedicated fitness/health account required on TikTok, Instagram and YouTube - no such account exists on the roster; Bio edit required: must start with 'Main YT: @jacobnach', include an approved tagline
 - ja-z-in-hbo-series-clipping-campaign: Approved footage and the required CTA ending live in permission-gated Google Drive folders that must be opened and downloaded by a human; The required CTA ending MP4 must be downloaded and appended af
 - yonna-x-b-a-duvet-clipping-phase-2: Requires a TikTok account with a history of posting streamer / pop culture content and a US/UK/CA/AU audience; the roster has no TikTok account that clearly qualifies, so a suitable account must be es
+- backyard-breaks-clipping-campaign: Dedicated Backyard Breaks-branded account required on TikTok/Instagram/YouTube — the roster has none and personal/existing niche accounts are banned; Profile picture must be the official Backyard Brea
+- bushbaby-danny-p-back-to-funk-nightlife-edits: No eligible account on the roster: the brief forbids dedicated and repost-only pages and requires original posts on your own main nightlife/meme account with a mostly Tier 1 (UK/US/AU/CA), 18+, 1%+ en
+- amour-propre-music-clipping-5k-budget-1-cpm: Requires a music/EDM/festival/rave/nightlife/DJ niche page or a brand-new anonymous persona page that the roster does not have; Requires editing the posting account's bio to add the 'Listen to We Are 
+- innellea-pacha-new-york-set-clips-8303: no linked account in its niche/platforms
+- flip-gg-clipping: Flip.gg overlay assets are behind a Notion page that requires sign-up/login to open and download; Mandatory Warm Up Guide, Approval Process and USA Audience Targeting sub-pages are login-gated and mus
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -69,6 +68,8 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
 - call-of-duty-mw4-warzone-operator-skin-toggle: RuntimeError: replay variant came out 13.1s, under 15s
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- avgusta-clips: no footage could be downloaded
