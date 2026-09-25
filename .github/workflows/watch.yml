@@ -1,10 +1,10 @@
 name: watch
 
-# Every 3 hours: look for campaigns never seen before, read + join the ones that fit, and start a
+# Every 4 hours: look for campaigns never seen before, read + join the ones that fit, and start a
 # production run straight away if they can fill empty slots. A few minutes when nothing is new.
 on:
   schedule:
-    - cron: "40 1,4,7,10,13,16,19,22 * * *"
+    - cron: "40 2,6,10,14,18,22 * * *"   # every 4 hours
   workflow_dispatch:
 
 concurrency:
