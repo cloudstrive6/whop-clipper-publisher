@@ -321,6 +321,17 @@ def produce(discover: bool = False) -> dict:
         report["joined"].append(c["id"])
         print(f"   joined {c['title']}")
 
+    print("\n== 3b. drop joined campaigns that have vanished from Whop (paused or ended by the brand)")
+    try:
+        joined = db.rows("campaigns", "status='joined'")
+        for title in whop.missing_campaigns([c["title"] for c in joined]):
+            c = next(x for x in joined if x["title"] == title)
+            db.upsert("campaigns", {"id": c["id"], "status": "ended"})
+            report.setdefault("ended", []).append(c["id"])
+            print(f"   {title}: no longer on Whop - marked ended, no more clips for it")
+    except Exception as err:
+        report["errors"].append(f"campaign check: {err.__class__.__name__}: {str(err)[:150]}")
+
     print("\n== 4. make clips until every account's slots are covered")
     deficit = _deficits()
     rate = _pass_rate()

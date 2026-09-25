@@ -128,6 +128,25 @@ def _search(page, query: str):
     return frame
 
 
+def missing_campaigns(titles: list[str]) -> list[str]:
+    """Titles whose campaign no longer shows up in Whop's search (paused, ended or removed by the brand).
+
+    The search page echoes the query as its heading, so a campaign counts as present only when its
+    stable title prefix appears again as a result card."""
+    missing = []
+    with browser(headless=True) as page:
+        for title in titles:
+            p = _prefix(title)
+            try:
+                frame = _search(page, p)
+                hits = [l for l in frame.inner_text("body").splitlines() if l.strip().lower().startswith(p)]
+                if len(hits) < 2:
+                    missing.append(title)
+            except Exception as err:  # a flaky page load isn't evidence the campaign is gone
+                print(f"[check] couldn't check {title!r}: {err.__class__.__name__}")
+    return missing
+
+
 def _prefix(title: str) -> str:
     return re.split(r"\s[–—|-]\s|\s\|", title, maxsplit=1)[0].strip().lower()
 
