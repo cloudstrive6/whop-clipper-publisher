@@ -72,7 +72,8 @@ def pick_multi(transcripts: dict[str, list[dict]], durations: dict[str, float], 
     return out[:n]
 
 
-def pick(segments: list[dict], checklist: dict | None, n: int | None = None) -> list[Moment]:
+def pick(segments: list[dict], checklist: dict | None, n: int | None = None,
+         source_title: str | None = None) -> list[Moment]:
     e = cfg()["editing"]
     n = n or e["clips_per_source"]
     lo = max(e["min_seconds"], (checklist or {}).get("min_seconds") or 0)
@@ -81,6 +82,9 @@ def pick(segments: list[dict], checklist: dict | None, n: int | None = None) -> 
         f"Pick the {n} best non-overlapping clips, each between {lo} and {hi} seconds long.\n"
         f"Use only timestamps that exist in the transcript.\n\n"
         f"<campaign_checklist>\n{checklist or 'none provided'}\n</campaign_checklist>\n\n"
+        + (f"<source_video_title>{source_title}</source_video_title>\n(Use this exact title wherever the rules "
+           "ask you to name the source video.)\n\n" if source_title else "") +
+        f""
         f"<transcript>\n{as_timestamped_text(segments)}\n</transcript>"
     )
     plan = llm.ask(prompt, ClipPlan, SYSTEM)

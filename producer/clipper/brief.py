@@ -44,7 +44,9 @@ class Checklist(BaseModel):
                     "creator's face or voice, brand approval of each clip before posting, a login- or terms-gated "
                     "download, attaching "
                     "an in-app sound, a brand-new or brand-named account the roster doesn't have, a bio edit, a "
-                    "manual form at submission time. Empty if an unattended pipeline can do all of it. Do NOT list "
+                    "manual form at submission time, or a payout condition an automated clipper can never meet "
+                    "truthfully (e.g. a screen recording proving you edited the clip yourself in CapCut/Premiere). "
+                    "Empty if an unattended pipeline can do all of it. Do NOT list "
                     "the campaign's one-time application to join: applications are handled automatically.")
     payout_steps: list[str] = Field(
         description="Human-only steps needed only AFTER a clip performs, to get it paid: audience-demographic "

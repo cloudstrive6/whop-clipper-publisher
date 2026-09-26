@@ -78,7 +78,7 @@ def _ytdlp(url: str, dest: Path, campaign_id: str, P: dict) -> None:
             "--max-filesize", f"{P['max_source_mb']}M",
             "--match-filter", f"duration < {P['max_source_minutes'] * 60} & !is_live",
             "--download-archive", str(campaign_dir(campaign_id) / "yt_archive.txt"),
-            "-o", str(dest / "%(title).80s [%(id)s].%(ext)s")]
+            "-o", str(dest / "%(title).150s [%(id)s].%(ext)s")]
     cookies = os.environ.get("YT_COOKIES_FILE")
     if cookies and Path(cookies).exists():
         args += ["--cookies", cookies]
@@ -120,6 +120,8 @@ def _producible(campaign: dict) -> tuple[bool, list[str]]:
     when produce.allow_payout_paperwork is on: the clips post and submit normally, and you do the
     paperwork for the ones that reach a payout."""
     ck = campaign.get("checklist") or {}
+    if campaign["id"] in (cfg()["produce"].get("exclude_campaigns") or []):
+        return False, ["excluded in config (produce.exclude_campaigns)"]
     if campaign["id"] in (cfg()["produce"].get("override_campaigns") or []):
         return True, []
     if "production_blockers" not in ck:  # analyzed before the split: fall back to the old verdict

@@ -188,6 +188,9 @@ produce:
   # campaigns to clip even though the brief has a human-only step (e.g. demographic proof at payout,
   # which you then provide yourself). Campaign ids as shown by: python -m clipper campaigns
   override_campaigns: []
+  # never clip these (e.g. payout needs proof you edited it yourself in CapCut, which automation can't honestly give)
+  exclude_campaigns:
+    - average-rob-clips
   # campaigns whose gated footage you downloaded by hand; the files live in the cloud's 'footage' release
   # (named <campaign id>__<file>), and their download blocker no longer counts
   manual_footage:

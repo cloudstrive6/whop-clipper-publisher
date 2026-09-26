@@ -48,7 +48,7 @@ def login() -> None:
         input("Log in to Whop in the opened browser, then press Enter here... ")
 
 
-def _app_frame(page, timeout: float = 30):
+def _app_frame(page, timeout: float = 75):
     """The Content Rewards UI renders inside a cross-origin iframe."""
     end = time.time() + timeout
     while time.time() < end:

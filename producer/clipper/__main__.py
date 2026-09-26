@@ -18,6 +18,7 @@
   sync-secrets                  renew + upload every credential to the cloud repo
 """
 import json
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -42,7 +43,7 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
     for s in sources:
         videos += [Path(s)] if Path(s).exists() else source.download(s, cdir / "sources")
     videos = _dedupe(videos)
-    min_len = max(cfg()["editing"]["min_seconds"], (checklist or {}).get("min_seconds") or 0)
+    min_len = (checklist or {}).get("min_seconds") or cfg()["editing"]["min_seconds"]
     if videos and all(render.probe_summary(v)["duration"] < min_len for v in videos):
         return _clip_short_assets(campaign_id, camp, videos, min_len, limit)
     # by file name: the same footage has a Windows path locally and a Linux path in the cloud
@@ -85,7 +86,8 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
         long_model = cfg()["editing"].get("whisper_model_long_ci") if IN_CI and durations[video.name] > 1200 else None
         segs = transcribe.transcribe(video, long_model)
         print(f"   transcript: {len(segs)} segments; picking moments…")
-        for m in moments.pick(segs, checklist, None if limit is None else limit - made):
+        title = re.sub(r"\s*\[[\w-]{6,}\]$", "", video.stem)  # yt-dlp names files "<title> [<id>]"
+        for m in moments.pick(segs, checklist, None if limit is None else limit - made, source_title=title):
             finish(video, segs, m)
     from . import compliance
     print("\n== compliance audit (every clip vs every campaign rule)")
