@@ -136,6 +136,39 @@ def submit_with_retry(clip: dict, url: str, target: dict, window_minutes: int = 
     raise last or RuntimeError("Whop submission did not succeed inside the window")
 
 
+LINK_BOX = ("input[type=url]:visible, input[placeholder*='http' i]:visible, input[placeholder*='link' i]:visible, "
+            "input[type=text]:visible")
+
+
+def _link_box(page, frame, wait_s: int = 45):
+    """The dialog's visible, enabled link field; waits for it (Whop can be slow to render it)."""
+    for _ in range(wait_s):
+        dlg = frame.locator("[role=dialog]")
+        if dlg.count():
+            box = dlg.last.locator(LINK_BOX)
+            for i in range(box.count()):
+                b = box.nth(i)
+                try:
+                    if b.is_enabled() and b.is_editable():
+                        return dlg.last, b
+                except Exception:
+                    pass
+        page.wait_for_timeout(1000)
+    return None, None
+
+
+def _evidence(page, frame, name: str) -> None:
+    """Screenshot + the dialog's HTML, attached to the run, so any failure can be diagnosed."""
+    try:
+        Path("artifacts").mkdir(exist_ok=True)
+        page.screenshot(path=f"artifacts/{name}.png")
+        d = frame.locator("[role=dialog]")
+        html = d.last.evaluate("e => e.outerHTML") if d.count() else frame.locator("body").inner_html()
+        Path(f"artifacts/{name}.html").write_text(html[:200000], encoding="utf-8")
+    except Exception:
+        pass
+
+
 def _failed_checks(dlg) -> list[str]:
     """Names of checks whose label Whop has turned red."""
     failed = []
@@ -180,9 +213,10 @@ def submit(clip: dict, url: str, target: dict, artifacts: Path | None = None) ->
 
             frame.locator("button:has-text('Submit clip')").first.click(timeout=20000)
             page.wait_for_timeout(3000)
-            dlg = frame.locator("[role=dialog]").last
-            box = dlg.locator("input[type=url], input[type=text], input[placeholder*='link' i], "
-                              "input[placeholder*='http' i]").first
+            dlg, box = _link_box(page, frame)
+            if box is None:
+                _evidence(page, frame, f"{clip['clip_id']}-no-link-box")
+                raise RuntimeError("the submit dialog's link box never became typeable")
             box.fill(url)
             box.press("Tab")  # blur triggers Whop's checks: linked account / not submitted / < 30 min
             page.wait_for_timeout(4000)
@@ -273,7 +307,16 @@ def preflight(clip: dict, tries: int = 2) -> str | None:
                     page.screenshot(path=f"artifacts/preflight-{clip.get('campaign_id', 'campaign')}.png")
                     reason = "the Submit dialog didn't open"
                     continue
-                dlg = frame.locator("[role=dialog]").last
+                dlg, box = _link_box(page, frame, 30)
+                if box is None:
+                    _evidence(page, frame, f"preflight-{clip.get('campaign_id', 'campaign')}-no-link-box")
+                    reason = "the submit dialog's link box isn't typeable"
+                    continue
+                box.fill("https://example.com/test")  # exactly what submission does, then undone
+                if box.input_value() != "https://example.com/test":
+                    reason = "the submit dialog's link box doesn't accept text"
+                    continue
+                box.fill("")
                 dlg.get_by_text("Cancel", exact=True).first.click(timeout=5000)
                 return None
             except Exception as err:

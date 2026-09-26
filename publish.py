@@ -347,6 +347,8 @@ def main() -> int:
                 print(f"  whop submission error: {err.__class__.__name__}: {err}")
                 exit_code = 1
                 unsubmitted_alert(clip, t, url, f"{err.__class__.__name__}: {str(err)[:200]}")
+                # don't post more of this campaign in this run: they'd likely fail the same way
+                whop_ready[clip["campaign_id"]] = f"its last submission failed ({err.__class__.__name__})"
             save_state(state)
     if not args.dry_run:
         retire_finished(state, clips, all_linked)
