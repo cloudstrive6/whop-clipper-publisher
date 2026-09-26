@@ -257,7 +257,7 @@ def main() -> int:
     if args.platform != "all":
         targets = [t for t in targets if t["platform"] == args.platform]
     if args.account:
-        targets = [t for t in targets if t["id"] == args.account]
+        targets = [t for t in targets if t["id"] in args.account.split(",")]
 
     exit_code = 0
     whop_ready: dict[str, str | None] = {}  # campaign -> None if submittable, else why not

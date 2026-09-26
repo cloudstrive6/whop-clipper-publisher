@@ -10,6 +10,9 @@ on:
       platform:
         description: youtube | instagram | tiktok | all
         default: all
+      accounts:
+        description: "optional: only these account ids, comma-separated (e.g. ig_manifestation,tt_cryptohustler)"
+        default: ""
       dry_run:
         description: "true to simulate"
         default: "false"
@@ -28,7 +31,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120   # one run can post to 6+ accounts, each waiting on Whop
     env:
       GH_TOKEN: ${{ github.token }}   # downloads queued videos from the 'queue' release
     steps:
@@ -73,7 +76,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python publish.py --platform "${{ steps.which.outputs.platform }}" \
-            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}             ${{ github.event.inputs.accounts && format('--account {0}', github.event.inputs.accounts) || '' }}
 
       - name: Keep Whop's refreshed login
         if: always()
