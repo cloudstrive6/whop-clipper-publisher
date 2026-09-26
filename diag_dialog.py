@@ -20,13 +20,13 @@ with sync_playwright() as p:
         if frame is None:
             continue
         frame.locator("button:has-text('Submit clip')").first.click(timeout=20000)
-        for secs in (3, 10, 25):
+        for secs in (1, 2, 4, 8):
             page.wait_for_timeout(secs * 1000 - (0 if secs == 3 else 0))
             d = frame.locator("[role=dialog]")
             print(f"  after ~{secs}s: dialogs={d.count()}")
             for i in range(d.count()):
                 print(f"    dialog {i}: {d.nth(i).inner_text()[:400]!r}")
-                print("    inputs:", d.nth(i).evaluate("e => [...e.querySelectorAll('input,textarea,[contenteditable]')].map(x => [x.tagName, x.getAttribute('type'), x.placeholder])"))
+                print("    inputs:", d.nth(i).evaluate("e => [...e.querySelectorAll('input,textarea,[contenteditable]')].map(x => [x.tagName, x.getAttribute('type'), x.placeholder, 'disabled=' + x.disabled, 'readonly=' + x.readOnly])"))
             page.screenshot(path=f"artifacts/diag-{n}-{secs}s.png")
         page.keyboard.press("Escape")
     b.close()
