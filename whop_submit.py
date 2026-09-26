@@ -256,11 +256,24 @@ def preflight(clip: dict, tries: int = 2) -> str | None:
                     reason = f"campaign {clip['campaign_title']!r} not found on Whop (ended or renamed)"
                     continue
                 frame.locator("button:has-text('Submit clip')").first.click(timeout=20000)
-                page.wait_for_timeout(3000)
-                dlg = frame.locator("[role=dialog]").last
-                if "submit video link" not in dlg.inner_text().lower():
+                # the dialog can take a while to render on a busy runner: wait for its link field
+                ready = False
+                for _ in range(30):
+                    page.wait_for_timeout(1000)
+                    dlg = frame.locator("[role=dialog]")
+                    try:
+                        text = dlg.last.inner_text(timeout=2000).lower() if dlg.count() else ""
+                    except Exception:
+                        text = ""
+                    if "submit video link" in text or "post a video link" in text:
+                        ready = True
+                        break
+                if not ready:
+                    Path("artifacts").mkdir(exist_ok=True)
+                    page.screenshot(path=f"artifacts/preflight-{clip.get('campaign_id', 'campaign')}.png")
                     reason = "the Submit dialog didn't open"
                     continue
+                dlg = frame.locator("[role=dialog]").last
                 dlg.get_by_text("Cancel", exact=True).first.click(timeout=5000)
                 return None
             except Exception as err:
