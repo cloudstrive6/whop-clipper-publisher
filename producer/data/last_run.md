@@ -1,4 +1,16 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 9 · **auto-approved** 0 · **held** 0
+**Scouted** 14 · **analyzed** 0 · **joined** 0 · **clips made** 23 · **auto-approved** 5 · **held** 3
+
+### Queued for posting
+- buy-turnkey-investments--b-harry-gold-present-0
+- buy-turnkey-investments--b-harry-gold-present-20
+- buy-turnkey-investments--b-harry-gold-present-250
+- buy-turnkey-investments--b-harry-gold-present-46
+- buy-turnkey-investments--b-harry-gold-present-77
+
+### Held for your review (not posted)
+- tjr-23-100-weekly-clippi-how-to-start-trading-3071: Logo rule needs an approver's ruling before this clip goes out. Logos appear on screen for the entire clip via the source footage, not via anything the pipeline added: a branded trucker cap worn by th
+- tjr-23-100-weekly-clippi-how-to-start-trading-667: Unresolved 'Logos of any kind are not allowed': the webcam inset carries incidental third-party brand marks from the source footage — a logo on the gaming-chair headrest, a logo on the cap worn by the
+- buy-turnkey-investments--b-harry-gold-present-145: Topical fit with the 'Rental Property' campaign tag is unresolved: the clip is entirely about fix-and-flip profits ('I flip the deal, I get the profits') with zero rental, turnkey, cash-flow or Sectio
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -53,9 +65,14 @@
 - amour-propre-music-clipping-5k-budget-1-cpm: Requires a music/EDM/festival/rave/nightlife/DJ niche page or a brand-new anonymous persona page that the roster does not have; Requires editing the posting account's bio to add the 'Listen to We Are 
 - innellea-pacha-new-york-set-clips-8303: no linked account in its niche/platforms
 - flip-gg-clipping: Flip.gg overlay assets are behind a Notion page that requires sign-up/login to open and download; Mandatory Warm Up Guide, Approval Process and USA Audience Targeting sub-pages are login-gated and mus
+- roll-anime-girls-roblox-game: Mandatory Discord join (https://discord.gg/SGf2ADYjb8) before participating; Premade footage pack "Roll Anime Girls Backup" has no URL — assets must be obtained manually before any clip can be made; R
+- nemzzz-lifestyle-clipping-content-drive-edits: No eligible account: campaign requires a UK rap / drill / German rap / hip-hop culture page posting as an original main account, and forbids dedicated or repost-only pages — the roster has no such Tik
+- bill-pay-the-musical-comedy-edits: The provided clip folder is behind a 'HERE' hyperlink inside the Google Doc that is not present in the extracted text — the footage URL must be retrieved manually before any compliant clip can be made
+- bill-pay-the-musical: Footage folder is behind an unresolved link in the reference doc ('HERE' / 'Footage Part 2') — the URLs are not in the supplied material, so a human must retrieve them before any clip can be cut; Post
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
+- average-rob-clips: excluded in config (produce.exclude_campaigns)
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 - coinbase-x-valorant-clipping: Approved Dropbox folder is the only permitted footage source and access is gated behind a Notion login — an unattended pipeline cannot fetch it; Warm Up Doc process must be completed manually for any 
 
@@ -68,8 +85,6 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- call-of-duty-mw4-warzone-operator-skin-toggle: RuntimeError: replay variant came out 13.1s, under 15s
+- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - avgusta-clips: no footage could be downloaded
