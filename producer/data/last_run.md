@@ -1,16 +1,13 @@
-**Scouted** 14 · **analyzed** 0 · **joined** 0 · **clips made** 23 · **auto-approved** 5 · **held** 3
+**Scouted** 14 · **analyzed** 1 · **joined** 0 · **clips made** 12 · **auto-approved** 2 · **held** 3
 
 ### Queued for posting
-- buy-turnkey-investments--b-harry-gold-present-0
-- buy-turnkey-investments--b-harry-gold-present-20
-- buy-turnkey-investments--b-harry-gold-present-250
-- buy-turnkey-investments--b-harry-gold-present-46
-- buy-turnkey-investments--b-harry-gold-present-77
+- buy-turnkey-investments--c-harry-gold-pt2-2762
+- aaron-golub-september-cl-2026-success-unscrip-702
 
 ### Held for your review (not posted)
-- tjr-23-100-weekly-clippi-how-to-start-trading-3071: Logo rule needs an approver's ruling before this clip goes out. Logos appear on screen for the entire clip via the source footage, not via anything the pipeline added: a branded trucker cap worn by th
-- tjr-23-100-weekly-clippi-how-to-start-trading-667: Unresolved 'Logos of any kind are not allowed': the webcam inset carries incidental third-party brand marks from the source footage — a logo on the gaming-chair headrest, a logo on the cap worn by the
-- buy-turnkey-investments--b-harry-gold-present-145: Topical fit with the 'Rental Property' campaign tag is unresolved: the clip is entirely about fix-and-flip profits ('I flip the deal, I get the profits') with zero rental, turnkey, cash-flow or Sectio
+- tjr-23-100-weekly-clippi-5-tips-that-made-me--276: Possible logo on camera: frames 2 and 3 show a small dark-green embroidered emblem on the chest of TJR's striped shirt. The campaign bans 'logos of any kind' with no carve-out for clothing in source f
+- tjr-23-100-weekly-clippi-5-tips-that-made-me--450: Possible garment logo in source footage: a small dark emblem sits on the left chest of the green-striped tee in frames 1-3. The campaign bans 'logos of any kind' with no exception for clothing, so thi
+- buy-turnkey-investments--c-harry-gold-pt2-1219: The presentation slide visible on the TV throughout the clip appears to show a third party's photo, name, phone number and email under '100% Financing at NCCG', while the audio accuses 'he and his org
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -69,16 +66,19 @@
 - nemzzz-lifestyle-clipping-content-drive-edits: No eligible account: campaign requires a UK rap / drill / German rap / hip-hop culture page posting as an original main account, and forbids dedicated or repost-only pages — the roster has no such Tik
 - bill-pay-the-musical-comedy-edits: The provided clip folder is behind a 'HERE' hyperlink inside the Google Doc that is not present in the extracted text — the footage URL must be retrieved manually before any compliant clip can be made
 - bill-pay-the-musical: Footage folder is behind an unresolved link in the reference doc ('HERE' / 'Footage Part 2') — the URLs are not in the supplied material, so a human must retrieve them before any clip can be cut; Post
+- clips-hablando-1-por-cada-1000-views: footage/audience is spanish; the accounts' audiences are English
+- todd-v-clipping-3-cpm: Requires brand-new dedicated accounts on TikTok, Instagram and YouTube Shorts using one of ~23 pre-approved ToddV* handles — the roster has no such account and cannot create/verify them unattended; Ap
+- cue-astrology-app: 'Show face in video' — requires the creator's face on camera and their own voice; 'Get approval before publishing' — CUE must give written approval of the exact final video, caption, disclosure and CT
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
-- coinbase-x-valorant-clipping: Approved Dropbox folder is the only permitted footage source and access is gated behind a Notion login — an unattended pipeline cannot fetch it; Warm Up Doc process must be completed manually for any 
 
 ### Slots still empty (clips short per account)
 - YouTube Shorts (@PogingPanda): 6
 - Instagram Reels (@kiwinoygamer): 4.5
+- TikTok draft (@mnfsttnsecrets): 1
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
@@ -87,4 +87,5 @@
 ### Errors
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - avgusta-clips: no footage could be downloaded
