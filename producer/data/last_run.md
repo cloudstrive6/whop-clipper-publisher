@@ -1,13 +1,20 @@
-**Scouted** 14 · **analyzed** 1 · **joined** 0 · **clips made** 12 · **auto-approved** 2 · **held** 3
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 14 · **auto-approved** 8 · **held** 4
 
 ### Queued for posting
-- buy-turnkey-investments--c-harry-gold-pt2-2762
-- aaron-golub-september-cl-2026-success-unscrip-702
+- michael-sartain-s-clippi-how-to-improve-your--43
+- whoisdeuel-stream-clips-cooking-blindfolded--270
+- whoisdeuel-stream-clips-cooking-blindfolded--436
+- whoisdeuel-stream-clips-cooking-blindfolded--605
+- whoisdeuel-stream-clips-cooking-blindfolded--94
+- whoisdeuel-stream-clips-cooking-blindfolded--1017
+- whoisdeuel-stream-clips-cooking-blindfolded--170
+- whoisdeuel-stream-clips-cooking-blindfolded--991
 
 ### Held for your review (not posted)
-- tjr-23-100-weekly-clippi-5-tips-that-made-me--276: Possible logo on camera: frames 2 and 3 show a small dark-green embroidered emblem on the chest of TJR's striped shirt. The campaign bans 'logos of any kind' with no carve-out for clothing in source f
-- tjr-23-100-weekly-clippi-5-tips-that-made-me--450: Possible garment logo in source footage: a small dark emblem sits on the left chest of the green-striped tee in frames 1-3. The campaign bans 'logos of any kind' with no exception for clothing, so thi
-- buy-turnkey-investments--c-harry-gold-pt2-1219: The presentation slide visible on the TV throughout the clip appears to show a third party's photo, name, phone number and email under '100% Financing at NCCG', while the audio accuses 'he and his org
+- michael-sartain-s-clippi-how-to-improve-your--0: Punchline at 12.4-16.2s uses sexual orientation as the insult ('why didn't you turn into a homosexual when you started talking to this girl?'). This breaks no campaign rule - the campaign's forbidden 
+- whoisdeuel-stream-clips-cooking-blindfolded--244: On-screen caption in the middle of the clip reads 'SO BLEEDING. YEAH.' — this looks like an auto-transcription error (the transcript shows the garbled line 'She can look so bleeding'). 'Clean captions
+- whoisdeuel-stream-clips-cooking-blindfolded--327: Burned-in captions appear to contain transcription errors, including on the clip's payoff line: the closing beat renders as 'REALLY PRETTY QUICK.' from a garbled transcript ('It's not to tell you you'
+- whoisdeuel-stream-clips-cooking-blindfolded--19: Likely garbled burned-in caption: the transcript feeding the word-by-word captions reads 'How many fingers are meveling up?' at 24.0-25.3s, a mis-transcription of 'How many fingers am I holding up?' /
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -69,6 +76,15 @@
 - clips-hablando-1-por-cada-1000-views: footage/audience is spanish; the accounts' audiences are English
 - todd-v-clipping-3-cpm: Requires brand-new dedicated accounts on TikTok, Instagram and YouTube Shorts using one of ~23 pre-approved ToddV* handles — the roster has no such account and cannot create/verify them unattended; Ap
 - cue-astrology-app: 'Show face in video' — requires the creator's face on camera and their own voice; 'Get approval before publishing' — CUE must give written approval of the exact final video, caption, disclosure and CT
+- lanah-cherry-streamer-clipping: Brand approval required for each clip before it can be posted
+- boxabl-x-asg: Brand/agency approval required before publishing each clip (panel: "Get approval before publishing"); X posts require a personal Boxabl tracking URL obtained by signing up at boxabl.com/affiliate — a 
+- swiss-clipping-campaign: Panel requires 'Show face in video' — the clipper's own face must appear in each clip; Official Switzerland watermark asset must be pulled from the Google Drive content folder and overlaid on every po
+- audien-luke-aleksander-7-miles-high: Official platform audio only, with a manually selected audio start — the in-app sound must be attached by hand in the TikTok/Instagram editor; No source assets are provided; movie and TV party scene f
+- smartblock-slide-shows: Bio edit required: the App Store link must be added to the posting account's bio; Content must be slide shows / carousels of original text slides, not clipped video — no clippable source footage is pr
+- matt-hazen-clipping-8431-budget-1-50-cpm: Source footage and content rules sit behind an access-gated Google Doc that returns 401 Unauthorized — access must be granted by a human before any compliant clip can be made; A bio edit is required t
+- relaxr-clipping-slideshow: Requires a brand-new dedicated wellness/self-care TikTok account (specific username formula and on-niche profile aesthetic) that the roster does not have; Requires a 3-day manual account warm-up (watc
+- clipping-espa-ol-daniel-curto: Página dedicada obligatoria en TikTok e Instagram cuyo username incluya el nombre del creador — el roster no tiene ninguna cuenta válida y hay que crearlas; La foto de perfil debe ser la proporcionada
+- arkheron-game-campaign-gameplay-stream-clips: Approved source VOD links and the required episode timecodes are not in the provided materials — the collapsed brief sections must be opened before any compliant clip can be cut; Posts must be origina
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -76,9 +92,8 @@
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 
 ### Slots still empty (clips short per account)
-- YouTube Shorts (@PogingPanda): 6
-- Instagram Reels (@kiwinoygamer): 4.5
-- TikTok draft (@mnfsttnsecrets): 1
+- YouTube Shorts (@ericknox2802): 1
+- TikTok draft (@iamcryptohustler): 1
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
@@ -87,5 +102,3 @@
 ### Errors
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
-- ryan-zofay-clipping-campaign-01: no footage could be downloaded
-- avgusta-clips: no footage could be downloaded
