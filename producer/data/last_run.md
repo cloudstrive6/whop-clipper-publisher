@@ -1,20 +1,8 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 14 · **auto-approved** 8 · **held** 4
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 6 · **auto-approved** 2 · **held** 0
 
 ### Queued for posting
-- michael-sartain-s-clippi-how-to-improve-your--43
-- whoisdeuel-stream-clips-cooking-blindfolded--270
-- whoisdeuel-stream-clips-cooking-blindfolded--436
-- whoisdeuel-stream-clips-cooking-blindfolded--605
-- whoisdeuel-stream-clips-cooking-blindfolded--94
-- whoisdeuel-stream-clips-cooking-blindfolded--1017
-- whoisdeuel-stream-clips-cooking-blindfolded--170
-- whoisdeuel-stream-clips-cooking-blindfolded--991
-
-### Held for your review (not posted)
-- michael-sartain-s-clippi-how-to-improve-your--0: Punchline at 12.4-16.2s uses sexual orientation as the insult ('why didn't you turn into a homosexual when you started talking to this girl?'). This breaks no campaign rule - the campaign's forbidden 
-- whoisdeuel-stream-clips-cooking-blindfolded--244: On-screen caption in the middle of the clip reads 'SO BLEEDING. YEAH.' — this looks like an auto-transcription error (the transcript shows the garbled line 'She can look so bleeding'). 'Clean captions
-- whoisdeuel-stream-clips-cooking-blindfolded--327: Burned-in captions appear to contain transcription errors, including on the clip's payoff line: the closing beat renders as 'REALLY PRETTY QUICK.' from a garbled transcript ('It's not to tell you you'
-- whoisdeuel-stream-clips-cooking-blindfolded--19: Likely garbled burned-in caption: the transcript feeding the word-by-word captions reads 'How many fingers are meveling up?' at 24.0-25.3s, a mis-transcription of 'How many fingers am I holding up?' /
+- michael-sartain-s-clippi-is-lindsay-clancy-gu-93
+- michael-sartain-s-clippi-is-lindsay-clancy-gu-330
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -92,7 +80,7 @@
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 
 ### Slots still empty (clips short per account)
-- YouTube Shorts (@ericknox2802): 1
+- YouTube Shorts (@ericknox2802): 2
 - TikTok draft (@iamcryptohustler): 1
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
@@ -100,5 +88,8 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
-- reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- scout featured: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- scout prayer inspirational: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- scout self improvement discipline: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
