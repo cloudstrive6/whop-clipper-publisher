@@ -3,8 +3,6 @@ name: produce
 # Daily, PC off: scout -> read briefs + reference docs -> join -> download footage -> clip
 # -> compliance audit -> auto-approve only clips cleared for unattended posting -> queue for publish.yml.
 on:
-  schedule:
-    - cron: "0 8 * * *"      # 08:00 UTC = 04:00 ET, so fresh clips are queued before the first posting slot
   repository_dispatch:
     types: [produce]         # cron-job.org can fire this too (GitHub's own cron sometimes skips runs)
   workflow_dispatch:

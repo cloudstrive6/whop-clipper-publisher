@@ -3,8 +3,6 @@ name: watch
 # Every 2 hours: look for campaigns never seen before, read + join the ones that fit, and start a
 # production run straight away if they can fill empty slots. A few minutes when nothing is new.
 on:
-  schedule:
-    - cron: "40 */2 * * *"   # every 2 hours
   repository_dispatch:
     types: [watch]           # fired by cron-job.org every 2h (GitHub's own cron skips runs)
   workflow_dispatch:
