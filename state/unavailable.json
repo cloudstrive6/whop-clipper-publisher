@@ -1,1 +1,7 @@
-{}
+{
+  "whoisdeuel-stream-clips": {
+    "since": "2026-09-28T23:01:56+00:00",
+    "checked": "2026-09-28T23:01:56+00:00",
+    "why": "TimeoutError: Whop Content Rewards app did not load (session may be stale)"
+  }
+}
