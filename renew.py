@@ -135,6 +135,10 @@ def minutes(free: int = 2000) -> int:
     recent = [by_day[d] for d in sorted(by_day)[-4:-1]] or list(by_day.values()) or [0]  # last full days
     projected = used + round(sum(recent) / len(recent) * (days_in_month - now.day))
     print(f"GitHub Actions this month: ~{used} of {free} free minutes (on pace for ~{projected})")
+    if projected > free and used > free * 0.25:  # early heads-up: at this pace the month won't fit
+        once(f"minutes|{month}|projected", f"⏱ GitHub minutes will run out this month (~{projected} projected of {free})",
+             f"~{used} used so far. When they run out GitHub stops every job (posting included). Upgrade to GitHub "
+             "Pro or raise the Actions budget at github.com/settings/billing before then.")
     for pct in (75, 90):
         if used >= free * pct / 100:
             once(f"minutes|{month}|{pct}", f"⏱ GitHub minutes at {pct}%: ~{used} of {free} used this month",
