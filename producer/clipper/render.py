@@ -78,11 +78,16 @@ def _speaking_times(segments: list[dict], start: float, end: float) -> list[tupl
             for s in segments for w in s.get("words", []) if w["end"] > start and w["start"] < end]
 
 
+ZOOM_FACE = 3.5      # the window is this many face-heights tall: head and shoulders
+MIN_WINDOW = 0.34    # never zoom tighter than this share of the frame height (tiny insets would turn to mush)
+
+
 def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
-                  segments: list[dict] | None = None) -> list[tuple[float, int]] | None:
-    """Where a 4:5 window should sit over time so it shows whoever is talking, like a TV director cutting
-    between cameras. Returns [(clip_time, left_x), ...] cut points, or None to keep the full frame
-    (nobody's face on screen most of the time: gameplay, B-roll, screens).
+                  segments: list[dict] | None = None) -> list[dict] | None:
+    """A "camera" that follows whoever is talking, like a TV director: it cuts to the speaker and zooms to
+    fit them - the full frame height for a big face, a punch-in for a small one (a reaction-video
+    picture-in-picture, a guest far from the camera). Returns shots [{t, x, y, w, h}, ...] as 4:5 boxes in
+    source pixels, or None to keep the full frame (nobody's face on screen most of the time).
 
     Faces come from YuNet (OpenCV's face model, handles angles and profiles). Who's talking is read from
     mouth movement: the face whose mouth area changes most while the transcript says someone is speaking.
@@ -90,8 +95,7 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
     import cv2
     import numpy
 
-    win = int(src_h * 4 / 5)
-    if win >= src_w:
+    if src_h * 4 / 5 >= src_w * 0.98:  # already narrower than 4:5: nothing to follow
         return None
     fps, sw = 5, 640
     sh = max(2, round(sw * src_h / src_w / 2) * 2)
@@ -103,6 +107,8 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
         return None
     det = cv2.FaceDetectorYN.create(str(ROOT / "assets" / "models" / "face_detection_yunet_2023mar.onnx"),
                                     "", (sw, sh), 0.6)
+    sface = ROOT / "assets" / "models" / "face_recognition_sface_2021dec.onnx"
+    rec = cv2.FaceRecognizerSF.create(str(sface), "") if sface.exists() else None  # who is who, across cuts
 
     tracks: list[dict] = []  # each: {"cx": last centre x, "hits": {frame: (cx, motion)}, "mouth": last mouth patch}
     with_face = 0
@@ -120,15 +126,42 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
             x0, y0 = int(max(mcx - mw / 2, 0)), int(max(mcy - mh / 2, 0))
             patch = gray[y0:int(min(mcy + mh / 2, sh)), x0:int(min(mcx + mw / 2, sw))]
             patch = cv2.resize(patch, (32, 16)).astype(numpy.float32) if patch.size else None
-            track = min(tracks, key=lambda t: abs(t["cx"] - cx), default=None)
-            if track is None or abs(track["cx"] - cx) > sw * 0.12:
-                track = {"cx": cx, "hits": {}, "mouth": None, "last": -9}
+            # the eye area moves with the head but not with speech: subtracting its change isolates the mouth
+            ex, ey = (f[4] + f[6]) / 2, (f[5] + f[7]) / 2
+            eye = gray[int(max(ey - mh / 2, 0)):int(min(ey + mh / 2, sh)), int(max(ex - mw / 2, 0)):int(min(ex + mw / 2, sw))]
+            eye = cv2.resize(eye, (32, 16)).astype(numpy.float32) if eye.size else None
+            cy = y + h / 2
+            # a face fingerprint for faces big enough to recognise: shows often put different people in the
+            # same close-up spot, so position alone can't tell who is who
+            e = None
+            if rec is not None and h >= 20:
+                try:
+                    e = rec.feature(rec.alignCrop(img, f)).flatten()
+                    e = e / (numpy.linalg.norm(e) + 1e-9)
+                except Exception:
+                    e = None
+            same = lambda t: e is None or t.get("emb") is None or float(t["emb"] @ e) >= 0.3
+            # the same person = the nearest track of a similar face size that is recognisably them
+            near = [t for t in tracks if abs(t["cx"] - cx) <= max(w, sw * 0.04) * 1.5 and abs(t["cy"] - cy) <= h * 1.5
+                    and 0.5 <= t["h"] / h <= 2 and same(t)]
+            track = min(near, key=lambda t: abs(t["cx"] - cx) + abs(t["cy"] - cy), default=None)
+            if track is None:
+                track = {"cx": cx, "cy": cy, "h": h, "hits": {}, "mouth": None, "eye": None, "last": -9}
                 tracks.append(track)
-            motion = 0.0
+            motion, head = 0.0, 0.0
+            face = gray[int(max(y, 0)):int(min(y + h, sh)), int(max(x, 0)):int(min(x + w, sw))]
+            face = cv2.resize(face, (24, 24)).astype(numpy.float32) if face.size else None
+            if face is not None and track.get("face") is not None and track["last"] == i - 1:
+                head = float(numpy.mean(numpy.abs(face - track["face"])))
+            if e is not None:
+                track["emb"] = e if track.get("emb") is None else (track["emb"] * 0.8 + e * 0.2)
+                track["emb"] = track["emb"] / (numpy.linalg.norm(track["emb"]) + 1e-9)
             if patch is not None and track["mouth"] is not None and track["last"] == i - 1:
                 motion = float(numpy.mean(numpy.abs(patch - track["mouth"])))
-            track.update(cx=cx, mouth=patch, last=i)
-            track["hits"][i] = (cx, motion)
+                if eye is not None and track.get("eye") is not None:
+                    motion = max(0.0, motion - float(numpy.mean(numpy.abs(eye - track["eye"]))))
+            track.update(cx=cx, cy=cy, h=h, mouth=patch, eye=eye, face=face, last=i)
+            track["hits"][i] = (cx, cy, h, motion, head)
     if with_face < len(frames) * 0.5:
         return None
 
@@ -137,38 +170,90 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
         t = i / fps
         return not talking or any(a - 0.2 <= t <= b + 0.2 for a, b in talking)
 
-    # who's talking, frame by frame: smoothed mouth motion (1 s window) among the faces on screen
-    def score(track, i):
-        vals = [track["hits"][j][1] for j in range(i - 2, i + 3) if j in track["hits"]]
-        return sum(vals) / max(len(vals), 1)
+    # who's talking = whose mouth moves in time with the voice (lip-sync). Loudness of the audio, per frame:
+    pcm = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{start:.2f}", "-t", f"{end - start:.2f}", "-i", str(video),
+                          "-vn", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"], capture_output=True).stdout
+    audio = numpy.frombuffer(pcm[: len(pcm) // 2 * 2], numpy.int16).astype(numpy.float32)
+    per = int(16000 / fps)
+    loud = numpy.array([numpy.sqrt(numpy.mean(audio[i * per:(i + 1) * per] ** 2)) if (i + 1) * per <= len(audio) else 0.0
+                        for i in range(len(frames))])
+
+    def sync(track, i, half=12, ahead=False):
+        """Correlation between this face's mouth movement and the audio loudness around frame i (~3 s).
+        A talking face scores high; a listener, a photo, or compression noise on a tiny face does not."""
+        lo, hi = (i, i + 2 * half) if ahead else (i - half, i + half)
+        js = [j for j in range(lo, hi + 1) if j in track["hits"] and 0 <= j < len(loud)]
+        if len(js) < 10:
+            return 0.0
+        a = loud[js]
+        if a.std() < 1e-6:
+            return 0.0
+        best = 0.0
+        for col, weight in ((3, 1.0), (4, 0.8)):  # lips, then whole head (a bit less telling)
+            m = numpy.array([track["hits"][j][col] for j in js])
+            if m.std() > 1e-6:
+                best = max(best, weight * float(numpy.corrcoef(m, a)[0, 1]))
+        return best
 
     k = src_w / sw
     current, since, cuts = None, 0, []
+    anchor = None  # the last person we have real evidence is speaking (not just whoever is on screen)
     min_shot = int(fps * 1.2)
     for i in range(len(frames)):
         present = [t for t in tracks if i in t["hits"]]
         if not present:
             continue
+        # ties go to the bigger face (the main subject), so a quiet moment doesn't cut to a background face
+        rank = lambda t: sync(t, i) + 0.3 * (t["h"] / sh)
         if current is None or not any(t is current for t in present):
-            best = max(present, key=lambda t: score(t, i))
+            # a new scene. If the speech carries straight on through the cut, the speaker hasn't changed:
+            # recognise them in the new shot. (A reaction close-up of a listener is shown - he may be the only
+            # face - but never becomes "the speaker".) Otherwise look ahead to see who talks in the new shot.
+            best = None
+            if anchor is not None and anchor.get("emb") is not None and speech_at(i) and speech_at(i - 2):
+                simi = lambda t: float(t["emb"] @ anchor["emb"]) if t.get("emb") is not None else -1.0
+                closest = max(present, key=simi)
+                others = [simi(t) for t in present if t is not closest]
+                if simi(closest) >= 0.36 and (not others or simi(closest) - max(others) >= 0.08):
+                    best = closest
+            if best is None:
+                best = max(present, key=lambda t: sync(t, i, ahead=True) + 0.1 * (t["h"] / sh))
+                if sync(best, i, ahead=True) >= 0.3:
+                    anchor = best  # clearly talking in the new shot
         else:
             best = current
             if speech_at(i) and len(present) > 1:
-                rival = max((t for t in present if t is not current), key=lambda t: score(t, i))
-                if score(rival, i) > score(current, i) * 1.4 + 0.5 and i - since >= min_shot:
-                    best = rival
+                rival = max((t for t in present if t is not current), key=rank)
+                bar = 0.5 if rival["h"] < current["h"] * 0.5 else 0.35  # cutting to a much smaller face needs more proof
+                # the evidence must hold for ~2 s (a laugh or a nod in rhythm isn't someone taking over)
+                held = all(sync(rival, j) > bar and sync(rival, j) > sync(current, j) + 0.25
+                           for j in (i, i + 5, i + 10) if j < len(frames))
+                if held and i - since >= min_shot:
+                    best = anchor = rival
+            if anchor is None and sync(current, i) >= 0.3:
+                anchor = current
         if best is not current:
             current, since = best, i
             cuts.append((i / fps, best))
-    # each shot sits on the median position of its speaker during that shot (no drifting)
+    # each shot: a steady 4:5 box around its speaker (median position and size over the shot, no drifting)
+    med = lambda v: sorted(v)[len(v) // 2]
+    even = lambda n: max(2, int(n) // 2 * 2)
     out = []
     for n, (t, track) in enumerate(cuts):
         t_end = cuts[n + 1][0] if n + 1 < len(cuts) else (end - start)
-        xs = [cx for j, (cx, _) in track["hits"].items() if t <= j / fps < t_end] or [track["cx"]]
-        centre = sorted(xs)[len(xs) // 2] * k
-        left = int(min(max(centre - win / 2, 0), src_w - win))
-        if not out or abs(out[-1][1] - left) > src_w * 0.03:
-            out.append((round(t, 2), left))
+        hits = [v for j, v in track["hits"].items() if t <= j / fps < t_end] or [(track["cx"], track["cy"], track["h"], 0)]
+        cx, cy, fh = med([v[0] for v in hits]) * k, med([v[1] for v in hits]) * k, med([v[2] for v in hits]) * k
+        h = min(max(fh * ZOOM_FACE, src_h * MIN_WINDOW), src_h)
+        w = h * 4 / 5
+        if w > src_w:
+            w, h = src_w, src_w * 5 / 4
+        w, h = even(w), even(h)
+        x = even(min(max(cx - w / 2, 0), src_w - w))
+        y = even(min(max(cy - h * 0.40, 0), src_h - h))  # face in the upper part of the frame
+        box = {"t": round(t if out else 0.0, 2), "x": x, "y": y, "w": w, "h": h}
+        if out and all(abs(out[-1][key] - box[key]) <= src_w * 0.03 for key in ("x", "y", "w", "h")):
+            continue  # same framing as the previous shot: no cut
+        out.append(box)
     return out or None
 
 
@@ -211,14 +296,24 @@ def render(video: Path, segments: list[dict], start: float, end: float, hook: st
     if e["layout"] == "crop" or vertical:
         vf = f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1[base]"
     else:
-        if track:  # talking head: a 4:5 window on whoever is speaking, cutting between speakers
-            win = int(src_h * 4 / 5)
-            x = str(track[-1][1])
-            for t, left in reversed(track[:-1]):
-                x = f"if(lt(t,{track[track.index((t, left)) + 1][0]}),{left},{x})"
+        if track:  # faces: a 4:5 "camera" on whoever is speaking, cutting and zooming between speakers
             fg_w, fg_h, top = W, round(W * 5 / 4 / 2) * 2, int(H * 0.19)
-            fg = f"[b]crop={win}:ih:'{x}':0,scale={fg_w}:{fg_h}"
-            print(f"   layout: 4:5 following the speaker ({len(track)} shot{'s' * (len(track) > 1)})")
+            dur_total = end - start
+            shots = []
+            for i, b in enumerate(track):
+                t1 = track[i + 1]["t"] if i + 1 < len(track) else dur_total + 1
+                src = f"[s{i}]" if len(track) > 1 else "[b]"
+                shots.append(f"{src}trim=start={b['t']}:end={t1:.2f},setpts=PTS-STARTPTS,"
+                             f"crop={b['w']}:{b['h']}:{b['x']}:{b['y']},scale={fg_w}:{fg_h},setsar=1"
+                             + (f"[c{i}]" if len(track) > 1 else ""))
+            if len(track) > 1:
+                fg = (f"[b]split={len(track)}" + "".join(f"[s{i}]" for i in range(len(track))) + ";"
+                      + ";".join(shots) + ";" + "".join(f"[c{i}]" for i in range(len(track)))
+                      + f"concat=n={len(track)}:v=1:a=0")
+            else:
+                fg = shots[0]
+            zooms = sum(1 for b in track if b["h"] < src_h * 0.95)
+            print(f"   layout: 4:5 camera on the speaker ({len(track)} shot{'s' * (len(track) > 1)}, {zooms} zoomed in)")
         else:  # full frame over the blurred copy, nudged up so captions sit below it
             fg_w = W
             fg_h = round(W * src_h / src_w / 2) * 2
