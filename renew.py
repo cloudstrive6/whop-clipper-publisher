@@ -105,8 +105,8 @@ def instagram(min_age_days: int = 7) -> int:
     return 0
 
 
-def minutes(free: int = 2000) -> int:
-    """This month's GitHub Actions minutes for this repo; Telegram warning at 75% and 90% of the free tier.
+def minutes(free: int = 3000) -> int:
+    """This month's GitHub Actions minutes for this repo; Telegram warning at 75% and 90% of the GitHub Pro allowance.
 
     Counts this repo only: other private repos on the account use the same allowance."""
     from notify import once
@@ -137,13 +137,13 @@ def minutes(free: int = 2000) -> int:
     print(f"GitHub Actions this month: ~{used} of {free} free minutes (on pace for ~{projected})")
     if projected > free and used > free * 0.25:  # early heads-up: at this pace the month won't fit
         once(f"minutes|{month}|projected", f"⏱ GitHub minutes will run out this month (~{projected} projected of {free})",
-             f"~{used} used so far. When they run out GitHub stops every job (posting included). Upgrade to GitHub "
-             "Pro or raise the Actions budget at github.com/settings/billing before then.")
+             f"~{used} used so far. When they run out GitHub stops every job (posting included). Raise the Actions "
+             "budget at github.com/settings/billing before then.")
     for pct in (75, 90):
         if used >= free * pct / 100:
             once(f"minutes|{month}|{pct}", f"⏱ GitHub minutes at {pct}%: ~{used} of {free} used this month",
-                 f"On pace for ~{projected} this month. Upgrade to GitHub Pro (3,000 minutes, ~$4/month) or raise "
-                 "the spending limit at github.com/settings/billing, or the workflows stop when the minutes run out.")
+                 f"On pace for ~{projected} this month. Raise the Actions budget at github.com/settings/billing, "
+                 "or the workflows stop when the minutes run out.")
     return 0
 
 
