@@ -1,8 +1,12 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 6 · **auto-approved** 2 · **held** 0
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 4 · **auto-approved** 3 · **held** 1
 
 ### Queued for posting
-- michael-sartain-s-clippi-is-lindsay-clancy-gu-93
-- michael-sartain-s-clippi-is-lindsay-clancy-gu-330
+- michael-sartain-s-clippi-men-simply-can-t-acc-186
+- michael-sartain-s-clippi-men-simply-can-t-acc-265
+- michael-sartain-s-clippi-men-simply-can-t-acc-366
+
+### Held for your review (not posted)
+- michael-sartain-s-clippi-men-simply-can-t-acc-49: Collect audience-demographic screenshots/analytics from the posting account and attach them to the clip at payout - this is the campaign's one content requirement and the video cannot satisfy it.; Rev
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -73,6 +77,15 @@
 - relaxr-clipping-slideshow: Requires a brand-new dedicated wellness/self-care TikTok account (specific username formula and on-niche profile aesthetic) that the roster does not have; Requires a 3-day manual account warm-up (watc
 - clipping-espa-ol-daniel-curto: Página dedicada obligatoria en TikTok e Instagram cuyo username incluya el nombre del creador — el roster no tiene ninguna cuenta válida y hay que crearlas; La foto de perfil debe ser la proporcionada
 - arkheron-game-campaign-gameplay-stream-clips: Approved source VOD links and the required episode timecodes are not in the provided materials — the collapsed brief sections must be opened before any compliant clip can be cut; Posts must be origina
+- bbno-why-am-i-like-this-minecraft-music-video: Official 'Why Am I Like This' sound must be attached in-app on TikTok/Instagram to every post — posts without it are rejected, and in-app sound attachment cannot be automated; Source footage must be p
+- wiped-clipping: Bio edit: usewiped.com must be added to the posting account's bio before posting and kept visible for 15+ days (panel requirement; the on-screen alternative is allowed only for self-made UGC); Ready-m
+- limitless-tire-automotive-clipping-campaign: Get approval before publishing — the brand must sign off on each clip before it goes live; Requires an automotive/car content account, which the roster does not have; No source asset folder is provide
+- kameron-marlowe-clipping: Folder 1 'I Won't' clips require attaching the official sound in-app on TikTok/Instagram/YouTube, mixed low under the clip audio - cannot be automated (Folder 2 'Thirst Trap' has no sound requirement 
+- bbno-x-hatsune-miku-remix-music-video-clips: Official TikTok/Instagram sound must be attached in-app to every post — posts without it are rejected, and this cannot be done by an unattended pipeline; no linked account in its niche/platforms
+- videos-youtube-3-por-cada-1000-visitas: footage/audience is spanish; the accounts' audiences are English
+- jimmy-kimmel-finish-the-story: Brand approval of each clip is required before publishing
+- denial-supersawrus: Must attach the official in-app TikTok/Instagram sound to each post; Requires an existing movie/TV, aesthetic, rave, car or nature themed page with a Tier 1 audience majority; new pages made for this 
+- treety-bad-vibes: Official 'Bad Vibes by Treety' TikTok sound must be attached in-app from the TikTok music page; Footage must be self-sourced and originally edited; no clippable source library is provided by the campa
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -80,16 +93,15 @@
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 
 ### Slots still empty (clips short per account)
-- YouTube Shorts (@ericknox2802): 2
-- TikTok draft (@iamcryptohustler): 1
+- YouTube Shorts (@PogingPanda): 2
+- YouTube Shorts (@ericknox2802): 3
+- TikTok draft (@iamcryptohustler): 4
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- scout featured: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- scout prayer inspirational: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- scout self improvement discipline: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- whoisdeuel-stream-clips: no footage could be downloaded
