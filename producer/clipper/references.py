@@ -125,6 +125,9 @@ def featured_face(campaign: dict):
     if not photo.exists() and not none.exists():
         channels = [u for u in (campaign.get("checklist") or {}).get("source_assets") or []
                     if re.search(r"youtube\.com/(@|channel/|c/|user/)", u)]
+        if not channels:
+            none.write_text("no YouTube channel among the source assets", encoding="utf-8")
+            return None
         try:
             req = urllib.request.Request(channels[0], headers={"User-Agent": "Mozilla/5.0",
                                                                "Accept-Language": "en-US,en"})
@@ -133,8 +136,7 @@ def featured_face(campaign: dict):
             img = re.sub(r"=s\d+-", "=s800-", img)  # the biggest size YouTube serves
             photo.write_bytes(urllib.request.urlopen(urllib.request.Request(img, headers={"User-Agent": "Mozilla/5.0"}),
                                                      timeout=30).read())
-        except Exception:
-            none.write_text("no channel picture", encoding="utf-8")
+        except Exception:  # network hiccup or a changed page: try again next run
             return None
     if none.exists():
         return None
