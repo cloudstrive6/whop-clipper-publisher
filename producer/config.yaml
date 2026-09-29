@@ -191,6 +191,7 @@ produce:
   # never clip these (e.g. payout needs proof you edited it yourself in CapCut, which automation can't honestly give)
   exclude_campaigns:
     - average-rob-clips
+    - michael-sartain-s-clipping-army  # banned us 2026-09-29 after an off-topic clip ('Not about Michael')
   # campaigns whose gated footage you downloaded by hand; the files live in the cloud's 'footage' release
   # (named <campaign id>__<file>), and their download blocker no longer counts
   manual_footage:
