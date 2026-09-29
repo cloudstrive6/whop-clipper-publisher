@@ -34,6 +34,13 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
 
     camp = db.get("campaigns", campaign_id) or {}
     checklist = camp.get("checklist")
+    if checklist:  # the brand's own doc (caption format, CTA) and any past rejections go to the AI verbatim
+        refs = campaign_dir(campaign_id) / "references.md"
+        checklist = dict(checklist)
+        if refs.exists():
+            checklist["reference_materials"] = refs.read_text(encoding="utf-8", errors="replace")[:9000]
+        if (camp.get("data") or {}).get("rejections"):
+            checklist["rejected_before"] = camp["data"]["rejections"][-5:]
     if not sources:
         sources = tuple((checklist or {}).get("source_assets", []))
         if not sources:

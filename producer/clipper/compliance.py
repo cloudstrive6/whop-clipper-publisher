@@ -125,6 +125,10 @@ transcript of this segment:
 {as_timestamped_text(segs) or '(no speech)'}
 </clip>
 
+{('REVIEWERS ALREADY REJECTED CLIPS FROM THIS CAMPAIGN: ' + str((campaign.get('data') or {}).get('rejections', [])[-5:]) + ' - fail this clip if it repeats anything that could explain those rejections.') if (campaign.get('data') or {}).get('rejections') else ''}
+The hook text and title must only state what the featured client actually says in this clip: FAIL them if they
+present an interviewer's question or another person's line as the client's claim. The caption must follow the
+reference materials' required format and call to action exactly (e.g. END with the booking CTA and tag if asked).
 Check every requirement, including: required caption text/tags/disclosure present; length; forbidden words or
 claims in the title, description, hook and speech; footage came from the approved source; on-screen elements;
 tone (does it read as a real clip rather than an ad?). Mark account-level rules (bio, follows, audience

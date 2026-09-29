@@ -232,6 +232,88 @@ class _SubmissionList(BaseModel):
     submissions: list[_Submission]
 
 
+class _Rejected(BaseModel):
+    campaign: str = Field(description="campaign title exactly as shown on the card")
+    date: str = Field(description="submission date as shown")
+    views: int = Field(description="view count shown (0 if none)")
+
+
+class _RejectedList(BaseModel):
+    items: list[_Rejected]
+
+
+def submissions_report(report: dict, record: bool = True) -> str:
+    """Daily: Whop's Approved / Pending / Rejected counts, what changed, and every new rejection with its
+    reason. A rejection is recorded on its campaign so future clips (and the audit) learn from it; a
+    campaign whose Whop title now names a different client is stopped. Returns the Telegram text."""
+    import re as _re
+
+    from . import llm, whop
+    from .config import DATA
+
+    ledger_path = DATA / "submissions_seen.json"
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8")) if ledger_path.exists() else {"counts": {}, "codes": []}
+    with whop.browser(headless=True) as page:
+        page.goto(cfg()["scout"]["marketplace_url"], wait_until="domcontentloaded", timeout=90000)
+        frame = whop._app_frame(page, 90)
+        page.wait_for_timeout(3000)
+        frame.get_by_text("Submissions", exact=True).first.click(force=True)
+        page.wait_for_timeout(7000)
+        body = frame.inner_text("body")
+        counts = {k: int(v) for k, v in _re.findall(r"(Approved|Pending|Rejected)\s*\n?\s*(\d+)", body)}
+        new_rejections = []
+        if counts.get("Rejected"):
+            frame.get_by_text("Rejected", exact=False).first.click(force=True)
+            page.wait_for_timeout(5000)
+            whop._scroll_all(frame, 4)
+            cards = llm.ask("List every rejected submission card on this Whop page (campaign title, date, views).\n\n"
+                            + frame.inner_text("body"), _RejectedList).items
+            buttons = frame.get_by_text("Rejection reason", exact=True)
+            for i in range(buttons.count()):
+                try:
+                    buttons.nth(i).click(force=True)
+                    page.wait_for_timeout(2000)
+                    d = frame.locator("[role=dialog]")
+                    text = d.last.inner_text() if d.count() else ""
+                    page.keyboard.press("Escape")
+                    page.wait_for_timeout(800)
+                except Exception:
+                    continue
+                lines = [l.strip() for l in text.splitlines() if l.strip() and l.strip() != "Rejection reason"]
+                code = next((l for l in lines if _re.fullmatch(r"[0-9a-f]{6,12}", l)), f"card{i}")
+                if code in ledger["codes"]:
+                    continue
+                reason = next((l for l in lines if l != code), "no reason given")
+                card = cards[i] if i < len(cards) else _Rejected(campaign="?", date="?", views=0)
+                new_rejections.append({"code": code, "reason": reason, **card.model_dump()})
+    prev = ledger.get("counts", {})
+    delta = lambda k: counts.get(k, 0) - prev.get(k, 0)
+    lines = [f"📊 Whop submissions: ✅ Approved {counts.get('Approved', 0)} ({delta('Approved'):+d}) · "
+             f"⏳ Pending {counts.get('Pending', 0)} · ✖️ Rejected {counts.get('Rejected', 0)} ({delta('Rejected'):+d})"]
+    known = {c["title"]: c for c in db.rows("campaigns", "1=1")}
+    for r in new_rejections:
+        lines.append(f"✖️ {r['campaign']} ({r['date']}, {r['views']:,} views): {r['reason']}")
+        camp = known.get(r["campaign"])
+        if camp is None:  # the campaign's title changed: maybe a different client now (agency campaigns do this)
+            suffix = r["campaign"].split("|")[-1].strip().lower()
+            camp = next((c for c in known.values() if c["status"] in ("joined", "ended")
+                         and (c["title"] or "").split("|")[-1].strip().lower() == suffix), None)
+            if camp and record:
+                db.upsert("campaigns", {"id": camp["id"], "status": "ended"})
+                lines.append(f"   ⚠️ We joined this as '{camp['title']}' - Whop now shows it for a different client. "
+                             "Stopped clipping for it; its queued clips won't post.")
+        if camp and record:
+            data = camp.get("data") or {}
+            data["rejections"] = (data.get("rejections") or []) + [{k: r[k] for k in ("date", "reason", "views")}]
+            db.upsert("campaigns", {"id": camp["id"], "data": data})
+    if record:
+        ledger["counts"] = counts
+        ledger["codes"] = ledger.get("codes", []) + [r["code"] for r in new_rejections]
+        ledger_path.write_text(json.dumps(ledger, indent=1), encoding="utf-8")
+    report["submissions"] = lines
+    return "\n".join(lines)
+
+
 def paperwork_check(report: dict) -> None:
     """Campaigns with payout paperwork: when a submitted clip reaches its minimum payout, message you on
     Telegram (a GitHub issue if Telegram isn't set up) saying exactly what to send, so the earnings aren't lost."""
@@ -470,6 +552,16 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
         paperwork_check(report)
     except Exception as err:
         report["errors"].append(f"paperwork check: {err.__class__.__name__}: {str(err)[:150]}")
+
+    if not quick:  # once a day: approved / pending / rejected, and learn from new rejections
+        print("\n== Whop submissions report")
+        try:
+            text = submissions_report(report)
+            if os.environ.get("GITHUB_ACTIONS"):
+                from .notify import telegram
+                telegram(text)
+        except Exception as err:
+            report["errors"].append(f"submissions report: {err.__class__.__name__}: {str(err)[:150]}")
 
     print("\n== 2. read briefs + reference materials")
     todo = [c for c in db.rows("campaigns", "status IN ('shortlisted','joined') ORDER BY score DESC")
