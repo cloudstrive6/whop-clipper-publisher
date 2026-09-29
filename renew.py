@@ -105,13 +105,17 @@ def instagram(min_age_days: int = 7) -> int:
     return 0
 
 
-def minutes(free: int = 3000) -> int:
-    """This month's GitHub Actions minutes for this repo; Telegram warning at 75% and 90% of the GitHub Pro allowance.
+def minutes(free: int = 2000) -> int:
+    """This month's GitHub Actions minutes for this repo; Telegram warning at 75% and 90% of the free tier.
 
     Counts this repo only: other private repos on the account use the same allowance."""
     from notify import once
 
     gh = {**os.environ, "GH_TOKEN": os.environ.get("GITHUB_TOKEN", "")}
+    private = subprocess.run(["gh", "api", f"repos/{REPO}", "-q", ".private"], capture_output=True, text=True, env=gh)
+    if private.stdout.strip() == "false":
+        print("Public repo: GitHub Actions minutes are free and unlimited, nothing to check")
+        return 0
     month = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m")
     by_day: dict[str, int] = {}
     page = 1
