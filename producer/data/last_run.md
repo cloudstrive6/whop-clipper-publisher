@@ -1,12 +1,4 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 4 · **auto-approved** 3 · **held** 1
-
-### Queued for posting
-- michael-sartain-s-clippi-men-simply-can-t-acc-186
-- michael-sartain-s-clippi-men-simply-can-t-acc-265
-- michael-sartain-s-clippi-men-simply-can-t-acc-366
-
-### Held for your review (not posted)
-- michael-sartain-s-clippi-men-simply-can-t-acc-49: Collect audience-demographic screenshots/analytics from the posting account and attach them to the clip at payout - this is the campaign's one content requirement and the video cannot satisfy it.; Rev
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -86,6 +78,7 @@
 - jimmy-kimmel-finish-the-story: Brand approval of each clip is required before publishing
 - denial-supersawrus: Must attach the official in-app TikTok/Instagram sound to each post; Requires an existing movie/TV, aesthetic, rave, car or nature themed page with a Tier 1 audience majority; new pages made for this 
 - treety-bad-vibes: Official 'Bad Vibes by Treety' TikTok sound must be attached in-app from the TikTok music page; Footage must be self-sourced and originally edited; no clippable source library is provided by the campa
+- higgsfield-20vc-clipping: Higgsfield watermark and source footage must be downloaded through a WeTransfer link gated behind a 'I agree to Terms of Service' acceptance wall; Higgsfield watermark must be manually sourced and ove
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -93,15 +86,21 @@
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 
 ### Slots still empty (clips short per account)
-- YouTube Shorts (@PogingPanda): 2
-- YouTube Shorts (@ericknox2802): 3
-- TikTok draft (@iamcryptohustler): 4
+- YouTube Shorts (@PogingPanda): 3
+- YouTube Shorts (@ericknox2802): 4
+- Instagram Reels (@iamcryptohustler): 0.5
+- TikTok draft (@iamcryptohustler): 5
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- scout featured: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- scout faith christian bible church: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- scout motivational speaker: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- submissions report: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
