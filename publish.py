@@ -82,6 +82,8 @@ def queue_items() -> list[dict]:
     out = []
     for meta in sorted(QUEUE.glob("*/meta.json")):
         d = json.loads(meta.read_text(encoding="utf-8"))
+        if d.get("campaign_ended"):  # ended by the brand, or we were banned: every submission would be rejected
+            continue
         d["dir"] = meta.parent
         d["file"] = meta.parent / "clip.mp4"
         out.append(d)
