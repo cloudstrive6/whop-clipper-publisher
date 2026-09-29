@@ -82,8 +82,33 @@ ZOOM_FACE = 3.5      # the window is this many face-heights tall: head and shoul
 MIN_WINDOW = 0.34    # never zoom tighter than this share of the frame height (tiny insets would turn to mush)
 
 
+SAME_PERSON = 0.36   # SFace cosine similarity at or above which two faces are the same person
+
+
+def face_embedding(image: Path):
+    """SFace fingerprint of the biggest face in a photo (e.g. a creator's channel avatar), or None."""
+    import cv2
+    import numpy
+
+    img = cv2.imread(str(image))
+    if img is None:
+        return None
+    scale = 640 / max(img.shape[:2])
+    if scale < 1:
+        img = cv2.resize(img, (round(img.shape[1] * scale), round(img.shape[0] * scale)))
+    det = cv2.FaceDetectorYN.create(str(ROOT / "assets" / "models" / "face_detection_yunet_2023mar.onnx"),
+                                    "", (img.shape[1], img.shape[0]), 0.6)
+    _, faces = det.detect(img)
+    if faces is None or not len(faces):
+        return None
+    f = max(faces, key=lambda f: f[2] * f[3])
+    rec = cv2.FaceRecognizerSF.create(str(ROOT / "assets" / "models" / "face_recognition_sface_2021dec.onnx"), "")
+    e = rec.feature(rec.alignCrop(img, f)).flatten()
+    return e / (numpy.linalg.norm(e) + 1e-9)
+
+
 def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
-                  segments: list[dict] | None = None) -> list[dict] | None:
+                  segments: list[dict] | None = None, featured=None, stats: dict | None = None) -> list[dict] | None:
     """A "camera" that follows whoever is talking, like a TV director: it cuts to the speaker and zooms to
     fit them - the full frame height for a big face, a punch-in for a small one (a reaction-video
     picture-in-picture, a guest far from the camera). Returns shots [{t, x, y, w, h}, ...] as 4:5 boxes in
@@ -91,7 +116,10 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
 
     Faces come from YuNet (OpenCV's face model, handles angles and profiles). Who's talking is read from
     mouth movement: the face whose mouth area changes most while the transcript says someone is speaking.
-    A cut only happens when the other person clearly takes over for a while, so it never flickers."""
+    A cut only happens when the other person clearly takes over for a while, so it never flickers.
+
+    featured: the fingerprint of the person the campaign is about. `stats` then gets featured_share - the part of
+    the speech where the speaker is recognisably them (None when too few speaking faces could be recognised)."""
     import cv2
     import numpy
 
@@ -199,10 +227,13 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
     current, since, cuts = None, 0, []
     anchor = None  # the last person we have real evidence is speaking (not just whoever is on screen)
     min_shot = int(fps * 1.2)
+    speaker_at: dict[int, dict] = {}  # frame -> who the camera is on while someone speaks
     for i in range(len(frames)):
         present = [t for t in tracks if i in t["hits"]]
         if not present:
             continue
+        if current is not None and speech_at(i):
+            speaker_at[i] = current
         # ties go to the bigger face (the main subject), so a quiet moment doesn't cut to a background face
         rank = lambda t: sync(t, i) + 0.3 * (t["h"] / sh)
         if current is None or not any(t is current for t in present):
@@ -235,6 +266,14 @@ def speaker_track(video: Path, start: float, end: float, src_w: int, src_h: int,
         if best is not current:
             current, since = best, i
             cuts.append((i / fps, best))
+    if featured is not None and stats is not None:
+        # is the person talking the one the campaign is about? (a reaction video on their channel can be carried
+        # by someone else entirely, with them in a corner inset)
+        known = [t for t in speaker_at.values() if t.get("emb") is not None]
+        match = sum(float(t["emb"] @ featured) >= SAME_PERSON for t in known)
+        stats["featured_share"] = round(match / len(known), 2) if len(known) >= max(10, len(speaker_at) * 0.5) else None
+        stats["featured_on_screen"] = any(t.get("emb") is not None and float(t["emb"] @ featured) >= SAME_PERSON
+                                          for t in tracks)
     # each shot: a steady 4:5 box around its speaker (median position and size over the shot, no drifting)
     med = lambda v: sorted(v)[len(v) // 2]
     even = lambda n: max(2, int(n) // 2 * 2)
@@ -269,9 +308,10 @@ def _feather_mask(w: int, h: int, folder: Path, edge: int = 90) -> Path:
 
 def render(video: Path, segments: list[dict], start: float, end: float, hook: str | None, out: Path,
            music: bool = True, disclosure: str | None = None, captions: bool | None = None,
-           full_frame: bool = False, verbatim_hook: bool = False) -> Path:
+           full_frame: bool = False, verbatim_hook: bool = False, featured=None, stats: dict | None = None) -> Path:
     """captions=False: no word captions (brand forbids our own text). full_frame: never crop (branded
-    footage whose logos, UI or legal lines must stay visible). verbatim_hook: approved line, exact case."""
+    footage whose logos, UI or legal lines must stay visible). verbatim_hook: approved line, exact case.
+    featured + stats: see speaker_track (is the person talking the one the campaign is about?)."""
     e = cfg()["editing"]
     W, H = e["width"], e["height"]
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -287,7 +327,7 @@ def render(video: Path, segments: list[dict], start: float, end: float, hook: st
     track = None
     if not vertical and not full_frame and e["layout"] != "crop" and e.get("talking_head_4x5", True):
         try:
-            track = speaker_track(video, start, end, src_w, src_h, segments)
+            track = speaker_track(video, start, end, src_w, src_h, segments, featured, stats)
         except Exception as err:  # face tracking is a nicety: never lose a clip over it
             print(f"   (face tracking unavailable: {err.__class__.__name__}; keeping the full frame)")
     bg = (f"[0:v]split[a][b];"

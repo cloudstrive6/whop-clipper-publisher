@@ -210,6 +210,14 @@ def _approve(campaign_id: str | None, report: dict) -> int:
                 report["errors"].append(f"audit {clip['id']}: {str(err)[:150]}")
             clip = db.get("clips", clip["id"])
             audit = (clip.get("qa") or {}).get("audit") or {}
+        meta = clip.get("meta") or {}
+        share = meta.get("featured_share")
+        if clip["status"] == "rendered" and meta.get("featured_person") and share is not None and share < 0.6:
+            # face recognition: someone else carries this clip ("Not about Michael" got us banned once)
+            db.upsert("clips", {"id": clip["id"], "status": "held"})
+            report["held"].append({"id": clip["id"], "why": [f"{meta['featured_person']} is the one talking for only "
+                                                             f"{share:.0%} of this clip"]})
+            continue
         if clip["status"] == "rendered" and audit.get("overall_pass") and audit.get("safe_to_autopost"):
             db.upsert("clips", {"id": clip["id"], "status": "approved"})
             report["approved"].append(clip["id"])
@@ -291,9 +299,20 @@ def submissions_report(report: dict, record: bool = True) -> str:
     lines = [f"📊 Whop submissions: ✅ Approved {counts.get('Approved', 0)} ({delta('Approved'):+d}) · "
              f"⏳ Pending {counts.get('Pending', 0)} · ✖️ Rejected {counts.get('Rejected', 0)} ({delta('Rejected'):+d})"]
     known = {c["title"]: c for c in db.rows("campaigns", "1=1")}
+    shown: dict[tuple, int] = {}
+    for r in new_rejections:  # one line per campaign + reason ("x19" rather than 19 identical lines)
+        shown[(r["campaign"], r["reason"])] = shown.get((r["campaign"], r["reason"]), 0) + 1
+    for (title, reason), n in shown.items():
+        views = max(r["views"] for r in new_rejections if (r["campaign"], r["reason"]) == (title, reason))
+        lines.append(f"✖️ {title}: {reason}" + (f" (x{n})" if n > 1 else f" ({views:,} views)"))
+    stopped = set()
     for r in new_rejections:
-        lines.append(f"✖️ {r['campaign']} ({r['date']}, {r['views']:,} views): {r['reason']}")
         camp = known.get(r["campaign"])
+        if camp and "banned" in r["reason"].lower() and camp["id"] not in stopped:
+            stopped.add(camp["id"])  # the campaign owner removed us: every clip from now on is auto-rejected
+            if record and camp["status"] != "ended":
+                db.upsert("campaigns", {"id": camp["id"], "status": "ended"})
+            lines.append(f"   ⛔ We're banned from '{camp['title']}'. Stopped clipping and posting for it.")
         if camp is None:  # the campaign's title changed: maybe a different client now (agency campaigns do this)
             suffix = r["campaign"].split("|")[-1].strip().lower()
             camp = next((c for c in known.values() if c["status"] in ("joined", "ended")
@@ -555,13 +574,19 @@ def produce(discover: bool = False, quick: bool = False) -> dict:
 
     if not quick:  # once a day: approved / pending / rejected, and learn from new rejections
         print("\n== Whop submissions report")
-        try:
-            text = submissions_report(report)
-            if os.environ.get("GITHUB_ACTIONS"):
-                from .notify import telegram
-                telegram(text)
-        except Exception as err:
-            report["errors"].append(f"submissions report: {err.__class__.__name__}: {str(err)[:150]}")
+        from .notify import telegram
+        for attempt in range(3):  # Whop's app sometimes loads slowly: a missed report hides rejections for a day
+            try:
+                text = submissions_report(report)
+                if os.environ.get("GITHUB_ACTIONS"):
+                    telegram(text)
+                break
+            except Exception as err:
+                if attempt == 2:
+                    report["errors"].append(f"submissions report: {err.__class__.__name__}: {str(err)[:150]}")
+                    if os.environ.get("GITHUB_ACTIONS"):
+                        telegram(f"⚠️ Couldn't read today's Whop submissions (approved/pending/rejected) after 3 tries: "
+                                 f"{err.__class__.__name__}. Check Whop > Submissions yourself today.")
 
     print("\n== 2. read briefs + reference materials")
     todo = [c for c in db.rows("campaigns", "status IN ('shortlisted','joined') ORDER BY score DESC")

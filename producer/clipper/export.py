@@ -118,10 +118,18 @@ def export_queue() -> int:
         print(f"queued {c['id']} -> {', '.join(tgts)}")
     for mf in queue.glob("*/meta.json"):  # clips queued by older runs: add what accounts added later match on
         d = json.loads(mf.read_text(encoding="utf-8"))
+        camp = db.get("campaigns", d["campaign_id"]) or {}
+        changed = False
         if "niche" not in d:
-            ck = (db.get("campaigns", d["campaign_id"]) or {}).get("checklist") or {}
+            ck = camp.get("checklist") or {}
             d["niche"] = (ck.get("niche") or "").lower()
             d["platforms"] = [x.lower() for x in ck.get("allowed_platforms", [])]
+            changed = True
+        if camp.get("status") == "ended" and not d.get("campaign_ended"):
+            d["campaign_ended"] = True  # the publisher skips it (the brand ended it, or we were banned)
+            changed = True
+            print(f"stop {d['clip_id']}: {camp.get('title')} has ended")
+        if changed:
             mf.write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\n{n} clip(s) in {queue}")
     if QUEUE_RELEASE:

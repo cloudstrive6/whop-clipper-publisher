@@ -63,13 +63,32 @@ def cmd_clip(campaign_id: str, *sources: str, limit: int | None = None) -> int:
 
     disclosure = _disclosure(checklist)
     made = 0
+    # creator campaigns: every clip must be that person talking (a reaction video on their channel can be
+    # carried by someone else - that got us banned from one campaign)
+    from . import brief, references
+    person = brief.featured_person(camp) if camp else None
+    if checklist is not None:
+        checklist["featured_person"] = person
+    face = None
+    if person:
+        try:
+            face = references.featured_face(camp)
+        except Exception as err:
+            print(f"   (no reference face for {person}: {err.__class__.__name__})")
+        print(f"   featured person: {person} ({'face check on' if face is not None else 'no reference face: AI check only'})")
 
     def finish(video: Path, segs: list[dict], m) -> None:
         cid = f"{campaign_id[:24]}-{source.slug(video.stem)[:20]}-{int(m.start)}"
         out = cdir / "clips" / f"{cid}.mp4"
-        render.render(video, segs, m.start, m.end, m.hook_text, out, music=use_music, disclosure=disclosure)
+        stats: dict = {}
+        render.render(video, segs, m.start, m.end, m.hook_text, out, music=use_music, disclosure=disclosure,
+                      featured=face, stats=stats)
         meta = _enforce_caption(m.model_dump(), checklist)
         meta["disclosure"] = disclosure  # the audit states exactly what was burned in
+        if person:
+            meta["featured_person"] = person
+            meta["featured_share"] = stats.get("featured_share")
+            meta["featured_on_screen"] = stats.get("featured_on_screen")
         report = qa.check(out, meta, checklist)
         db.upsert("clips", {"id": cid, "campaign_id": campaign_id, "source": str(video), "start": m.start,
                             "end": m.end, "meta": meta, "file": str(out), "qa": report,

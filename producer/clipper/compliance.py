@@ -59,6 +59,22 @@ def contact_sheet(video: Path, out: Path, n: int = 4) -> Path:
     return out
 
 
+def featured_rule(meta: dict, ck: dict) -> str:
+    """Creator campaigns pay for one person's content: a clip carried by anyone else is rejected (and got us
+    banned from one campaign)."""
+    person = meta.get("featured_person") or ck.get("featured_person")
+    if not person:
+        return ""
+    share = meta.get("featured_share")
+    face = ("" if share is None else f" Face recognition against {person}'s own channel picture: they are the one "
+            f"talking for {share:.0%} of this clip{'' if meta.get('featured_on_screen') else ' and never recognised on screen'}.")
+    return (f"This campaign pays for {person}'s content. Add a check 'clip is about {person}': FAIL it unless "
+            f"{person} is the main speaker carrying the clip, in their own words. A stretch carried by someone else "
+            "(a guest, a co-host, a caller, another creator's video or a news clip they react to, a commentator "
+            f"while {person} only appears in a corner inset) fails, even when it comes from {person}'s own channel. "
+            f"If the evidence can't show who is speaking, mark it fail.{face}")
+
+
 def audit_clip(clip: dict, campaign: dict) -> Audit:
     ck = campaign.get("checklist") or {}
     refs = campaign_dir(campaign["id"]) / "references.md"
@@ -126,6 +142,7 @@ transcript of this segment:
 </clip>
 
 {('REVIEWERS ALREADY REJECTED CLIPS FROM THIS CAMPAIGN: ' + str((campaign.get('data') or {}).get('rejections', [])[-5:]) + ' - fail this clip if it repeats anything that could explain those rejections.') if (campaign.get('data') or {}).get('rejections') else ''}
+{featured_rule(meta, ck)}
 The hook text and title must only state what the featured client actually says in this clip: FAIL them if they
 present an interviewer's question or another person's line as the client's claim. The caption must follow the
 reference materials' required format and call to action exactly (e.g. END with the booking CTA and tag if asked).

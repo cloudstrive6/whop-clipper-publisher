@@ -110,3 +110,35 @@ def gather(campaign_id: str, brief_text: str) -> tuple[str, list[str]]:
     (campaign_dir(campaign_id) / "references.md").write_text(
         combined + "\n\n### Media links\n" + "\n".join(media), encoding="utf-8")
     return combined, media
+
+
+def featured_face(campaign: dict):
+    """Face fingerprint of the person a creator campaign is about, from their own YouTube channel's picture
+    (the campaign's source channel). Cached in the campaign folder; None if there's no channel or no face."""
+    from pathlib import Path
+
+    from . import render
+
+    folder = campaign_dir(campaign["id"])
+    photo, none = folder / "featured_face.jpg", folder / "featured_face.none"
+    folder.mkdir(parents=True, exist_ok=True)
+    if not photo.exists() and not none.exists():
+        channels = [u for u in (campaign.get("checklist") or {}).get("source_assets") or []
+                    if re.search(r"youtube\.com/(@|channel/|c/|user/)", u)]
+        try:
+            req = urllib.request.Request(channels[0], headers={"User-Agent": "Mozilla/5.0",
+                                                               "Accept-Language": "en-US,en"})
+            page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+            img = re.search(r'<meta property="og:image" content="([^"]+)"', page).group(1)
+            img = re.sub(r"=s\d+-", "=s800-", img)  # the biggest size YouTube serves
+            photo.write_bytes(urllib.request.urlopen(urllib.request.Request(img, headers={"User-Agent": "Mozilla/5.0"}),
+                                                     timeout=30).read())
+        except Exception:
+            none.write_text("no channel picture", encoding="utf-8")
+            return None
+    if none.exists():
+        return None
+    emb = render.face_embedding(Path(photo))
+    if emb is None:
+        none.write_text("the channel picture has no face (a logo?)", encoding="utf-8")
+    return emb

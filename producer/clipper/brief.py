@@ -6,6 +6,12 @@ from . import db, llm
 
 class Checklist(BaseModel):
     summary: str = Field(description="One paragraph: what the brand wants and why")
+    featured_person: str | None = Field(
+        default=None,
+        description="The person whose own content this campaign pays to clip (a creator, podcaster, coach, "
+                    "streamer, artist), full name as the brief writes it, e.g. 'Michael Sartain'. Every clip must be "
+                    "about them: them talking, not a guest or another creator's video they react to. None for "
+                    "brand, product, game, app and music campaigns that aren't about one person.")
     content_requirements_verbatim: list[str] = Field(
         description="Every bullet under the campaign panel's 'Content requirements' heading, copied word for word. "
                     "Empty list only if that section truly is not present.")
@@ -85,3 +91,21 @@ def analyze(campaign_id: str, brief_text: str) -> Checklist:
     result = llm.ask(prompt, Checklist, SYSTEM)
     db.upsert("campaigns", {"id": campaign_id, "checklist": result.model_dump()})  # status (joined etc.) untouched
     return result
+
+
+class _Featured(BaseModel):
+    featured_person: str | None = Field(description=Checklist.model_fields["featured_person"].description)
+
+
+def featured_person(campaign: dict) -> str | None:
+    """The person a campaign's clips must be about. Read from the checklist; older checklists get it filled in
+    once from the brief (the full analysis isn't redone)."""
+    ck = campaign.get("checklist") or {}
+    if "featured_person" in ck:
+        return ck["featured_person"]
+    text = ((campaign.get("data") or {}).get("brief_text") or "")[:6000]
+    who = llm.ask(f"Campaign: {campaign.get('title')}\n\nSummary: {ck.get('summary')}\n\n<campaign_panel>\n{text}\n"
+                  "</campaign_panel>\n\nSource assets: " + ", ".join(ck.get("source_assets") or []),
+                  _Featured).featured_person
+    db.upsert("campaigns", {"id": campaign["id"], "checklist": {**ck, "featured_person": who}})
+    return who
