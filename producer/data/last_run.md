@@ -1,7 +1,8 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 19 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
+- coinbase-x-valorant-clipping: Approved Dropbox folder is the only permitted footage source and access is gated behind a Notion login — an unattended pipeline cannot fetch it; Warm Up Doc process must be completed manually for any 
 - alpha-futures-clipping-campaign: Page name must include "Alpha Futures" — requires a brand-named account the roster does not have (new account creation or rename); The official Alpha Futures logo PNG must be fetched from the campaign
 - 2-cpm-new-clipping-niche-payments: Bio edit: the posting account's bio must contain www.eflow.com; Brand approval of each clip is required before publishing
 - camp-duval: Brand approval required before publishing each clip
@@ -86,6 +87,11 @@
 - france-stranger-than-heaven-show-business-mode: Minimum 50% France audience required on the page or the post — no roster account can satisfy this, so a compliant post cannot be made truthfully; footage/audience is french; the accounts' audiences ar
 - the-wldlfe-ruby-8259: Official "Ruby" TikTok sound must be attached to the post, which requires the TikTok app; Source footage must be hand-sourced from specific films/TV shows; no downloadable asset folder is provided; Po
 - bible-captions-1-per-1k-views: Requires original Christian content featuring the creator's own personality and prayers — needs a human's face/voice and cannot be assembled from existing footage; No source footage or asset library i
+- hardscope-trailers-x-clipfarm: Trailer footage is only available via a WeTransfer transfer link (we.tl/t-kfBB3yKRyOqbHBee), which requires a manual browser download and expires — an unattended pipeline cannot fetch the source asset
+- lyrah-last-call-romantic-movie-edits-world: Official 'Last Call' TikTok sound must be attached in-app; any other audio version is rejected immediately; Source movie footage is not provided — commercial film clips must be sourced manually; no li
+- matchbox-twenty-30th-anniversary-clips-8298: Each clip must display the accurate song, location and year of the source footage, and "30 years ago this week" may only be used on footage genuinely from 30 years ago — a human must verify this metad
+- omc-uae-business-tax-clipping-1-00-cpm: Get approval before publishing — OMC must sign off on each clip before it goes live; Source footage must be downloaded from a permission-gated SharePoint/OneDrive folder; Approved source video subfold
+- matchday-fc-uk-clipping-14-days: Brand approval of each clip is required before publishing ('Get approval before publishing')
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -113,6 +119,6 @@
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
-- bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
+- bbno-minecraft-concert-clips: no footage could be downloaded
 - avgusta-clips: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
