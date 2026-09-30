@@ -1,4 +1,4 @@
-**Scouted** 19 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -92,6 +92,16 @@
 - matchbox-twenty-30th-anniversary-clips-8298: Each clip must display the accurate song, location and year of the source footage, and "30 years ago this week" may only be used on footage genuinely from 30 years ago — a human must verify this metad
 - omc-uae-business-tax-clipping-1-00-cpm: Get approval before publishing — OMC must sign off on each clip before it goes live; Source footage must be downloaded from a permission-gated SharePoint/OneDrive folder; Approved source video subfold
 - matchday-fc-uk-clipping-14-days: Brand approval of each clip is required before publishing ('Get approval before publishing')
+- please-like-me-tv-show-clipping: Approved assets folder is behind a 'HERE' link inside the Google Doc with no direct URL in the brief; a human must open it and retrieve the footage before any clip can be produced (using any other sou
+- armin-van-buuren-take-me-home-sped-up-version: Must attach the official platform audio (in-app TikTok/Instagram sound) with a manually selected start point; Official audio cuts must be downloaded from the ClipCash brief page; Posts must be origina
+- the-seer-clips: Content requirement 'Get approval before publishing' — a human must get brand sign-off on each clip before it can go live
+- kelsey-cook-netflix-special-clipping: The required per-folder caption text is only in the linked Google Doc, which is inaccessible (HTTP 404), so a compliant caption cannot be produced; No roster Instagram account is a comedy/relatable/gi
+- campaign-p-1: The campaign brief, guidelines, assets and private community channels are access-gated behind approval plus acceptance of the Creator Confidentiality Terms — a human must retrieve them before any comp
+- parkerryt: Parkerr Twitch stamp/branding asset is only available 'attached in email' — a human must retrieve the file before any compliant clip can be rendered, since every clip must include the stamp
+- clip-for-uk-rapper-ghostbalaa-s-hit-single-g19: Official TikTok sound must be attached in the TikTok app ("CONVO by Ghostbalaa") - cannot be done by an unattended pipeline; No source footage supplied (Section 6: "N/A follow section 5") - original U
+- logan-ideker-campaign: Requires a brand-new dedicated Logan Ideker fan account per platform with a mandated username style, one of three exact display names, and a cut-out photo of Logan's face as the profile picture — the 
+- make-new-york-nights-meme-edits: Meme-edit craft is mandatory and human-only: sound-synced edits require attaching a trending TikTok or ad sound inside the native app editor, and the brief explicitly rejects a plain interview cut wit
+- 3-850-architects-machine-sound-campaign: The official 'Machine' sound must be attached in-app on TikTok/Instagram and trimmed to start at 0:43; uploading the video with the song already attached is explicitly banned; Content bank and transla
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -102,7 +112,7 @@
 - YouTube Shorts (@PogingPanda): 3
 - YouTube Shorts (@ericknox2802): 6
 - YouTube Shorts (@modernmanifestationsecrets): 6
-- Instagram Reels (@kiwinoygamer): 1.5
+- Instagram Reels (@kiwinoygamer): 3.5
 - Instagram Reels (@iamcryptohustler): 2.5
 - Instagram Reels (@modernmanifestationsecrets): 4.5
 - TikTok draft (@iamcryptohustler): 6
@@ -119,6 +129,6 @@
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
-- bbno-minecraft-concert-clips: no footage could be downloaded
+- bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - avgusta-clips: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
