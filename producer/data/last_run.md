@@ -113,7 +113,7 @@
 - YouTube Shorts (@ericknox2802): 6
 - YouTube Shorts (@modernmanifestationsecrets): 6
 - Instagram Reels (@kiwinoygamer): 3.5
-- Instagram Reels (@iamcryptohustler): 2.5
+- Instagram Reels (@iamcryptohustler): 3.5
 - Instagram Reels (@modernmanifestationsecrets): 4.5
 - TikTok draft (@iamcryptohustler): 6
 - TikTok draft (@mnfsttnsecrets): 6
@@ -126,9 +126,11 @@
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
+- frida-x-mark-rober-human-car-wash-kids-care-clip: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
 - bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - avgusta-clips: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
+- outside-10-000-clipping-campaign: no footage could be downloaded
