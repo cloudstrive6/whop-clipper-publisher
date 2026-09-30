@@ -79,6 +79,13 @@
 - denial-supersawrus: Must attach the official in-app TikTok/Instagram sound to each post; Requires an existing movie/TV, aesthetic, rave, car or nature themed page with a Tier 1 audience majority; new pages made for this 
 - treety-bad-vibes: Official 'Bad Vibes by Treety' TikTok sound must be attached in-app from the TikTok music page; Footage must be self-sourced and originally edited; no clippable source library is provided by the campa
 - higgsfield-20vc-clipping: Higgsfield watermark and source footage must be downloaded through a WeTransfer link gated behind a 'I agree to Terms of Service' acceptance wall; Higgsfield watermark must be manually sourced and ove
+- clip-for-j2trading: Bio edit required: the posting Instagram or TikTok account must have the link @j2trading_ in its bio; No source footage URLs provided; a human must find and pull J2Trading's YouTube/Kick stream VODs
+- influence-ai-clipping-5k-budget-0-50-cpm: Brand-new TikTok account dedicated exclusively to Influence AI, with a prescribed username theme — not on the roster; Bio must be edited to the two prescribed lines on that account; Profile picture mu
+- dhan-aziz-new-music-clips: Every clip must be approved by the campaign owner before publishing; Source footage is behind a Dropbox login / 'Join folder' wall and cannot be downloaded unattended; no linked account in its niche/p
+- germany-stranger-than-heaven-show-business-mode: Official logo PNG must be downloaded from Google Drive and composited onto every clip; On-screen text must be authored in German and be factually tied to what appears in the specific clip; Posting acc
+- france-stranger-than-heaven-show-business-mode: Minimum 50% France audience required on the page or the post — no roster account can satisfy this, so a compliant post cannot be made truthfully; footage/audience is french; the accounts' audiences ar
+- the-wldlfe-ruby-8259: Official "Ruby" TikTok sound must be attached to the post, which requires the TikTok app; Source footage must be hand-sourced from specific films/TV shows; no downloadable asset folder is provided; Po
+- bible-captions-1-per-1k-views: Requires original Christian content featuring the creator's own personality and prayers — needs a human's face/voice and cannot be assembled from existing footage; No source footage or asset library i
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -87,20 +94,25 @@
 
 ### Slots still empty (clips short per account)
 - YouTube Shorts (@PogingPanda): 3
-- YouTube Shorts (@ericknox2802): 4
-- Instagram Reels (@iamcryptohustler): 0.5
-- TikTok draft (@iamcryptohustler): 5
+- YouTube Shorts (@ericknox2802): 6
+- YouTube Shorts (@modernmanifestationsecrets): 6
+- Instagram Reels (@kiwinoygamer): 1.5
+- Instagram Reels (@iamcryptohustler): 2.5
+- Instagram Reels (@modernmanifestationsecrets): 4.5
+- TikTok draft (@iamcryptohustler): 6
+- TikTok draft (@mnfsttnsecrets): 6
 - YouTube Shorts (@destinedforgreatness777): 6
 - Instagram Reels (@destinedforgreatness777): 4.5
 - TikTok (@iamdestinedforgreatness): 6
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- scout featured: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- scout faith christian bible church: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- scout motivational speaker: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- submissions report: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
+- josh-fear-campaign: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
+- bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
+- avgusta-clips: no footage could be downloaded
+- organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
