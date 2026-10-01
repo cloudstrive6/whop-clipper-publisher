@@ -1,4 +1,4 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 15 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -6,7 +6,6 @@
 - alpha-futures-clipping-campaign: Page name must include "Alpha Futures" — requires a brand-named account the roster does not have (new account creation or rename); The official Alpha Futures logo PNG must be fetched from the campaign
 - 2-cpm-new-clipping-niche-payments: Bio edit: the posting account's bio must contain www.eflow.com; Brand approval of each clip is required before publishing
 - camp-duval: Brand approval required before publishing each clip
-- bobby-chandler-oceans-com: Bio edit: an Oceans.com link must be added to the posting account's bio; Source footage sits behind a Dropbox link that is not exposed in the brief text, so a human must open the Google Doc and fetch/
 - moonpay-xgames-winter-draft: MoonPay watermark download is behind a WeTransfer Terms-of-Service gate; Official footage URLs are hyperlinks inside a Google Doc and must be opened manually to obtain; Instagram likes must be confirm
 - funko-pop-250: WeTransfer asset pack requires agreeing to Terms of Service before download (terms-gated); Primary footage is an eBay Live VOD with no direct URL supplied — a human must find and capture it; no linked
 - boxabl-official-clipping: For X posts only: a personal boxabl.com/affiliate tracking URL must be generated through a sign-up before posting, and the X accounts are not connected yet; no linked account in its niche/platforms
@@ -102,6 +101,16 @@
 - logan-ideker-campaign: Requires a brand-new dedicated Logan Ideker fan account per platform with a mandated username style, one of three exact display names, and a cut-out photo of Logan's face as the profile picture — the 
 - make-new-york-nights-meme-edits: Meme-edit craft is mandatory and human-only: sound-synced edits require attaching a trending TikTok or ad sound inside the native app editor, and the brief explicitly rejects a plain interview cut wit
 - 3-850-architects-machine-sound-campaign: The official 'Machine' sound must be attached in-app on TikTok/Instagram and trimmed to start at 0:43; uploading the video with the song already attached is explicitly banned; Content bank and transla
+- flyquest-ptl-clipping: Watermark file must be downloaded from a link the brief does not supply ('DOWNLOAD LINK'), so it cannot be fetched automatically; The 'official folder' of approved footage is referenced but has no URL
+- 10-000-pump-fun-clipping-campaign: Approved-creator list is a view-only Google Sheet that rendered with no creator names — a human must open it to learn which creators/streams may be clipped at all; Official Pumpfun watermark must be f
+- coinbase-x-valorant: Approved Dropbox folder is the only permitted footage source and no link/access is provided; the rules page itself is gated behind a Notion login; Every post must be geo-tagged to a city or region, wh
+- motor-mouths-episode-1: Content requirement 'Get approval before publishing' - brand must approve each clip before it goes live
+- spawn-make-multiplayer-games: No source assets to clip: the creator must personally sign in to spawn.co, make or play a game for ten minutes and screen-record it, which an unattended pipeline cannot do; Login-gated product — Spawn
+- austin-georgas-2-500-clipping-campaign: no linked account in its niche/platforms
+- ipx-exchange-clipping: No source footage provided — 'Assets Required' section of the brief is empty and no media links exist, so no compliant clip can be produced; Required 'Warm Up Guide', 'Approval Process' and 'HOW TO TA
+- clip-for-abby-ai-app: Brand-new dedicated persona TikTok account (real-person photo, relationship-advice username) that the roster does not have, and which cannot double as any existing niche account; 3-day manual account 
+- milkxp-ep-2-clipping: Official footage download is behind a WeTransfer Terms-of-Service 'I agree' gate (https://we.tl/t-eq7KFNtVoC9r3fP5), and only footage from the official links may be used; Required Milk watermark asset
+- matchday-fc-clipping-france-14-jours: Get approval before publishing - each clip must be reviewed and approved by the brand before it can go live; footage/audience is french; the accounts' audiences are English
 - coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
@@ -112,8 +121,8 @@
 - YouTube Shorts (@PogingPanda): 3
 - YouTube Shorts (@ericknox2802): 6
 - YouTube Shorts (@modernmanifestationsecrets): 6
-- Instagram Reels (@kiwinoygamer): 3.5
-- Instagram Reels (@iamcryptohustler): 3.5
+- Instagram Reels (@kiwinoygamer): 4.5
+- Instagram Reels (@iamcryptohustler): 4.5
 - Instagram Reels (@modernmanifestationsecrets): 4.5
 - TikTok draft (@iamcryptohustler): 6
 - TikTok draft (@mnfsttnsecrets): 6
