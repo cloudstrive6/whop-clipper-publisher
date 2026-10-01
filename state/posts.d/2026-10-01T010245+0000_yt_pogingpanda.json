@@ -2,9 +2,9 @@
   "clip_id": "whoisdeuel-stream-clips-cooking-blindfolded--94",
   "target_id": "yt_pogingpanda",
   "campaign_id": "whoisdeuel-stream-clips",
-  "status": "posting",
+  "status": "failed",
   "url": "",
-  "note": "",
-  "at": "2026-10-01T01:02:45+00:00",
+  "note": "RefreshError: ('invalid_grant: Token has been expired or revoked.', {'error': 'invalid_grant', 'error_description': 'Token has been expired or revoked.'})",
+  "at": "2026-10-01T01:02:46+00:00",
   "submitted": false
 }
