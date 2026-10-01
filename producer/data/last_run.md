@@ -1,4 +1,4 @@
-**Scouted** 15 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -111,7 +111,19 @@
 - clip-for-abby-ai-app: Brand-new dedicated persona TikTok account (real-person photo, relationship-advice username) that the roster does not have, and which cannot double as any existing niche account; 3-day manual account 
 - milkxp-ep-2-clipping: Official footage download is behind a WeTransfer Terms-of-Service 'I agree' gate (https://we.tl/t-eq7KFNtVoC9r3fP5), and only footage from the official links may be used; Required Milk watermark asset
 - matchday-fc-clipping-france-14-jours: Get approval before publishing - each clip must be reviewed and approved by the brand before it can go live; footage/audience is french; the accounts' audiences are English
-- coco-jones-clipping: Campaign footage download is gated behind agreeing to WeTransfer's Terms of Service, and the brief forbids any source other than that link
+- double-d-show-clipping: Brand-new / niche-dedicated Latvian Double D Show account required on TikTok and Instagram; the roster has no eligible account; Bio must be edited to add https://linkly.link/2uVQ7; Mandatory in-app an
+- sean-ok-my-girl-music-campaign-1-cpm: Official TikTok sound must be attached in-app - cannot be done by an unattended pipeline; Requires a dedicated or Love/Quotes/Series/Edits/Music niche TikTok page that the roster does not have; Requir
+- jomm-melatonin-anime-edits: Must attach the official in-app TikTok sound 'Melatonin' at post time, which an automated uploader cannot do; Likes and comments must be left on at all times (manual post setting check); no linked acc
+- deniz-inan-high-energy-clipping: Source footage is not linked: the promised Drive folder and Deniz's YouTube account must be obtained manually from the brand before any clip can be made; footage/audience is german; the accounts' audi
+- empire-of-the-sun-tour-clipping: Footage is restricted to an approved Dropbox folder whose link is not present in the brief — a human must obtain and open the share to download the tour and Ally Pally multicam files; Each post must h
+- forest-slater-freaks-clipping-campaign: Official in-app audio must be attached on TikTok/Instagram (TikTok music page or IG Reels audio page) — cannot be done by an automated poster; No source footage is provided: camping/nature, gym/workou
+- easy-post-lyric-audio-videos: Requires attaching the in-app TikTok sound 'original sound - voidslsx by 🌀', which can only be selected inside the TikTok app; no linked account in its niche/platforms; footage/audience is spanish; th
+- popdarts-clipping-campaign-west-coast-wildcard: Approved footage folder '3. 2026 West Coast Wildcard (7-11-26)' has no link in the brief - access must be requested from ClipHouse before any compliant clip can be made; Posting account must have 50%+
+- magic-sort-1-cpm: Gameplay source footage is in a login-gated Dropbox folder and must be downloaded manually; Trending music must be added directly within the platform when publishing, which requires manual use of the 
+- clip-for-r-seaux-by-abena-mk-and-chily: Must attach the official "Réseaux by A B É 🫦" in-app TikTok sound to every post; No source assets provided — compliant dance footage must be sourced or filmed manually, and unapproved footage is groun
+- bassem-youssef-clipping: Affiliate ticket link must be added to the posting account's bio before posting (manual bio edit); Source footage sits in a Google Drive folder that requires Google sign-in to download; 90%+ US viewer
+- aron-orlando-go-fly-1-50-music-clipping: TikTok posts must use the in-app sound crediting 'original sound - aronorlando by Aron Orlando' — attaching a specific in-app sound cannot be done by an unattended uploader; Instagram posts must carry
+- tiger-lewis-2-per-1k-views: no linked account in its niche/platforms
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
@@ -135,11 +147,11 @@
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
-- frida-x-mark-rober-human-car-wash-kids-care-clip: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
 - bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - avgusta-clips: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
+- preme-clipping: no footage could be downloaded
 - outside-10-000-clipping-campaign: no footage could be downloaded
