@@ -124,6 +124,9 @@
 - bassem-youssef-clipping: Affiliate ticket link must be added to the posting account's bio before posting (manual bio edit); Source footage sits in a Google Drive folder that requires Google sign-in to download; 90%+ US viewer
 - aron-orlando-go-fly-1-50-music-clipping: TikTok posts must use the in-app sound crediting 'original sound - aronorlando by Aron Orlando' — attaching a specific in-app sound cannot be done by an unattended uploader; Instagram posts must carry
 - tiger-lewis-2-per-1k-views: no linked account in its niche/platforms
+- worlds-collide-tour-worlds-collide-8204: no linked account in its niche/platforms
+- hoodrich-clipping-1-00-cpm: Drafts require pre-approval from the brand before each clip can be posted; Add link in bio (https://www.instagram.com/hoodrichcredit/) - manual bio edit on the posting account; Provided Kick frame wat
+- bios-3v3-clipping-campaign: No source footage or reference materials provided — the clipper must personally play the BIOS 3v3 map and record original gameplay, which an automated pipeline cannot produce; 'Only upload original or
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
@@ -145,6 +148,7 @@
 
 ### Errors
 - apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- ben-affleck-podcast-clipping: no footage could be downloaded
 - stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
@@ -154,4 +158,5 @@
 - avgusta-clips: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - preme-clipping: no footage could be downloaded
+- preme-x-deen-x-ab-livestream: no footage could be downloaded
 - outside-10-000-clipping-campaign: no footage could be downloaded
