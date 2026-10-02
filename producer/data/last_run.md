@@ -1,4 +1,8 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 16 · **analyzed** 0 · **joined** 2 · **clips made** 0 · **auto-approved** 0 · **held** 0
+
+### Joined
+- tjr-23-100-weekly-clipping-campaign
+- hardscope-x-clipfarm
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -6,6 +10,7 @@
 - alpha-futures-clipping-campaign: Page name must include "Alpha Futures" — requires a brand-named account the roster does not have (new account creation or rename); The official Alpha Futures logo PNG must be fetched from the campaign
 - 2-cpm-new-clipping-niche-payments: Bio edit: the posting account's bio must contain www.eflow.com; Brand approval of each clip is required before publishing
 - camp-duval: Brand approval required before publishing each clip
+- bobby-chandler-oceans-com: Bio edit: an Oceans.com link must be added to the posting account's bio; Source footage sits behind a Dropbox link that is not exposed in the brief text, so a human must open the Google Doc and fetch/
 - moonpay-xgames-winter-draft: MoonPay watermark download is behind a WeTransfer Terms-of-Service gate; Official footage URLs are hyperlinks inside a Google Doc and must be opened manually to obtain; Instagram likes must be confirm
 - funko-pop-250: WeTransfer asset pack requires agreeing to Terms of Service before download (terms-gated); Primary footage is an eBay Live VOD with no direct URL supplied — a human must find and capture it; no linked
 - boxabl-official-clipping: For X posts only: a personal boxabl.com/affiliate tracking URL must be generated through a sign-up before posting, and the X accounts are not connected yet; no linked account in its niche/platforms
@@ -16,7 +21,6 @@
 - graeme-holm-clipping: Dedicated page required: username must include "Graeme Holm" or "Money Mentor", profile picture must be a clear professional image of Graeme Holm — the roster has no such account; Theme page alternati
 - song-medusa-by-zak-azoury-anime-tv-edits: Attaching the official "Medusa" in-app TikTok sound to each post; No anime / TV / Kdrama TikTok account on the roster — the campaign requires an anime, TV/movie or Kdrama editor account, so a new dedi
 - diegoloveless-clipping: Source clips must be downloaded from Twitch's clips tab, which needs a logged-in Twitch session (no open asset folder provided); Clip link must be submitted to the campaign portal within 30 minutes of
-- steven-malcolm-holy-water-faith-edits-8305: The official "Holy Water" TikTok sound must be attached in-app as the only audio; re-uploads, sped-up or remixed versions are rejected, so a pre-rendered upload cannot satisfy this; Source footage sit
 - easy-post-mexican-tiktok-videos: Attaching the required in-app TikTok sound 'original sound - anqw48 by Anthony' must be done manually in the TikTok app; No downloadable source footage is provided - Mexican-themed footage must be sou
 - easy-mexican-tiktok-trends: Requires attaching an in-app TikTok sound ('original sound - eddyjae by EddyJae'), which must be selected manually in the TikTok app; No source asset folder — only a single login-gated TikTok referenc
 - easy-post-thirst-traps: Requires original footage of a real person on camera (thirst trap) — no source assets exist to clip from; Requires attaching the in-app TikTok sound "If I Part 2 - Bass Boosted by 03Greedo"; Requires 
@@ -127,6 +131,7 @@
 - worlds-collide-tour-worlds-collide-8204: no linked account in its niche/platforms
 - hoodrich-clipping-1-00-cpm: Drafts require pre-approval from the brand before each clip can be posted; Add link in bio (https://www.instagram.com/hoodrichcredit/) - manual bio edit on the posting account; Provided Kick frame wat
 - bios-3v3-clipping-campaign: No source footage or reference materials provided — the clipper must personally play the BIOS 3v3 map and record original gameplay, which an automated pipeline cannot produce; 'Only upload original or
+- clip-any-call-it-a-day-episode: no linked account in its niche/platforms
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
@@ -152,11 +157,12 @@
 - stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
+- tjr-23-100-weekly-clipping-campaign: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
 - whoisdeuel-stream-clips: no footage could be downloaded
 - bbno-minecraft-concert-clips: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - avgusta-clips: no footage could be downloaded
+- preme-x-deen-x-ab-livestream: no footage could be downloaded
 - organic-tarzan-clipping: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - preme-clipping: no footage could be downloaded
-- preme-x-deen-x-ab-livestream: no footage could be downloaded
 - outside-10-000-clipping-campaign: no footage could be downloaded
