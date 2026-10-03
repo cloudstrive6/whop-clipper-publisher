@@ -3,10 +3,5 @@
     "since": "2026-09-29T22:08:39+00:00",
     "checked": "2026-09-29T22:08:39+00:00",
     "why": "campaign \"Michael Sartain's Clipping Army\" not found on Whop (ended or renamed)"
-  },
-  "whoisdeuel-stream-clips": {
-    "since": "2026-10-01T22:01:56+00:00",
-    "checked": "2026-10-02T22:01:55+00:00",
-    "why": "TimeoutError: Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"input[placeholder*='campaigns' i]\").first\n"
   }
 }
