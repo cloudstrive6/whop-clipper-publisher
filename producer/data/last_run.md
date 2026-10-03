@@ -1,8 +1,4 @@
-**Scouted** 16 · **analyzed** 0 · **joined** 2 · **clips made** 0 · **auto-approved** 0 · **held** 0
-
-### Joined
-- tjr-23-100-weekly-clipping-campaign
-- hardscope-x-clipfarm
+**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -138,7 +134,7 @@
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
 
 ### Slots still empty (clips short per account)
-- YouTube Shorts (@PogingPanda): 3
+- YouTube Shorts (@PogingPanda): 6
 - YouTube Shorts (@ericknox2802): 6
 - YouTube Shorts (@modernmanifestationsecrets): 6
 - Instagram Reels (@kiwinoygamer): 4.5
@@ -152,7 +148,13 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
+- scout featured: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- scout faith christian bible church: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- scout prayer inspirational: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- paperwork check: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- submissions report: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- analyze bios-3v3-buildfigh-campaign-map-7242-6817-1945: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- apply dumbmoneyhunter-s-clipping: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - ben-affleck-podcast-clipping: no footage could be downloaded
 - stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
