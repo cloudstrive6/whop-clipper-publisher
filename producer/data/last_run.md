@@ -149,14 +149,13 @@
 
 ### Errors
 - scout featured: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- scout faith christian bible church: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- scout prayer inspirational: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- scout gospel worship jesus: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- scout gaming streamer esports: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - paperwork check: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - submissions report: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - analyze bios-3v3-buildfigh-campaign-map-7242-6817-1945: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - apply dumbmoneyhunter-s-clipping: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
 - ben-affleck-podcast-clipping: no footage could be downloaded
-- stranger-than-heaven-clip-with-ado-tori-kelly: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - tjr-23-100-weekly-clipping-campaign: TypeError: open() got an unexpected keyword argument 'metadata_errors'
