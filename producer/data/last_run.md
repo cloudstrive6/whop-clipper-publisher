@@ -1,4 +1,4 @@
-**Scouted** 0 · **analyzed** 0 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 0 · **analyzed** 1 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -128,6 +128,10 @@
 - hoodrich-clipping-1-00-cpm: Drafts require pre-approval from the brand before each clip can be posted; Add link in bio (https://www.instagram.com/hoodrichcredit/) - manual bio edit on the posting account; Provided Kick frame wat
 - bios-3v3-clipping-campaign: No source footage or reference materials provided — the clipper must personally play the BIOS 3v3 map and record original gameplay, which an automated pipeline cannot produce; 'Only upload original or
 - clip-any-call-it-a-day-episode: no linked account in its niche/platforms
+- bios-3v3-buildfigh-campaign-map-7242-6817-1945: No source assets provided: original BIOS 3v3 Fortnite gameplay must be captured by a human playing map 7242-6817-1945, and the brief bans fake or non-original footage; Bio edit required: the posting a
+- persona-4-revival-shadow-trailer-clipping: Official footage must be downloaded from a SEGA-hosted SharePoint/OneDrive personal-drive folder that requires sign-in or share acceptance; no other source is permitted, so a human must fetch the asse
+- jacques-amoako-x-eat: Must create a debit card on the EAT Card / WYDE website before clipping — external signup an unattended pipeline cannot complete; Must add the Maison D'Élites affiliate link (https://whop.com/maison-d
+- fold: Must follow 4 accounts on both Instagram and TikTok (@cliphausinc, @peter.sint/@petersint, @jamesfettr/@jamespfetter) — manual action on each posting account; Approved Fold footage/assets are required
 - viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
@@ -148,15 +152,11 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- scout featured: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- scout gospel worship jesus: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- scout gaming streamer esports: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- paperwork check: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- submissions report: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- analyze bios-3v3-buildfigh-campaign-map-7242-6817-1945: claude -p error: Credit balance is too low  (fix login with: claude auth login)
-- apply dumbmoneyhunter-s-clipping: RuntimeError: claude -p error: Credit balance is too low  (fix login with: claude auth login)
+- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
 - ben-affleck-podcast-clipping: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
+- ava-clipping-army: no footage could be downloaded
 - reality-tv-clips-1-50-cpm-100-bonus: no footage could be downloaded
 - tjr-23-100-weekly-clipping-campaign: TypeError: open() got an unexpected keyword argument 'metadata_errors'
 - ryan-zofay-clipping-campaign-01: no footage could be downloaded
