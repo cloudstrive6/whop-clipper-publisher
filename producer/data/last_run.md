@@ -1,4 +1,4 @@
-**Scouted** 0 · **analyzed** 1 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
+**Scouted** 12 · **analyzed** 1 · **joined** 0 · **clips made** 0 · **auto-approved** 0 · **held** 0
 
 ### Campaigns that need a human
 - forgegui-clipping-roblox: Must use a fully Roblox-based account; roster has no Roblox-dedicated account and a new channel would have to be created; Required account bio edit: 'The Best AI Tool for Roblox Devs > forgegui.com'; 
@@ -24,7 +24,6 @@
 - tv-show-edits-for-country-song-don-t-stop-now: Must attach the official in-app sound on TikTok and Instagram Reels; Instagram official sound link is not provided in the brief (placeholder text), so a compliant Instagram post cannot be made until t
 - gnarls-barkley-pictures-multi-edit-type-camp: Must post original content from your own personal main account - dedicated and repost-only pages are explicitly banned, and the whole roster is niche-dedicated; Must attach the official in-app TikTok/
 - clip-megamcqueen-4-2k-budget: Bio edit required: posting account's bio link must point directly to twitch.tv/mcqueennlive at all times; Eligible account required: dedicated McQueen-only page or a themed streamer/gaming page with 5
-- brenduh-kick-stream-clipping: Brand-new dedicated Brenduh-named fan page required on TikTok, Instagram and YouTube - the roster has no such account; Profile photo must be set to one of her posts; Bio must be edited to include 'Fan
 - irubyana-twitch-clips: Brand approval of each clip is required before publishing; Brand logo overlay asset must be obtained manually; Twitch banner background asset must be obtained manually
 - date-night-podcast-clipping: Brand-new DNP-named dedicated account required on TikTok/IG/YouTube — roster has none; Account bio/description must be edited to add the required line and @thednp link; DNP watermark assets must be do
 - 1-1k-views-bios-zonewars-clipping: Original gameplay must be captured live in Fortnite on the current map version — an unattended clipping pipeline has no source footage to work from; Human must confirm the map is on its CURRENT versio
@@ -132,10 +131,18 @@
 - persona-4-revival-shadow-trailer-clipping: Official footage must be downloaded from a SEGA-hosted SharePoint/OneDrive personal-drive folder that requires sign-in or share acceptance; no other source is permitted, so a human must fetch the asse
 - jacques-amoako-x-eat: Must create a debit card on the EAT Card / WYDE website before clipping — external signup an unattended pipeline cannot complete; Must add the Maison D'Élites affiliate link (https://whop.com/maison-d
 - fold: Must follow 4 accounts on both Instagram and TikTok (@cliphausinc, @peter.sint/@petersint, @jamesfettr/@jamespfetter) — manual action on each posting account; Approved Fold footage/assets are required
-- viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
+- como-1907-the-lifestyle-ecosystem: Requires the creator's own voice/commentary or own footage ('your own footage, commentary or a meaningful original edit', 'presenting it in your own voice'); Requires genuine original research and an 
+- clipbel-x-abdel-ossiffar-clipping-espa-ol: Drafts require pre-approval before posting (panel content requirement); First 3 clips must be sent to Clipbel support on Whop and reviewed before they are uploaded; Mandatory brand-new dedicated accou
+- howieazy-twitch-clipping-viral: Bio edit: the posting account must add https://www.twitch.tv/howieazy to its bio; Binding rules are in a Google Drive doc that must be opened and read before compliant clips can be made; No source foo
+- forest-slater-remember-you-adventure-time-clip: Must attach the official in-app TikTok/Instagram 'Remember You' sound at post time — requires manual action in the app; 'No dedicated accounts' — clips must go out on an existing general account, and 
+- jamerica-viral-music-campaign: Must attach the official in-app TikTok sound / Instagram Reels audio — a sound of your own is explicitly forbidden; Audio must be trimmed in-app to start at 0:53 on the "Never can say goodbye" vocals 
+- scroll-the-bible-clipping-9k-budget-1-25-cpm: Requires brand-new accounts dedicated exclusively to Scroll The Bible on TikTok, Instagram, and YouTube — existing roster faith accounts (@destinedforgreatness777, @iamdestinedforgreatness, @mnfsttnse
+- viral-xshot-clipping: Create a brand-new dedicated account whose username contains a variation of "XSHOT" — the roster has no such account; Set the account profile picture to a screenshotted official XSHOT product image; E
+- jay-guapo-x-mypip-streamer-clips: Rule 3 bans all AI and any auto clipping tool (Opus Clip named explicitly); the stated pass condition is 'cut it yourself, from the real footage', which an unattended automated clipper cannot truthful
 - clips-do-digui: Bio edit: the posting account's bio must contain the link comunidadealpha.xyz
 - average-rob-clips: excluded in config (produce.exclude_campaigns)
 - lovable-clipping: Must post from a brand-new account or an AI/startup-themed account — no roster account qualifies, so a new account must be created; Must join the Lovable Clipping Discord (https://discord.gg/6sx98acFw
+- viral-my-mini-mixed-capsule-clipping: Brand-new dedicated account required with a "My Mini" variation in the username — the roster has no such account and no eligible toy/unboxing/kids theme page; Bio must be edited to tag @mymini_officia
 
 ### Slots still empty (clips short per account)
 - YouTube Shorts (@PogingPanda): 6
@@ -152,8 +159,7 @@
 - TikTok (@kiwinoygaming): 3
 
 ### Errors
-- paperwork check: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
-- apply dumbmoneyhunter-s-clipping: TimeoutError: Content Rewards iframe did not load (are you logged in? run: python -m clipper login)
+- apply dumbmoneyhunter-s-clipping: Whop didn't accept the application form (a required field may be missing)
 - ben-affleck-podcast-clipping: no footage could be downloaded
 - josh-fear-campaign: no footage could be downloaded
 - ava-clipping-army: no footage could be downloaded
